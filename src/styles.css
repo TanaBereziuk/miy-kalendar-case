@@ -1,0 +1,1697 @@
+/*
+ * Стиль: «UI · Тиждень — стиль Apple» з прототипу.
+ * Шрифт e-Ukraine © Fedoriv / Мінцифри України, ліцензія CC BY 4.0 (public/fonts/LICENSE-e-Ukraine.txt)
+ */
+@font-face { font-family: 'e-Ukraine'; src: url('/fonts/e-Ukraine-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'e-Ukraine'; src: url('/fonts/e-Ukraine-Medium.woff2') format('woff2'); font-weight: 500 600; font-display: swap; }
+@font-face { font-family: 'e-Ukraine'; src: url('/fonts/e-Ukraine-Bold.woff2') format('woff2'); font-weight: 700 900; font-display: swap; }
+@font-face { font-family: 'e-UkraineHead'; src: url('/fonts/e-UkraineHead-Bold.woff2') format('woff2'); font-weight: 700 900; font-display: swap; }
+
+:root {
+  --bg: #f5f5f7;
+  --card: #ffffff;
+  --ink: #1d1d1f;
+  --muted: #6e6e73;
+  --label2: #3a3a3c;
+  --sep: rgba(60, 60, 67, 0.18);
+  --sep-strong: rgba(60, 60, 67, 0.29);
+  --fill: rgba(118, 118, 128, 0.12);
+  --danger: #d70015;
+  --now: #d47e5e;
+  --today-col: rgba(0, 0, 0, 0.018);
+  --shadow-pill: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 18px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.06);
+  --hatch: repeating-linear-gradient(135deg, rgba(60, 60, 67, 0.12) 0, rgba(60, 60, 67, 0.12) 1px, transparent 1px, transparent 6px);
+  --gutter: 60px;
+  font-family: 'e-Ukraine', -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+input::placeholder, textarea::placeholder { color: var(--muted); }
+button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible {
+  outline: 3px solid rgba(0, 0, 0, 0.45);
+  outline-offset: 1px;
+}
+.head-font {
+  font-family: 'e-UkraineHead', 'e-Ukraine', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  margin: 0;
+}
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 28px 32px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* ---------- Верхня панель ---------- */
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 2px 4px 0; }
+.title-block { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin-right: auto; }
+.month-title { font-size: 38px; }
+.week-range { font-size: 15px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+.badge { font-size: 12px; font-weight: 600; color: var(--muted); padding: 3px 9px; border-radius: 999px; background: var(--fill); }
+
+.pill-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-pill);
+}
+.pill-btn {
+  height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pill-btn.icon { width: 34px; padding: 0; }
+.pill-btn:hover { background: var(--fill); }
+
+.btn {
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.btn.primary { background: var(--ink); color: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); padding-left: 14px; }
+.btn.primary:hover { background: #000; }
+.btn.tinted, .btn.secondary { background: var(--fill); color: var(--ink); }
+.btn.small { height: 28px; padding: 0 12px; font-size: 12px; }
+.btn.danger { background: var(--danger); color: #fff; }
+.btn.plain-danger { background: transparent; color: var(--danger); padding: 0 8px; font-weight: 500; }
+
+.notice {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: var(--fill);
+}
+
+.legend { display: flex; gap: 6px 18px; flex-wrap: wrap; font-size: 13px; font-weight: 500; padding: 0 4px; }
+.legend-item { display: inline-flex; align-items: center; gap: 8px; }
+.legend-tile, .chip-tile {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+/* ---------- Тиждень ---------- */
+.week {
+  background: var(--card);
+  border-radius: 24px;
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.week-row { display: grid; grid-template-columns: var(--gutter) repeat(7, minmax(0, 1fr)); }
+.week-head { border-bottom: 2px solid var(--ink); }
+.day-head { padding: 14px 10px 12px; min-width: 0; }
+.day-head .dow { font-size: 12px; font-weight: 600; }
+.num-line { display: flex; align-items: baseline; gap: 6px; margin-top: 2px; }
+.day-head .num {
+  font-family: 'e-UkraineHead', 'e-Ukraine', sans-serif;
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.today-badge { font-size: 10px; font-weight: 700; color: #fff; background: var(--ink); padding: 3px 8px; border-radius: 999px; }
+.day-head.today, .allday-cell.today, .group-cell.today, .day-col.today { background-color: var(--today-col); }
+
+.side-label { padding: 9px 8px 0 0; text-align: right; font-size: 11px; font-weight: 600; color: var(--label2); }
+.allday-row { border-bottom: 0.5px solid var(--sep-strong); }
+.allday-cell {
+  padding: 4px;
+  border-left: 0.5px solid var(--sep);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 40px;
+}
+.allday-add { flex: 1 1 auto; min-height: 24px; border: 0; background: transparent; border-radius: 6px; }
+.allday-add:hover { background: var(--fill); }
+.pill {
+  border: 0;
+  border-radius: 6px;
+  padding: 4px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.week-group { border-bottom: 0.5px solid var(--sep-strong); }
+.group-head > div { height: 26px; border-bottom: 0.5px solid var(--sep); }
+.hatch { background-image: var(--hatch); }
+.group-side { display: flex; align-items: center; justify-content: flex-end; padding-right: 4px; }
+.group-toggle {
+  height: 24px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.group-cell { display: flex; align-items: center; padding: 0 8px; border-left: 0.5px solid var(--sep); }
+.range-chip {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--bg);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.range-chip.muted { color: var(--muted); }
+
+.hour-labels { position: relative; }
+.hour-label {
+  position: relative;
+  top: -7px;
+  padding-right: 8px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.hour-label:first-child { top: 3px; }
+.day-col {
+  position: relative;
+  border-left: 0.5px solid var(--sep);
+  background-image: repeating-linear-gradient(to bottom, rgba(60, 60, 67, 0.12) 0, rgba(60, 60, 67, 0.12) 1px, transparent 1px, transparent 56px);
+  cursor: copy;
+}
+.event {
+  position: absolute;
+  border: 0;
+  border-radius: 10px;
+  padding: 4px 8px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+  z-index: 2;
+}
+.event:hover { filter: brightness(0.96); }
+.ev-title { font-size: 12px; font-weight: 600; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ev-time { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; line-height: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; min-width: 0; }
+.ev-time-t { opacity: 0.9; }
+.ev-title-inline { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.event.compact { justify-content: center; padding-top: 0; padding-bottom: 0; }
+.now-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--now); z-index: 3; pointer-events: none; }
+.now-line span {
+  position: absolute;
+  left: 4px;
+  top: -10px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #f6e3db;
+  color: #9a4a2c;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.night-side { padding: 10px 8px 10px 0; text-align: right; }
+.night-name { font-size: 12px; font-weight: 700; }
+.night-range { font-size: 11px; color: var(--muted); }
+.night-body {
+  grid-column: 2 / -1;
+  border-left: 0.5px solid var(--sep);
+  padding: 8px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+.muted-text { font-size: 12px; color: var(--muted); }
+
+/* ---------- Вікно події ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 20;
+}
+.dialog {
+  width: 100%;
+  max-width: 480px;
+  max-height: 100%;
+  overflow-y: auto;
+  background: var(--card);
+  border-radius: 24px;
+  padding: 22px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.04);
+  animation: sheetIn 0.18s ease-out;
+}
+@keyframes sheetIn { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .dialog { animation: none; } }
+.dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.dialog-head h2 { font-size: 26px; }
+.round-btn {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 15px;
+  background: var(--fill);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.field { display: flex; flex-direction: column; gap: 6px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.field > span, .field > legend { font-size: 13px; font-weight: 600; padding: 0 4px; }
+.field input, .field textarea {
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  padding: 0 14px;
+  background: var(--fill);
+  font-size: 16px;
+  min-width: 0;
+  width: 100%;
+}
+.field textarea { height: auto; padding: 11px 14px; resize: vertical; }
+.row { display: flex; gap: 12px; align-items: flex-end; }
+.row .check { height: 44px; }
+.grow { flex: 1 1 0; }
+.check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  height: 36px;
+  padding: 0 12px 0 6px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--fill);
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.chip .chip-tile { width: 24px; height: 24px; border-radius: 999px; }
+.chip.on { background: var(--ink); color: #fff; font-weight: 600; }
+.error { margin: 0; font-size: 13px; font-weight: 600; color: var(--danger); }
+.actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding-top: 4px; }
+.actions .btn.primary { padding-left: 22px; padding-right: 22px; }
+.spacer { flex: 1 1 auto; }
+
+/* ---------- Телефон: Сьогодні ---------- */
+@media (max-width: 760px) {
+  .app { padding: 14px 14px 100px; gap: 12px; }
+  .month-title { font-size: 30px; }
+  .week-range { font-size: 13px; }
+  .overlay { align-items: flex-end; padding: 0; }
+  .dialog { border-radius: 24px 24px 0 0; max-height: 92dvh; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+}
+.today-view { display: flex; flex-direction: column; gap: 14px; }
+.day-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  padding: 4px;
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow-pill);
+}
+.strip-day {
+  border: 0;
+  background: transparent;
+  border-radius: 14px;
+  padding: 7px 0 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.strip-day .dow { font-size: 11px; font-weight: 500; color: var(--muted); }
+.strip-day .num { font-family: 'e-UkraineHead', 'e-Ukraine', sans-serif; font-size: 19px; font-weight: 900; letter-spacing: -0.03em; }
+.strip-day.is-today:not(.on) .num { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.strip-day.on { background: var(--ink); }
+.strip-day.on .dow, .strip-day.on .num { color: #fff; }
+.mark { width: 5px; height: 5px; border-radius: 3px; }
+.mark.has { background: var(--muted); }
+.strip-day.on .mark.has { background: #fff; }
+
+.today-title { display: flex; align-items: baseline; gap: 10px; padding: 6px 4px 0; flex-wrap: wrap; }
+.today-title h1 { font-size: 34px; }
+.today-date { font-size: 15px; font-weight: 500; color: var(--muted); }
+
+.group-card { display: flex; flex-direction: column; gap: 8px; }
+.group-card-title { margin: 0 4px; font-size: 15px; font-weight: 700; display: flex; align-items: baseline; gap: 8px; }
+.group-card-range { font-size: 12px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+.list {
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  background: var(--card);
+  overflow: hidden;
+  box-shadow: var(--shadow-pill);
+}
+.row-item {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  text-align: left;
+  min-height: 60px;
+  position: relative;
+}
+.row-item + .row-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 58px;
+  right: 0;
+  height: 0.5px;
+  background: var(--sep-strong);
+}
+.row-tile { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex: none; }
+.row-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.row-title { font-size: 15px; font-weight: 600; }
+.row-sub { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.empty-add {
+  width: 100%;
+  height: 52px;
+  border: 1.5px dashed rgba(60, 60, 67, 0.28);
+  border-radius: 16px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  height: 52px;
+  padding: 0 22px 0 18px;
+  font-size: 15px;
+  z-index: 10;
+}
+
+/* ---------- Вхід ---------- */
+.splash { min-height: 100dvh; background: var(--bg); }
+.login {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px 48px;
+  background: var(--bg);
+}
+.login-frame {
+  width: 100%;
+  max-width: 440px;
+  padding: 8px;
+  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  border-radius: 34px;
+  background: rgba(60, 60, 67, 0.09);
+}
+.login-card {
+  padding: 28px;
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 27px;
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.login-title { font-size: 42px; line-height: 1.02; }
+.login-sub { margin: 14px 0 0; font-size: 15px; line-height: 1.3; color: var(--muted); }
+.benefits {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--sep);
+}
+.benefits li { display: flex; align-items: center; gap: 14px; padding: 13px 16px; background: var(--bg); font-size: 13px; line-height: 1.3; }
+.benefits svg { flex: none; }
+.login-btn {
+  height: 54px;
+  padding: 0 20px 0 22px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+.login-btn:disabled { opacity: 0.7; cursor: progress; }
+.login-btn-main { display: flex; align-items: center; gap: 10px; }
+.login-foot { margin: -8px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
+.closed-box { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 14px; background: var(--bg); font-size: 13px; line-height: 1.3; }
+.closed-box strong { font-size: 15px; }
+
+.mini-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-radius: 14px; }
+.mini-col { display: flex; flex-direction: column; }
+.mini-dow { padding: 0 0 6px 4px; font-size: 10px; font-weight: 600; color: var(--muted); }
+.mini-body { position: relative; height: 108px; border-left: 1px solid rgba(60, 60, 67, 0.12); border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.mini-ev { position: absolute; left: 3px; right: 3px; height: 20px; border-radius: 6px; }
+
+/* ---------- Акаунт і стан синхронізації ---------- */
+.account { position: relative; }
+.account summary { list-style: none; }
+.account summary::-webkit-details-marker { display: none; }
+.account-btn { background: var(--card); box-shadow: var(--shadow-pill); border: 0.5px solid rgba(0, 0, 0, 0.08); width: 40px; height: 40px; cursor: pointer; }
+.account-menu {
+  position: absolute;
+  right: 0;
+  top: 48px;
+  z-index: 15;
+  min-width: 220px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.account-email { font-size: 13px; color: var(--muted); word-break: break-all; }
+.notice.warn { background: #fbe9e4; color: #8a2e17; }
+.link-btn { border: 0; background: none; padding: 0; font-weight: 600; text-decoration: underline; color: inherit; }
+
+/* ---------- «без дня» ---------- */
+.pending-row { border-bottom: 0.5px solid var(--sep-strong); }
+.pending-body {
+  grid-column: 2 / -1;
+  border-left: 0.5px solid var(--sep);
+  padding: 6px 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.pending-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 3px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1.5px dashed #8e7cc4;
+  font-size: 12px;
+  font-weight: 600;
+}
+.pending-tile { width: 20px; height: 20px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; }
+.pending-count { font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+.field select {
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  padding: 0 12px;
+  background: var(--fill);
+  font-size: 16px;
+  width: 100%;
+}
+.hint { margin: 0; font-size: 13px; line-height: 1.3; color: var(--muted); }
+.hint.small { font-size: 12px; }
+
+/* ---------- Онбординг ---------- */
+.onb {
+  min-height: 100dvh;
+  background: var(--bg);
+  padding: 28px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.onb-top { width: 100%; max-width: 560px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
+.onb-brand { font-size: 22px; }
+.onb-card {
+  width: 100%;
+  max-width: 560px;
+  padding: 28px;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+@media (max-width: 520px) {
+  .onb { padding: 16px 10px 32px; }
+  .onb-card { padding: 20px 16px; border-radius: 20px; }
+}
+.step { display: flex; flex-direction: column; gap: 24px; }
+.step-head h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.18; }
+.step-title-row { display: flex; align-items: center; gap: 10px; }
+.step-sub { margin: 10px 0 0; font-size: 14px; line-height: 1.3; color: var(--muted); }
+.mod-tile { display: inline-flex; align-items: center; justify-content: center; flex: none; color: var(--ink); }
+
+.mod-stepper { display: flex; flex-direction: column; gap: 12px; }
+.mod-stepper-top { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); }
+.mod-stepper-top span:first-child { font-weight: 600; }
+.mod-stepper-top .num { font-variant-numeric: tabular-nums; }
+.mod-stepper-bars { display: flex; gap: 6px; }
+.bar-item { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.bar { display: block; height: 4px; border-radius: 2px; background: var(--sep); }
+.bar.done { background: var(--ink); }
+.bar-label { font-size: 12px; font-weight: 500; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-item.cur .bar-label { font-weight: 700; color: var(--ink); }
+
+.grouped { display: flex; flex-direction: column; gap: 0.5px; border-radius: 14px; overflow: hidden; background: var(--sep); }
+.grouped.bordered { gap: 1px; border: 1px solid #c7c7cc; background: #c7c7cc; }
+.grouped-row { display: flex; align-items: center; gap: 14px; min-height: 52px; padding: 8px 16px; background: var(--bg); font-size: 16px; flex-wrap: wrap; }
+.grouped-row.tall { min-height: 72px; padding: 10px 16px; flex-wrap: nowrap; }
+.row-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.row-name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.row-name.small { font-weight: 600; }
+.row-desc { font-size: 12px; line-height: 1.25; color: var(--muted); margin: 0; }
+.grow { flex: 1 1 auto; min-width: 0; }
+
+.ios-switch {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(120, 120, 128, 0.32);
+  transition: background 0.2s;
+}
+.ios-switch span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.2s;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 1px rgba(0, 0, 0, 0.16);
+}
+.ios-switch.on { background: var(--ink); }
+.ios-switch.on span { left: 22px; }
+
+.seg { display: flex; padding: 2px; border-radius: 10px; background: var(--fill); max-width: 100%; }
+.seg button {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.seg.fill button { flex: 1 1 0; min-width: 0; }
+.seg button.on { background: #fff; font-weight: 600; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04); border: 0.5px solid rgba(0, 0, 0, 0.04); }
+
+.step-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding-top: 4px; }
+.nav-back {
+  height: 48px;
+  padding: 0 22px 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fill);
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.nav-skip { height: 48px; padding: 0 14px; border: 0; background: transparent; color: var(--muted); font-size: 16px; font-weight: 500; }
+.nav-next {
+  height: 48px;
+  padding: 0 26px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+.nav-next:disabled { opacity: 0.7; cursor: progress; }
+@media (max-width: 520px) {
+  .step-nav .spacer { display: none; }
+  .nav-next { flex: 1 1 100%; justify-content: center; order: -1; }
+}
+
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.stack.small-gap { gap: 10px; }
+.sub-title { margin: 0; font-size: 17px; font-weight: 700; }
+.sub-title.small { font-size: 14px; }
+.label-muted { font-size: 13px; font-weight: 600; color: var(--muted); }
+.label-muted.center { text-align: center; font-weight: 500; }
+.chips-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.inline-add { display: flex; gap: 8px; }
+.inline-add input, .o-field input, .o-field select, .act-name {
+  height: 46px;
+  padding: 0 14px;
+  border: 0.5px solid rgba(60, 60, 67, 0.18);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 16px;
+  min-width: 0;
+  width: 100%;
+}
+.inline-add input { flex: 1 1 auto; }
+.round-add { width: 46px; height: 46px; flex: none; border: 0; border-radius: 999px; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; }
+.dish-chip { display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 6px 0 14px; border-radius: 999px; background: #8dc88a; font-size: 14px; font-weight: 500; }
+.dish-chip button { width: 28px; height: 28px; border: 0; border-radius: 999px; background: transparent; display: flex; align-items: center; justify-content: center; }
+
+.deadline-banner { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--bg); font-size: 14px; line-height: 1.3; }
+.deadline-banner.urgent { border: 1px solid #b5401a; background: #ffe8df; color: var(--ink); }
+.deadline-banner.urgent svg { color: #9a3412; }
+.deadline-list { display: flex; flex-direction: column; }
+.deadline-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 52px; border-bottom: 1px solid #e0e0e0; font-size: 14px; }
+.dl-text { font-weight: 600; line-height: 1.3; padding: 8px 0; }
+.dl-date { color: var(--muted); font-variant-numeric: tabular-nums; }
+.dl-toggle { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0; border: 0; background: transparent; font-size: 16px; font-weight: 600; align-self: flex-start; }
+.dl-toggle svg { transition: transform 0.2s; }
+.dl-toggle svg.flip { transform: rotate(180deg); }
+
+.soft-card { display: flex; flex-direction: column; gap: 16px; padding: 18px; border-radius: 16px; background: var(--bg); }
+.soft-card.flush { gap: 0; padding: 0; }
+.section-head { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 12px 18px; }
+.section-head .row-name { font-size: 17px; }
+.section-body { display: flex; flex-direction: column; gap: 14px; padding: 0 18px 18px; }
+.act-head { display: flex; align-items: center; gap: 10px; }
+.act-name { font-size: 17px; font-weight: 600; height: 44px; }
+.round-btn.big { width: 44px; height: 44px; border-radius: 999px; color: var(--ink); }
+.icon-picks { display: flex; flex-wrap: wrap; gap: 8px; }
+.icon-picks button { width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 0.5px solid rgba(60, 60, 67, 0.18); background: #fff; }
+.icon-picks button.on { border: 0; background: var(--ink); color: #fff; }
+.days-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.day-pill { width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; font-size: 13px; font-weight: 600; background: var(--fill); }
+.day-pill.on { background: var(--ink); color: #fff; }
+.at-time { display: flex; align-items: center; gap: 8px; margin-left: 6px; font-size: 14px; color: var(--muted); }
+.at-time input, .row-line input[type='time'] { height: 40px; padding: 0 10px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 10px; background: #fff; font-size: 15px; }
+.row-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 15px; }
+.row-line.wrap { flex-wrap: wrap; justify-content: flex-start; gap: 10px 14px; }
+.row-line.tight { gap: 10px; min-height: 44px; }
+.row-line.full { flex-basis: 100%; }
+.stepper-pill { display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; background: #fff; border: 0.5px solid rgba(0, 0, 0, 0.08); }
+.stepper-pill button { width: 34px; height: 34px; border: 0; border-radius: 999px; background: transparent; display: flex; align-items: center; justify-content: center; }
+.stepper-pill .num { min-width: 28px; text-align: center; font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.preset { height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--bg); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+
+.o-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--muted); min-width: 0; }
+.o-field input, .o-field select { height: 44px; color: var(--ink); font-weight: 400; }
+.pet-tab { height: 40px; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 600; border: 0.5px solid rgba(60, 60, 67, 0.25); background: #fff; }
+.pet-tab.on { border: 0; background: var(--ink); color: #fff; }
+.med { display: flex; flex-direction: column; gap: 16px; padding: 4px 0 8px; border-bottom: 0.5px solid var(--sep); }
+.often { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: -4px; font-size: 13px; color: var(--muted); }
+.chip-btn { height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--fill); font-size: 13px; font-weight: 600; }
+.grid-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; align-items: end; }
+.grid-fields.wide { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.days-input { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); font-weight: 500; }
+.days-input input { width: 72px; height: 40px; }
+.text-danger { align-self: flex-start; height: 44px; padding: 0; border: 0; background: transparent; color: #b3261e; font-size: 14px; font-weight: 600; }
+.dashed-add { align-self: flex-start; height: 44px; padding: 0 16px; border: 1px dashed rgba(60, 60, 67, 0.4); border-radius: 999px; background: transparent; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.line-card { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 14px; }
+.card-name { font-size: 15px; font-weight: 700; }
+.card-name.big { font-size: 17px; margin: 0; }
+
+.push-card { flex-direction: row; flex-wrap: wrap; align-items: flex-start; }
+.full { flex-basis: 100%; }
+.example-box { padding: 16px 18px; border-radius: 16px; background: rgba(118, 118, 128, 0.1); display: flex; flex-direction: column; gap: 10px; }
+.example-box ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.35; }
+
+.summary-row { display: flex; gap: 14px; padding: 16px; background: var(--bg); align-items: flex-start; }
+.summary-name { margin: 0; font-size: 18px; font-weight: 700; }
+.summary-lines { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.summary-lines p { margin: 0; font-size: 12.5px; line-height: 1.3; }
+
+.preview-card { display: flex; flex-direction: column; gap: 14px; padding: 18px 20px; border: 1px solid rgba(60, 60, 67, 0.12); border-radius: 22px; background: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05); }
+.preview-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.preview-day { font-size: 17px; }
+.preview-grid { display: flex; flex-direction: column; gap: 8px; }
+.pv-row { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: start; gap: 8px; }
+.pv-row.two { grid-template-columns: 44px minmax(0, 1fr) minmax(0, 1fr); }
+.pv-time { padding-top: 8px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pv-ev { padding: 7px 10px; border-radius: 10px; font-size: 12px; line-height: 1.35; display: flex; flex-direction: column; }
+.pv-ev.line { flex-direction: row; align-items: center; gap: 8px; height: 32px; padding: 0 10px; }
+.pv-ev.google { border: 1.5px dashed rgba(60, 60, 67, 0.45); background: #fff; color: var(--label2); }
+.preview-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; padding-top: 12px; border-top: 1px solid rgba(60, 60, 67, 0.12); font-size: 12px; color: var(--muted); }
+.preview-legend span { display: flex; align-items: center; gap: 6px; }
+.dot-fill { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+.dot-dash { width: 10px; height: 10px; border-radius: 50%; border: 1.5px dashed var(--muted); }
+.muted-lines p { margin: 0; font-size: 13px; line-height: 1.3; color: var(--label2); }
+
+/* Блоки з перемикачами: вирівнювання по верху.
+   Перший рядок тексту стоїть на рівні середини перемикача. */
+.grouped-row:has(> .ios-switch),
+.section-head:has(> .ios-switch),
+.row-line:has(> .ios-switch),
+.push-card {
+  align-items: flex-start;
+}
+.grouped-row:has(> .ios-switch) > .row-text,
+.grouped-row:has(> .ios-switch) > .grow,
+.section-head > .row-text,
+.row-line:has(> .ios-switch) > span:first-child {
+  padding-top: 4px;
+}
+
+/* Сегменти на всю ширину: довгі підписи переносяться, а не налазять один на одного */
+.seg.fill button { white-space: normal; text-align: center; line-height: 1.15; min-height: 32px; height: auto; padding: 6px 8px; }
+
+.hint.xs { font-size: 11px; }
+
+/* Відстань від заголовка кроку до першого блоку — 48 px (удвічі більше за звичайні 24) */
+.step > .step-head { margin-bottom: 8px; }
+/* Підказка одразу під блоком — 12 px (удвічі менше) */
+.step > .grouped + .hint { margin-top: -12px; }
+
+/* Від заголовка до блоку — 32 px; усередині блоку — просторіше */
+.grouped-row { padding: 14px 20px; gap: 16px; }
+.grouped-row.tall { padding: 18px 20px; gap: 16px; }
+.grouped-row.tall .row-text { gap: 6px; }
+
+/* Основна кнопка: на всю ширину, текст 12 px; «Назад» і «Пропустити» — рядком під нею */
+.step-nav .spacer { display: none; }
+.nav-next { flex: 1 1 100%; order: -1; justify-content: center; font-size: 12px; }
+.nav-back { margin-right: auto; }
+
+/* Картка онбордингу — посередині екрана */
+.onb-card { margin-block: auto; }
+
+/* Крок «Модулі»: заголовок 24 px, назви модулів 14 px bold, просторіші рядки */
+.step-head h1 { font-size: 24px; }
+.grouped-row.tall .row-name { font-size: 14px; font-weight: 700; }
+.grouped-row.tall { padding: 22px 24px; }
+
+/* Картка онбордингу — 520 px завширшки (на вузьких екранах — на всю ширину) */
+.onb-card, .onb-top { max-width: 520px; }
+
+/* Логотип над карткою — по центру; кнопка «Закрити» (при повторному налаштуванні) — праворуч */
+.onb-top { position: relative; justify-content: center; }
+.onb-top > .btn { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); }
+/* Рядки блоку модулів: на 2 px менше з кожного боку */
+.grouped-row.tall { padding: 20px 22px; }
+
+/* Розділювачі між рядками блоку — стабільна лінія 1 px замість щілини 0.5 px */
+.grouped:not(.bordered) { gap: 0; background: var(--bg); }
+.grouped:not(.bordered) > * + * { border-top: 1px solid rgba(60, 60, 67, 0.12); }
+
+/* Рядки блоку модулів: 16 px з кожного боку */
+.grouped-row.tall { padding: 16px; }
+
+/* Заокруглення онбордингу — одна шкала:
+   картка 24 → блоки 16 → вкладені картки й поля 12 → іконки 27 % від розміру (44 px → 12, 34 → 9, 30 → 8) */
+.grouped, .grouped.bordered { border-radius: 16px; }
+.soft-card { border-radius: 16px; }
+.line-card { border-radius: 12px; }
+.inline-add input, .o-field input, .o-field select, .act-name { border-radius: 12px; }
+
+/* Сірі блоки — м'якші кути; назви модулів — 15 px з малої літери */
+.grouped, .grouped.bordered, .soft-card { border-radius: 24px; }
+.grouped-row.tall .row-name { font-size: 15px; }
+
+/* Назви модулів — 16 px */
+.grouped-row.tall .row-name { font-size: 16px; }
+
+/* Крок «харчування» за дизайн-системою: поле «додати страву» і кнопка «+» — 44 px (як усі поля, радіус 12) */
+.inline-add input { height: 44px; }
+.round-add { width: 44px; height: 44px; }
+/* Смуга прогресу на телефоні: підписи 11 px, щоб назви модулів не обрізалися */
+@media (max-width: 520px) {
+  .bar-label { font-size: 11px; }
+}
+
+/* Смуга прогресу: увесь текст 11 px */
+.mod-stepper-top, .bar-label { font-size: 11px; }
+
+/* Поля онбордингу: текст 12 px; в активному стані — обводка 1 px чорна */
+.inline-add input, .o-field input, .o-field select { font-size: 12px; }
+.onb input:focus, .onb select:focus { outline: none; border: 1px solid var(--ink); }
+
+/* «Назад» і «Пропустити» — текст 12 px */
+.nav-back, .nav-skip { font-size: 12px; }
+
+/* Смуга прогресу: від смужки до підпису — 4 px (було 6) */
+.bar-item { gap: 4px; }
+
+/* Нижні кнопки — в один ряд: «Назад» (лише стрілка, коло 48 px) · «Пропустити» · основна кнопка на решту ширини */
+.step-nav { flex-wrap: nowrap; }
+.nav-back { width: 48px; padding: 0; margin-right: 0; flex: none; justify-content: center; }
+.nav-skip { flex: none; padding: 0 12px; }
+.nav-next { flex: 1 1 auto; order: 0; min-width: 0; padding: 0 20px; white-space: nowrap; }
+/* Ряд нижніх кнопок: між кнопками 8 px, щоб на телефоні вміщався найдовший підпис */
+.step-nav { gap: 8px; }
+.nav-skip { padding: 0 8px; }
+.nav-next { padding: 0 16px; }
+/* Основна кнопка в ряду — відступи по 24 px з боків */
+.nav-next { padding: 0 24px; }
+
+/* Смуга прогресу без підписів під смужками (назви лишаються для екранного читача) */
+.bar-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.bar-item { gap: 0; }
+
+/* Смуга прогресу: від тексту зверху до смужок — 6 px (було 12) */
+.mod-stepper { gap: 6px; }
+
+/* «Далі» — за шириною тексту з відступами 24 px з боків (не розтягується); стоїть праворуч,
+   «Пропустити» — одразу перед нею, «Назад» — ліворуч */
+.nav-next { flex: none; width: auto; margin-left: auto; padding: 0 24px; }
+.nav-skip { margin-left: auto; }
+.nav-skip + .nav-next { margin-left: 0; }
+
+/* Якщо довгий підпис не вміщається в ряд (вузький телефон) — кнопка переходить на рядок нижче, праворуч */
+.step-nav { flex-wrap: wrap; row-gap: 12px; }
+/* Ряд кнопок: «Назад» ліворуч, усе інше — праворуч (і в перенесеному рядку теж) */
+.step-nav { justify-content: flex-end; }
+.nav-back { margin-right: auto; }
+.nav-skip, .nav-next, .nav-skip + .nav-next { margin-left: 0; }
+.nav-skip { padding: 0 6px; }
+
+/* Основна кнопка: на ноутбуці — повний підпис («Налаштувати …»), на телефоні — «Далі» */
+.nav-next .lbl-long { display: inline-flex; align-items: center; gap: 10px; }
+.nav-next .lbl-short { display: none; }
+@media (max-width: 520px) {
+  .nav-next .lbl-long { display: none; }
+  .nav-next .lbl-short { display: inline; }
+}
+
+/* ================= Кроки 2–8 онбордингу за дизайн-системою (13.11) =================
+   Ті самі правила, що й на кроках «модулі» та «харчування». */
+
+/* Примітки під блоками й полями — 11 px */
+.onb .hint.small { font-size: 11px; }
+
+/* Підписи над полями й біля перемикачів-сегментів — 12 px, 600, muted, з малої */
+.o-field { font-size: 12px; }
+.onb .label-muted { font-size: 12px; }
+.row-line > span:first-child:not(.card-name), .at-time, .days-input, .often { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+/* Поля — 44 px, текст 12, радіус 12 (час, дата, кількість днів так само) */
+.at-time input, .row-line input[type='time'], .days-input input { height: 44px; font-size: 12px; border-radius: 12px; }
+.act-name { font-size: 16px; font-weight: 700; }
+
+/* Кнопки й чипи в онбордингу — текст 12 */
+.preset, .chip-btn, .dashed-add, .text-danger, .pet-tab, .day-pill, .dl-toggle { font-size: 12px; }
+
+/* Сірі блоки-розділи: відступ 16 з усіх боків, назва 16 bold */
+.soft-card { padding: 16px; }
+.section-head { padding: 16px; min-height: 0; }
+.section-body { padding: 0 16px 16px; }
+.section-head .row-name, .card-name, .card-name.big, .sub-title, .sub-title.small { font-size: 16px; font-weight: 700; }
+.line-card { padding: 16px; }
+
+/* ФОП: банер і список дедлайнів — 12 */
+.deadline-banner, .deadline-row { font-size: 12px; }
+
+/* Нагадування: верх картки як рядок модуля (плитка 44 · назва й опис · перемикач по верху) */
+.push-card { flex-direction: column; align-items: stretch; gap: 16px; }
+.push-top { display: flex; align-items: flex-start; gap: 16px; }
+.push-top > .row-text { padding-top: 4px; gap: 6px; }
+.example-box { padding: 16px; border-radius: 24px; background: var(--bg); gap: 12px; }
+.example-box ul { font-size: 12px; line-height: 1.3; }
+
+/* Підсумок: плитка 44, назва 16 bold, рядки — як опис (12, muted, між рядками 6) */
+.summary-row { gap: 16px; }
+.summary-name { font-size: 16px; line-height: 1.3; padding-top: 4px; }
+.summary-lines { margin-top: 6px; gap: 6px; }
+.summary-lines p { font-size: 12px; line-height: 1.25; color: var(--muted); }
+
+/* Google: пояснення 12; «Підключити Google Календар» — другорядна кнопка (fill), бо чорна на екрані одна — «Далі» */
+.muted-lines p { font-size: 12px; }
+.preview-card { border-radius: 24px; }
+.connect-btn { height: 48px; width: 100%; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.onb .notice { font-size: 12px; }
+/* Між назвою й описом у розділах — 6 px (як у рядку модуля) */
+.section-head > .row-text { gap: 6px; }
+
+/* ================= Крок ФОП за прототипом (14.11) =================
+   Радіосписок «як ви працюєте» з тегом групи, рядок «ПДВ і працівники», чипи «кому ви платите»,
+   неактивна «Далі» (коли обрано «я не знаю групу»). */
+.radio-list .radio-item { display: flex; flex-direction: column; }
+.radio-row { position: relative; display: flex; align-items: flex-start; gap: 14px; padding: 16px; cursor: pointer; }
+.radio-input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+/* Радіокнопка: 22 px; не обрана — біла з обводкою 1.5 px, обрана — чорна з білою крапкою 8 px */
+.radio-dot { flex: none; width: 22px; height: 22px; margin-top: 1px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid rgba(60, 60, 67, 0.29); background: #fff; display: inline-flex; align-items: center; justify-content: center; }
+.radio-dot.on { border: 0; background: var(--ink); }
+.radio-dot.on::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.radio-input:focus-visible + .radio-dot { outline: 2px solid var(--ink); outline-offset: 2px; }
+.radio-row .row-text { gap: 6px; }
+.radio-row .row-name { line-height: 1.3; }
+/* Вміст обраного пункту — під текстом: зліва 16 + 22 + 14 = 52 px */
+.radio-body { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 0 16px 16px 52px; }
+.radio-body .seg { align-self: stretch; }
+/* Тег групи: капсула 24 px кольору ФОП, текст 12/600 */
+.group-tag { align-self: flex-start; display: inline-flex; align-items: center; height: 24px; margin-top: 2px; padding: 0 10px; border-radius: 999px; background: #e99a7d; color: var(--ink); font-size: 12px; font-weight: 600; line-height: 1; }
+/* Маленька другорядна кнопка (fill) — «Змінити», «Відкрити Е-кабінет» */
+.chip-btn.small { flex: none; height: 28px; padding: 0 12px; font-size: 12px; }
+.grouped-row.tall > .chip-btn.small { align-self: flex-start; margin-top: 2px; }
+.link-btn { display: inline-flex; align-items: center; color: var(--ink); text-decoration: none; }
+/* «Кому ви платите»: назва, опис, чипи й примітка одна під одною */
+.grouped-row.pay-row { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
+.pay-row .row-text { gap: 6px; }
+.choice-chip { height: 36px; padding: 0 14px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 999px; background: #fff; color: var(--ink); font-size: 12px; font-weight: 500; }
+.choice-chip.on { border-color: var(--ink); background: var(--ink); color: #fff; font-weight: 600; }
+.nav-next.off { background: var(--fill); color: var(--muted); box-shadow: none; opacity: 1; cursor: default; }
+/* Рядки блоку «ПДВ і працівники» — 16 px з боків, як рядок модуля */
+.fop-extras > .grouped-row { padding-left: 16px; padding-right: 16px; }
+
+/* Крок ФОП (14.11, правка): «як ви працюєте» — всередині сірого блоку (16 bold),
+   назви варіантів 12 bold, пояснення 11 regular; тег — 11, приглушений */
+.radio-head { margin: 0; padding: 16px 16px 4px; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; }
+.grouped:not(.bordered) > .radio-head + .radio-item { border-top: 0; }
+.radio-row .row-name { font-size: 12px; font-weight: 700; letter-spacing: 0; line-height: 1.3; }
+.radio-row .row-desc, .radio-body .row-desc { font-size: 11px; line-height: 1.3; }
+.radio-row .row-text { gap: 4px; padding-top: 3px; }
+.radio-dot { margin-top: 0; }
+.group-tag { height: 20px; padding: 0 8px; background: #f6e3db; color: #9a4a2c; font-size: 11px; font-weight: 600; }
+
+/* Крок ФОП (14.11, правка 2): без ліній між варіантами «як ви працюєте»;
+   примітка про Е-кабінет після питань — 11, посилання текстом з підкресленням */
+.radio-list > .radio-item + .radio-item { border-top: 0; }
+.onb .hint.fop-ecab { margin-top: -12px; font-size: 11px; line-height: 1.3; }
+.text-link { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.text-link:hover { text-decoration-thickness: 2px; }
+
+/* Крок ФОП (14.11, правка 3): щільніший радіосписок — рядки 8 px зверху й знизу (останній — 16 знизу),
+   назви варіантів 14 bold */
+.radio-list .radio-row { padding-top: 8px; padding-bottom: 8px; }
+.radio-list .radio-head { padding-bottom: 8px; }
+.radio-list .radio-item:last-child .radio-row { padding-bottom: 16px; }
+.radio-list .radio-body { padding-bottom: 8px; }
+.radio-list .radio-item:last-child .radio-body { padding-bottom: 16px; }
+.radio-list .radio-row .row-name { font-size: 14px; letter-spacing: -0.005em; }
+.radio-list .radio-row .row-text { padding-top: 2px; }
+
+/* Крок ФОП (14.11, правка 4): менші радіокнопки 18 px (крапка 6); «обрати групу самостійно» —
+   випадний список групи в тому ж рядку; блок «ПДВ і працівники» — за 8 px від радіосписку;
+   «Змінити» — іконка олівця в колі 32 (fill) */
+.radio-dot { width: 18px; height: 18px; margin-top: 0; }
+.radio-dot.on::after { width: 6px; height: 6px; }
+.radio-list .radio-row .row-text { padding-top: 0; }
+.radio-line { display: flex; align-items: center; gap: 8px; padding-right: 16px; }
+.radio-line > .radio-row { flex: 1 1 auto; min-width: 0; }
+.radio-line > .radio-row:only-child { margin-right: -16px; }
+.group-select {
+  flex: none; height: 32px; padding: 0 30px 0 12px; border: 0; border-radius: 999px; background-color: var(--fill); color: var(--ink);
+  font: inherit; font-size: 13px; font-weight: 600; appearance: none; -webkit-appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%231d1d1f' d='M3.5 8.5 6 6l6 6 6-6 2.5 2.5L12 17z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; background-size: 12px 12px;
+}
+.group-select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.step > .fop-extras { margin-top: -16px; }
+.icon-edit { flex: none; align-self: flex-start; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.icon-edit svg { fill: currentColor; }
+.icon-edit:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Крок ФОП (14.11, правка 5): блоки-селектори замість простих радіокнопок.
+   Біла картка 12 з обводкою 0.5 separator усередині сірого блоку, між картками 8;
+   обрана — обводка 1.5 ink (без зсуву вмісту); радіо приховане, фокус — обведення картки */
+.radio-list > .choice-cards { border-top: 0; }
+.choice-cards { display: flex; flex-direction: column; gap: 8px; padding: 0 16px 16px; }
+.choice-card { display: flex; align-items: center; gap: 8px; padding-right: 14px; border-radius: 12px; background: #fff; border: 0.5px solid rgba(60, 60, 67, 0.18); box-shadow: inset 0 0 0 1px transparent; transition: box-shadow 0.15s, border-color 0.15s; }
+.choice-card.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.choice-main { position: relative; flex: 1 1 auto; min-width: 0; padding: 12px 0 12px 14px; cursor: pointer; }
+.choice-main .row-text { gap: 4px; padding-top: 0; }
+.choice-main .row-name { font-size: 14px; font-weight: 700; letter-spacing: -0.005em; line-height: 1.3; }
+.choice-main .row-desc { font-size: 11px; line-height: 1.3; }
+.choice-card:has(.radio-input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Крок ФОП (14.11, правка 6): «ПДВ і працівники» — у тому ж сірому блоці під картками (через лінію);
+   у картках-селекторах — радіокнопка 18 ліворуч; випадний список групи — радіус 8 (вкладений у картку 12) */
+.radio-list > .grouped-row { padding-left: 16px; padding-right: 16px; }
+.choice-main { display: flex; align-items: flex-start; gap: 12px; }
+.choice-main .radio-dot { margin-top: 0; }
+.group-select { border-radius: 8px; }
+
+/* Крок ФОП (14.11, правка 7): від заголовка «як ви працюєте» до карток 16; у картках 16 зверху й знизу;
+   у частині «ПДВ і працівники» без ліній-розділювачів; «кому ви платите» — 14 bold */
+.radio-list .radio-head { padding-bottom: 16px; }
+.choice-main { padding-top: 16px; padding-bottom: 16px; }
+.radio-list > * + * { border-top: 0 !important; }
+.pay-row .row-name { font-size: 14px; letter-spacing: -0.005em; }
+
+/* Крок ФОП (14.11, правка 8): лінія лише між вибором і «ПДВ і працівники»; над «кому ви платите» — 16;
+   «що зʼявиться в календарі» — далі від примітки (40 замість 24); у переліку дедлайнів без ліній */
+.radio-list > .grouped-row.tall { border-top: 1px solid rgba(60, 60, 67, 0.12) !important; }
+.radio-list > .grouped-row:not(.tall):not(.pay-row) { padding-bottom: 0; }
+.radio-list > .grouped-row.pay-row { padding-top: 16px; }
+.step > .fop-preview { margin-top: 16px; }
+.fop-preview .deadline-row { border-bottom: 0; }
+
+/* Крок ФОП (14.11, правка 9): «що зʼявиться в календарі» компактно — між частинами 8,
+   рядки переліку 24 px заввишки, текст 12 regular; «ще N» — 28 px; банер — відступ 10 × 12 */
+.fop-preview { gap: 8px; }
+.fop-preview .deadline-banner { padding: 10px 12px; font-size: 12px; font-weight: 400; }
+.fop-preview .deadline-row { min-height: 24px; font-size: 12px; }
+.fop-preview .dl-text { padding: 3px 0; font-weight: 400; font-size: 12px; }
+.fop-preview .dl-date { font-size: 12px; font-weight: 400; }
+.fop-preview .dl-toggle { min-height: 28px; }
+.fop-preview > .hint { margin-top: 4px; }
+
+/* Крок ФОП (14.11, правка 10): випадний список групи не підсвічується чорним при натисканні —
+   без обводки ink; для клавіатури — м'яке кільце separator-strong 2 px */
+.onb .group-select, .onb .group-select:focus { border: 0; outline: none; box-shadow: none; }
+.onb .group-select:focus-visible { box-shadow: 0 0 0 2px rgba(60, 60, 67, 0.29); }
+
+/* Крок ФОП (14.11, правка 11): нова структура полів — один сірий блок із секціями через лінію:
+   група (4 варіанти сіткою 2 × 2), ставка, ЄСВ за себе, виплати іншим (позначки).
+   Заголовок секції 16 bold, від нього до варіантів 16; секція 16 з усіх боків */
+.fop-form { overflow: hidden; }
+.fop-form > .fop-sec { display: flex; flex-direction: column; gap: 16px; padding: 16px; border-top: 0; }
+.fop-form > .fop-sec + .fop-sec { border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.fop-q { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; }
+.fop-sec .choice-cards { padding: 0; }
+.choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.choice-card.compact { position: relative; display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; }
+.choice-card.compact .row-name, .fop-sec .choice-main .row-name { font-size: 14px; font-weight: 700; letter-spacing: -0.005em; line-height: 1.3; }
+.choice-card.compact:has(.radio-input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+.fop-sec .choice-main { align-items: center; padding-top: 12px; padding-bottom: 12px; }
+/* Позначка (чекбокс) 18 px: не обрана — біла з обводкою 1.5 separator-strong, обрана — ink з білою галочкою; радіус 5 */
+.check-box { flex: none; width: 18px; height: 18px; box-sizing: border-box; border-radius: 5px; border: 1.5px solid rgba(60, 60, 67, 0.29); background: #fff; display: inline-flex; align-items: center; justify-content: center; color: #fff; }
+.check-box.on { border: 0; background: var(--ink); }
+.check-box svg { fill: currentColor; }
+/* «Не знаєте свою групу?» — текстове посилання-кнопка 12, ink 600, підкреслення; підказки секцій 11 */
+.link-btn-plain { align-self: flex-start; margin-top: -8px; padding: 0; border: 0; background: none; font-size: 12px; cursor: pointer; }
+.onb .hint.fop-help { margin-top: -8px; font-size: 11px; line-height: 1.3; }
+.step > .fop-preview { margin-top: 16px; }
+
+/* Крок ФОП (14.11, правка 12): група — випадний список 44 px (білий, обводка 0.5, радіус 12, текст 14/600,
+   без чорної обводки при натисканні); ЄСВ — звичайні радіокнопки без карток; «здійснюю виплати іншим» —
+   перемикач у рядку з заголовком, під ним чипи (кілька) */
+.onb .fop-select, .onb .fop-select:focus {
+  width: 100%; height: 44px; padding: 0 40px 0 14px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background-color: #fff; color: var(--ink);
+  font: inherit; font-size: 14px; font-weight: 600; outline: none; box-shadow: none; appearance: none; -webkit-appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%231d1d1f' d='M3.5 8.5 6 6l6 6 6-6 2.5 2.5L12 17z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 12px 12px;
+}
+.onb .fop-select:focus-visible { box-shadow: 0 0 0 2px rgba(60, 60, 67, 0.29); }
+.fop-q label { cursor: pointer; }
+.plain-radios { display: flex; flex-direction: column; gap: 12px; }
+.plain-radio { position: relative; display: flex; align-items: center; gap: 12px; font-size: 14px; line-height: 1.3; cursor: pointer; }
+.plain-radio:has(.radio-input:focus-visible) .radio-dot { outline: 2px solid var(--ink); outline-offset: 2px; }
+.fop-switch-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.fop-sec .chips-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+.fop-help .text-link { white-space: nowrap; }
+
+/* Крок ФОП (14.11, правка 13): випадний список групи — як поле вводу: в активному стані обводка 1 px ink */
+.onb .fop-select:focus, .onb .fop-select:focus-visible { border: 1px solid var(--ink); box-shadow: none; outline: none; }
+
+/* ================= Крок хобі (14.11) =================
+   Іконка — випадний список біля плитки; рядки «підпис ліворуч — значення праворуч», підписи 14 ink;
+   для «N разів на тиждень» — примітка про перетягування; «Додати ще одне заняття» — сіра кнопка на всю ширину */
+.icon-dd { position: relative; flex: none; }
+.icon-dd-btn { display: flex; align-items: center; gap: 6px; padding: 0 8px 0 0; height: 44px; border: 0; border-radius: 12px; background: transparent; color: var(--ink); cursor: pointer; }
+.icon-dd-tile { width: 44px; height: 44px; border-radius: 12px; background: #a98beb; display: inline-flex; align-items: center; justify-content: center; color: var(--ink); }
+.icon-dd-btn svg { fill: currentColor; transition: transform 0.15s; }
+.icon-dd-btn svg.flip { transform: rotate(180deg); }
+.icon-dd-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.icon-dd-list { position: absolute; z-index: 20; top: 50px; left: 0; width: 200px; margin: 0; padding: 4px; list-style: none; border-radius: 12px; background: #fff; border: 0.5px solid rgba(60, 60, 67, 0.18); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.12); }
+.icon-dd-list button { width: 100%; display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font-size: 14px; text-align: left; cursor: pointer; }
+.icon-dd-list button:hover, .icon-dd-list button:focus-visible { background: var(--fill); outline: none; }
+.icon-dd-list button.on { font-weight: 600; }
+.icon-dd-list svg { flex: none; fill: currentColor; }
+.icon-dd-list .icon-dd-check { margin-left: auto; }
+.act-card .act-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; min-height: 40px; }
+.act-card .act-label { font-size: 14px; font-weight: 400; color: var(--ink); }
+.act-card .act-row > :last-child { margin-left: auto; }
+.act-days { display: flex; gap: 4px; justify-content: flex-end; }
+.act-card .day-pill { width: 32px; height: 32px; }
+.act-card .act-time { height: 40px; padding: 0 10px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background: #fff; font: inherit; font-size: 14px; color: var(--ink); }
+.onb .act-card .act-time:focus { outline: none; border: 1px solid var(--ink); }
+.onb .hint.act-note { margin-top: -4px; font-size: 11px; line-height: 1.3; }
+.add-act-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.add-act-btn svg { fill: currentColor; }
+
+/* ---- крок улюбленця (14.11): чорні таби виду, розділи через 16, рядки як у картці заняття ---- */
+.seg.dark button.on { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: none; }
+.seg.dark button svg { fill: currentColor; }
+.pet-step > .soft-card.flush + .soft-card.flush { margin-top: -8px; }
+.pet-step .act-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; min-height: 40px; }
+.pet-step .act-label { font-size: 14px; font-weight: 400; color: var(--ink); }
+.pet-step .act-row > :last-child { margin-left: auto; }
+.pet-step .act-time, .pet-step .row-select { height: 40px; padding: 0 10px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background: #fff; font: inherit; font-size: 14px; color: var(--ink); }
+.pet-step .act-time.num { width: 72px; text-align: right; }
+.pet-step .row-select { appearance: none; -webkit-appearance: none; padding-right: 30px; font-weight: 600; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%231d1d1f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; }
+.pet-step .pet-input { height: 44px; padding: 0 12px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background: #fff; font: inherit; font-size: 12px; color: var(--ink); width: 100%; box-sizing: border-box; }
+.onb .pet-step .act-time:focus, .onb .pet-step .row-select:focus, .onb .pet-step .pet-input:focus { outline: none; border: 1px solid var(--ink); }
+.pet-step .med { gap: 12px; padding: 0 0 16px; }
+.pet-step .med .often { margin-top: 0; }
+.pet-step .line-card .act-row .card-name { margin: 0; }
+.pet-step .section-body .add-act-btn { margin-top: 0; }
+
+/* ================= Крок хобі — правка 14.11 (вечір) =================
+   Назва заняття 14; від шапки картки до табів «розклад» 20 (було 16);
+   підписи рядків («дні», «час», «тривалість»…) — 14/600 ink (правка 19:48; так само в розділах улюбленця);
+   вибір іконки — набір іконок без підписів замість списку; над картками — «мої заняття» з кнопкою «Додати ще одне». */
+.onb .act-name { font-size: 14px; font-weight: 600; }
+.act-card > .act-head { margin-bottom: 4px; }
+.act-card .act-label, .pet-step .act-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+.icon-dd-grid { position: absolute; z-index: 20; top: 50px; left: 0; display: grid; grid-template-columns: repeat(4, 40px); gap: 4px; padding: 8px; border-radius: 12px; background: #fff; border: 0.5px solid rgba(60, 60, 67, 0.18); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.12); }
+.icon-dd-grid button { width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: transparent; color: var(--ink); cursor: pointer; }
+.icon-dd-grid button:hover, .icon-dd-grid button:focus-visible { background: var(--fill); outline: none; }
+.icon-dd-grid button.on { background: var(--ink); color: #fff; }
+.icon-dd-grid svg { fill: currentColor; }
+.acts-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.acts-head .sub-title { margin: 0; }
+.step > .acts-head + .act-card { margin-top: -12px; }
+.acts-add { display: inline-flex; align-items: center; gap: 6px; flex: none; font-weight: 600; }
+.acts-add svg { fill: currentColor; }
+
+/* Банер «найближчий дедлайн» у «що зʼявиться в календарі» (правка 14.11, 19:50) — легкий оранжевий фон #ffecd9 замість сірого; терміновий (≤3 дні) додатково з обводкою #b5401a */
+.deadline-banner, .deadline-banner.urgent { background: #ffecd9; color: var(--ink); }
+
+/* Крок хобі (правка 14.11, 19:56): між картками занять 8 (було 24); усередині картки між елементами 20 (було 16), від шапки до табів 24 (було 20) */
+.step > .act-card + .act-card { margin-top: -16px; }
+.soft-card.act-card { gap: 20px; }
+
+/* Крок улюбленця за дизайн-системою картки заняття (правка 14.11, 20:03):
+   між картками розділів 8 (було 16); усередині розділу між елементами 20 (було 14/12),
+   від шапки розділу до вмісту 20; у вкладених картках (щеплення, ветеринар, процедури) між елементами теж 20. */
+.pet-step > .soft-card.flush + .soft-card.flush { margin-top: -16px; }
+.pet-step .section-body { gap: 20px; padding-top: 4px; }
+.pet-step .med { gap: 20px; padding: 0 0 20px; }
+.pet-step .line-card { gap: 20px; }
+/* примітки під блоками й «часто додають» під полем — за 12, як «від блоку до примітки 12» */
+.pet-step .section-body > .hint { margin-top: -8px; }
+.pet-step .med .often { margin-top: -8px; }
+/* Телефон: сегменти в рядках «підпис — значення» не вилазять за картку («щодня / через день / раз на тиждень») */
+@media (max-width: 520px) {
+  .pet-step .act-row .seg, .act-card .act-row .seg { min-width: 0; }
+  .pet-step .act-row .seg button, .act-card .act-row .seg button { padding: 0 9px; flex: 1 1 auto; min-width: 0; }
+}
+
+/* Крок улюбленця (правка 14.11, 21:26):
+   таби виду — обраний білий, текст чорний (звичайні сегменти);
+   щеплення й інші процедури — без вкладених карток і рамок: групи рядків, між групами лінія rgba(60,60,67,.12);
+   ветеринар — «останній огляд», «наступний візит» (дата + час), «повторювати» → «інтервал» 6 / 12;
+   «Додати ще ліки» / «Додати процедуру» — текстова кнопка з «+» (ink, 12/600, висота 32). */
+.pet-step .pet-group { display: flex; flex-direction: column; gap: 20px; }
+.pet-step .pet-group + .pet-group { padding-top: 20px; border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.pet-step .act-row .pair { display: inline-flex; gap: 8px; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+.pet-step .act-row .pair input[type="time"] { width: 112px; }
+.pet-step .med { border-bottom: 1px solid rgba(60, 60, 67, 0.12); }
+.text-add { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.text-add svg { fill: currentColor; }
+.pet-step .section-body .text-add { margin-top: -8px; }
+.pet-step .pet-group > .text-danger, .pet-step .med > .text-danger { height: 32px; margin-top: -8px; }
+
+/* Крок улюбленця (правка 14.11, 21:33): над блоками — «мій улюбленець» (кілька — «мої улюбленці») з кнопкою праворуч «Додати ще одну тварину», як «мої заняття»; від рядка до наступного блоку 12; нижньої сірої кнопки більше немає */
+.step.pet-step > .acts-head + * { margin-top: -12px; }
+.acts-head .sub-title { white-space: nowrap; }
+/* телефон: «Додати ще одну» без слова «тварину», щоб заголовок не переносився */
+@media (max-width: 520px) { .acts-head .wide-only { display: none; } }
+
+/* Крок улюбленця, ліки (правка 14.11, 21:39):
+   чип «часто додають» — маленький, відступи 4 з кожного боку (текст 12/600, радіус 6);
+   доза — таби «1/4 / 1/2 / 1 ціла» (рядок «доза»), замість текстового поля;
+   перемикач усередині розділу («повторювати» у ветеринара) — удвічі менший: 26 × 16, кулька 12. */
+.pet-step .often .chip-btn { height: auto; padding: 4px; border-radius: 6px; font-size: 12px; font-weight: 600; line-height: 1.25; }
+.pet-step .section-body .ios-switch { width: 26px; height: 16px; }
+.pet-step .section-body .ios-switch span { top: 2px; left: 2px; width: 12px; height: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); }
+.pet-step .section-body .ios-switch.on span { left: 12px; }
+
+/* Крок улюбленця (правка 14.11, 21:51):
+   таби виду (Кіт / Собака / Інше) — на 16 вищі: сегмент 48 (було 32);
+   від рядка «мій улюбленець» до наступного блоку 24 (було 12);
+   ветеринар — таби «запланований / повторюваний» на всю ширину;
+   інші процедури — як ліки: кожна процедура з лінією знизу, далі «Додати ще процедуру». */
+.pet-step > .seg.fill button { height: 48px; }
+.step.pet-step > .acts-head + * { margin-top: 0; }
+
+/* Перший крок (правка 14.11, 22:15): лише тут основна кнопка тягнеться на всю ширину */
+.modules-step .nav-next { flex: 1 1 100%; width: 100%; margin-left: 0; justify-content: center; }
+.modules-step .nav-next .lbl-long, .modules-step .nav-next .lbl-short { justify-content: center; }
+
+/* Крок ФОП (правка 14.11, 22:15): «найближчий дедлайн», перелік і «ще N» — один оранжевий блок #ffecd9 (радіус 12, відступ 10 × 12);
+   перелік — під лінією rgba(60,60,67,.12) 1 px, від неї 8; терміновий (≤3 дні) — обводка 1 px #b5401a */
+.deadline-card { display: flex; flex-direction: column; border-radius: 12px; background: #ffecd9; padding: 10px 12px; }
+.deadline-card.urgent { border: 1px solid #b5401a; }
+.fop-preview .deadline-card .deadline-banner, .fop-preview .deadline-card .deadline-banner.urgent { padding: 0 0 10px; background: transparent; border: 0; border-radius: 0; }
+.deadline-card .deadline-banner + .deadline-list { padding-top: 8px; border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.deadline-card .dl-toggle { color: var(--ink); }
+
+/* Крок улюбленця (правка 14.11, 22:15): «раз на тиждень» → «бажаний день» (кружки 32 через 4, один обраний);
+   запланований візит — одне поле «дата і час» (datetime-local, 40, радіус 12) */
+.pet-step .day-pill { width: 32px; height: 32px; }
+.pet-step .act-datetime { min-width: 0; }
+
+/* Підсумок (правка 14.11, 22:15): превʼю тижня з подіями онбордингу + розгортувані розділи з кнопкою «Редагувати» */
+.wk-preview { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 24px; background: var(--bg); }
+.wk-head { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
+.wk-range { font-size: 14px; font-weight: 600; }
+.wk-arrows { display: inline-flex; gap: 4px; }
+.wk-arrows button { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; background: #fff; color: var(--ink); cursor: pointer; }
+.wk-arrows button:disabled { opacity: 0.35; cursor: default; }
+.wk-arrows svg { fill: currentColor; }
+.wk-loose { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 0 4px; }
+.wk-loose-label { font-size: 11px; font-weight: 600; color: var(--muted); margin-right: 4px; }
+.wk-scroll { overflow-x: auto; border-radius: 12px; background: #fff; }
+.wk-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); min-height: 180px; }
+.wk-col { display: flex; flex-direction: column; min-width: 0; border-left: 0.5px solid rgba(60, 60, 67, 0.18); }
+.wk-col:first-child { border-left: 0; }
+.wk-day { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 6px; font-size: 11px; color: var(--muted); }
+.wk-day b { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--ink); }
+.wk-col.today .wk-day b { background: var(--ink); color: #fff; }
+.wk-evs { display: flex; flex-direction: column; gap: 3px; padding: 0 3px 8px; }
+.wk-ev { display: block; padding: 3px 5px; border-radius: 6px; font-size: 10px; font-weight: 600; line-height: 1.25; color: var(--ink); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word; }
+.wk-ev em { display: block; font-style: normal; font-weight: 500; opacity: 0.75; }
+.wk-loose .wk-ev { display: inline-block; }
+@media (max-width: 520px) { .wk-grid { grid-template-columns: repeat(7, 76px); } }
+.summary-row { align-items: flex-start; }
+.summary-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; min-height: 44px; }
+.summary-toggle .summary-name { padding-top: 0; }
+.summary-toggle svg { fill: currentColor; transition: transform 0.2s; }
+.summary-toggle svg.flip { transform: rotate(180deg); }
+.summary-row > .btn.small { margin-top: 8px; }
+.summary-row .summary-lines { margin-top: 0; }
+.wk-ev { display: block; -webkit-line-clamp: unset; }
+.wk-ev .wk-t { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.wk-loose .wk-ev { display: inline-block; }
+.summary-toggle .summary-name { white-space: nowrap; }
+@media (max-width: 520px) {
+  .summary-row { gap: 12px; padding: 16px 12px; }
+  .summary-row > .btn.small { padding: 0 10px; }
+}
+
+/* Підсумок (правка 14.11, 22:34): «Редагувати» — кругла кнопка fill 32 з олівцем 16; праворуч від неї стрілка розгортання (32, без фону, 14) */
+.summary-icon { flex: none; width: 32px; height: 32px; margin-top: 6px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); cursor: pointer; }
+.summary-icon.plain { background: transparent; margin-left: -8px; }
+.summary-icon svg { fill: currentColor; transition: transform 0.2s; }
+.summary-icon svg.flip { transform: rotate(180deg); }
+.summary-row { gap: 12px; }
+.summary-toggle { width: 100%; }
+@media (max-width: 520px) { .summary-row { gap: 10px; } }
+
+/* Онбординг (правка 14.11, 22:38): текст основної (чорної) кнопки — 13 (було 12), на всіх кроках */
+.onb .nav-next, .onb .nav-next .lbl-long, .onb .nav-next .lbl-short { font-size: 13px; }
+
+/* Календар, тиждень (правка 14.11, 22:46): без білої підкладки — сітка на фоні сторінки (bg),
+   білим виділено лише сьогоднішній день (шапка, «весь день», групи й колонка годин) */
+.week { background: transparent; border: 0; box-shadow: none; border-radius: 0; overflow: visible; }
+.day-head.today, .allday-cell.today, .group-cell.today, .day-col.today { background-color: #fff; }
+.day-head.today { border-radius: 12px 12px 0 0; }
+
+/* ================= Модуль «харчування» (14.11) =================
+   Кнопка «Страви» у шапці (капсула як «Сьогодні», з плиткою-іконкою); бічна панель бібліотеки 320 справа від тижня
+   (біла картка 24, тінь картки, відступ 16, липка); рядки страв 52 (плитка 36 радіус 10 кольору харчування, назва 14/600, мета 12 muted);
+   пошук — поле 40 fill радіус 12; категорії — капсули 28 (обрана ink); «Додати страву» — сіра капсула 40;
+   унизу «Скопіювати минулий тиждень» / «Очистити тиждень» — малі капсули fill 28.
+   У сітці тижня клітинка під час перетягування — легкий фон харчування; страви-події можна перетягувати між днями й годинами.
+   Телефон: у групах дня — текстова кнопка «+ Додати страву» → список страв (той самий вигляд, вікно знизу). */
+.food-toggle { gap: 8px; background: var(--card); border: 0.5px solid rgba(0, 0, 0, 0.08); box-shadow: var(--shadow-pill); padding: 0 14px 0 6px; height: 40px; font-weight: 600; }
+.food-toggle svg { width: 24px; height: 24px; padding: 5px; box-sizing: border-box; border-radius: 999px; background: #a3c6a0; fill: var(--ink); }
+.food-toggle.on { background: var(--ink); color: #fff; }
+main.with-food { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+.food-panel { position: sticky; top: 16px; max-height: calc(100dvh - 32px); overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 24px; background: var(--card); box-shadow: var(--shadow-card); box-sizing: border-box; }
+.food-head { display: flex; align-items: center; justify-content: space-between; }
+.food-head h2 { margin: 0; font-size: 16px; font-weight: 700; }
+.food-search { height: 40px; width: 100%; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 12px; background: var(--fill); font: inherit; font-size: 14px; color: var(--ink); }
+.food-search:focus { outline: none; box-shadow: inset 0 0 0 1px var(--ink); }
+.food-cats { display: flex; flex-wrap: wrap; gap: 4px; }
+.food-cat { height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
+.food-cat.on { background: var(--ink); color: #fff; font-weight: 600; }
+.add-act-btn.food-add { height: 40px; }
+.food-list { display: flex; flex-direction: column; gap: 2px; }
+.food-row { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px; border: 0; border-radius: 12px; background: transparent; color: var(--ink); text-align: left; font: inherit; cursor: grab; }
+.food-row:hover { background: var(--bg); }
+.food-row:active { cursor: grabbing; }
+.food-thumb { flex: none; width: 36px; height: 36px; border-radius: 10px; object-fit: cover; display: inline-flex; align-items: center; justify-content: center; }
+.food-thumb svg { fill: currentColor; }
+.food-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.food-name { font-size: 14px; font-weight: 600; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.food-fav { display: inline-flex; vertical-align: -1px; margin-right: 4px; }
+.food-fav svg { fill: var(--ink); }
+.food-meta { font-size: 12px; color: var(--muted); line-height: 1.25; }
+.food-empty { padding: 8px 4px; line-height: 1.3; }
+.food-panel .hint.xs { margin: 0; font-size: 11px; color: var(--muted); line-height: 1.3; }
+.food-week { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 12px; border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.food-week .btn.small:disabled { opacity: 0.45; cursor: default; }
+.btn.danger.small { background: var(--danger); color: #fff; }
+.day-col.drop-on, .group-cell.drop-on { background-color: rgba(163, 198, 160, 0.28) !important; }
+.event[draggable='true'] { cursor: grab; }
+/* Картка страви: вікно як у події, фото 160 на всю ширину, категорії й теги — капсули без плитки */
+.dish-dialog { max-width: 520px; }
+.dish-photo { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; background: var(--fill); }
+.chip.plain { padding: 0 14px; }
+.dish-dialog .seg.fill button { flex: 1 1 0; }
+.text-link.small { font-size: 13px; align-self: flex-start; }
+/* Телефон: вибір страви */
+.dish-picker { gap: 12px; }
+.dish-picker .food-list { max-height: 50dvh; overflow-y: auto; }
+.group-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.group-card-head .text-add { height: 24px; margin-right: 4px; }
+@media (max-width: 760px) {
+  .dish-picker, .dish-dialog { align-self: flex-end; border-radius: 24px 24px 0 0; max-height: 92dvh; }
+}
+/* «Страви» увімкнено — сіра капсула fill (чорна кнопка на екрані одна — «+ Подія») */
+.food-toggle.on { background: var(--fill); color: var(--ink); box-shadow: none; }
+@media (max-width: 760px) { .overlay:has(.dish-picker), .overlay:has(.dish-dialog) { padding: 16px 0 0; } }
+
+/* Картка страви (15.11, правка 22:21): стилі дизайн-системи, як в онбордингу.
+   Підпис поля 12/600 muted · поле 44 біле, обводка 0.5 separator, радіус 12, текст 12, в активному стані обводка 1 px ink ·
+   примітки 11 muted · теги — чипи вибору 36 · «необовʼязково» — сірий розділ (bg, радіус 24, 16 з усіх боків, назва 16 bold,
+   стрілка 14 без фону; між елементами 20). */
+.dish-dialog { gap: 20px; }
+.dish-dialog .field { gap: 6px; }
+.dish-dialog .field > span, .dish-dialog .field > legend { padding: 0; font-size: 12px; font-weight: 600; color: var(--muted); }
+.dish-dialog .field > legend { margin-bottom: 6px; }
+.dish-dialog .field input, .dish-dialog .field textarea {
+  padding: 0 12px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background: #fff;
+  font: inherit; font-size: 12px; color: var(--ink); box-sizing: border-box;
+}
+.dish-dialog .field input { height: 44px; }
+.dish-dialog .field textarea { padding: 12px; line-height: 1.3; resize: vertical; }
+.dish-dialog .field input:focus, .dish-dialog .field textarea:focus { outline: none; border: 1px solid var(--ink); }
+.dish-dialog .hint.small { margin: 0; font-size: 11px; line-height: 1.3; color: var(--muted); }
+.dish-dialog .field-wrap { display: flex; flex-direction: column; gap: 6px; }
+/* Картка страви (16.11): кнопки за дизайн-системою.
+   Кнопки за дизайн-системою (як в онбордингу): висота 48; «Зберегти» — ink, 13/600, відступи 24;
+   «Скасувати» — fill, 12/600, відступи 20; «Видалити» — текстова danger-text 12/600; «Видалити остаточно» — danger 48, 12. */
+.dish-dialog .actions { gap: 8px; padding-top: 4px; }
+.dish-dialog .actions .btn { height: 48px; font-weight: 600; }
+.dish-dialog .actions .btn.primary { padding: 0 24px; font-size: 13px; }
+.dish-dialog .actions .btn.secondary { padding: 0 20px; font-size: 12px; }
+.dish-dialog .actions .btn.danger { padding: 0 20px; font-size: 12px; }
+.dish-dialog .actions .text-danger { height: 48px; align-self: auto; }
+.dish-dialog .actions .btn.primary:disabled { background: var(--fill); color: var(--muted); box-shadow: none; }
+/* Картка страви (16.11, 10:07): угорі місце для фото 160 (радіус 16), далі джерело, назва, опис;
+   інгредієнти — чипи 36, виділені з опису автоматично, з кнопкою «прибрати». Необовʼязкових полів немає. */
+.dish-photo-empty { width: 100%; height: 160px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 16px; background: var(--bg); color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; flex: none; }
+.dish-photo-empty:hover { background: var(--fill); }
+.dish-photo-empty svg { fill: currentColor; }
+.dish-photo-box { position: relative; flex: none; }
+.dish-photo-box .dish-photo { display: block; }
+.dish-photo-actions { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; }
+.dish-photo-btn { height: 28px; padding: 0 12px; border: 0; border-radius: 999px; background: #fff; color: var(--ink); font: inherit; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 18px rgba(0, 0, 0, 0.06); cursor: pointer; }
+.dish-photo-btn.icon { width: 28px; padding: 0; }
+.dish-photo-btn svg { fill: currentColor; }
+.dish-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.dish-dialog .chips { gap: 8px; }
+.ingr-chip { height: 36px; padding: 0 8px 0 14px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 999px; background: #fff; color: var(--ink); font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+.ingr-chip button { width: 20px; height: 20px; padding: 0; border: 0; border-radius: 999px; background: var(--fill); color: var(--muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.ingr-chip button svg { fill: currentColor; }
+/* Картка страви (16.11, 10:20): на ноутбуці — панель праворуч, притиснута до краю екрана, на всю висоту,
+   без затемнення: календар під нею лишається доступним; закривається «×» або Esc. Ширина 440, лівий край радіус 24.
+   Підписи полів — 12/600 ink (чорні); «необовʼязково» біля «джерело» — 12/400 muted. */
+@media (min-width: 761px) {
+  .dish-overlay { background: transparent; pointer-events: none; padding: 0; justify-content: flex-end; align-items: stretch; }
+  .dish-overlay .dish-dialog {
+    pointer-events: auto; width: 440px; max-width: 100%; height: 100dvh; max-height: 100dvh;
+    border-radius: 24px 0 0 24px; padding: 24px 24px 20px; animation: dishSheetIn 0.2s ease-out;
+    box-shadow: -1px 0 0 rgba(60, 60, 67, 0.12), -20px 0 60px rgba(0, 0, 0, 0.12);
+  }
+  .dish-overlay .dish-dialog .actions { margin-top: auto; }
+}
+@keyframes dishSheetIn { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .dish-overlay .dish-dialog { animation: none; } }
+.dish-dialog .field > span, .dish-dialog .field > legend, .dish-label { color: var(--ink); }
+.dish-dialog .field-opt { font-weight: 400; color: var(--muted); }
+/* Картка страви (16.11, 10:28): «опис» займає весь вільний простір панелі (мінімум 4 рядки);
+   кнопки «Скасувати» і «Зберегти» — на всю ширину порівну; «Видалити» / «Видалити остаточно» — окремим рядком над ними. */
+.dish-dialog .dish-note { flex: 1 1 auto; min-height: 120px; }
+.dish-dialog .dish-note textarea { flex: 1 1 auto; min-height: 96px; resize: none; }
+.dish-dialog .actions { flex-wrap: wrap; }
+.dish-dialog .actions .spacer { display: none; }
+.dish-dialog .actions .btn.secondary, .dish-dialog .actions .btn.primary { flex: 1 1 0; padding: 0 12px; min-width: 0; }
+.dish-dialog .actions .text-danger, .dish-dialog .actions .btn.danger { flex: 1 1 100%; justify-content: center; }
+.dish-dialog .actions .text-danger { height: 32px; }
+@media (max-width: 760px) { .dish-dialog .dish-note { flex: none; } }
+
+/* ---------- Шапка календаря (16.11): заголовок — дати тижня; праворуч: «+», «Сьогодні», стрілки, акаунт ---------- */
+.btn.primary.icon-only { width: 40px; padding: 0; gap: 0; }
+.fab.btn.primary.icon-only { width: 52px; height: 52px; padding: 0; }
+/* Телефон: заголовок на всю ширину, нижче «Сьогодні» і стрілки ліворуч, акаунт — у крайньому правому краї */
+@media (max-width: 760px) {
+  .top .title-block { flex-basis: 100%; }
+  .top .account { margin-left: auto; }
+}
+
+/* Шапка (16.11, 10:52): легенду модулів під заголовком прибрано; «Сьогодні» зі стрілками в одній капсулі; кнопку «Страви» повернено ліворуч від «+» */
+
+/* Нова подія (16.11, 11:00): вікно як картка страви — панель праворуч на ноутбуці, вікно знизу на телефоні.
+   Угорі вкладки модулів (чипи 36 через 8; обраний — ink): харчування, звітність ФОП, хобі та спорт, улюбленець, без модуля.
+   Поля залежать від вкладки: «харчування» — поля картки страви (фото, джерело, назва, опис, інгредієнти), решта — поки загальні. */
+.event-tabs { flex: none; }
+.event-dialog .field select {
+  height: 44px; padding: 0 12px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background: #fff;
+  font: inherit; font-size: 12px; color: var(--ink); box-sizing: border-box;
+}
+.event-dialog .field select:focus { outline: none; border: 1px solid var(--ink); }
+.event-dialog .row { align-items: flex-end; }
+.event-dialog .check { font-size: 12px; font-weight: 600; }
+.event-dialog .chip-tile { width: 24px; height: 24px; }
+
+/* Нова подія (16.11, 11:08): вкладки модулів — таби (сегменти на всю ширину): угорі іконка (плитка 24 кольору модуля),
+   внизу короткий підпис 12/600 — «їжа», «ФОП», «хобі», «улюбленець», «інше»; сегмент 60, обраний — білий.
+   Панель на 20 % ширша (440 → 528). Місце для фото нижче (96). Кнопки «Скасувати» і «Зберегти» — внизу панелі, закріплені:
+   форма прокручується, кнопки лишаються на місці (на білій підкладці з тонкою лінією зверху). */
+.dish-photo-empty { height: 96px; }
+@media (min-width: 761px) {
+  .dish-overlay .dish-dialog { width: 528px; }
+}
+.dish-dialog .actions {
+  position: sticky; bottom: -20px; z-index: 2; margin: auto -24px -20px; padding: 12px 24px 20px;
+  background: #fff; box-shadow: 0 -1px 0 rgba(60, 60, 67, 0.12);
+}
+@media (max-width: 760px) {
+  .dish-dialog .actions { margin-left: -22px; margin-right: -22px; padding-left: 22px; padding-right: 22px; }
+}
+
+/* Нова подія (16.11, 11:13): в табах модулів іконок немає — лише підписи; таби звичайної висоти 32 (сегмент 13/500, обраний 600). */
+.event-tabs button { flex-direction: row; gap: 0; height: 32px; padding: 0 4px; font-size: 13px; }
+
+/* Асистент (16.11): «+» відкриває лише чат «що запланувати» — панель праворуч 528 як картка страви (на телефоні вікно знизу).
+   Повідомлення 14; ваші — сіра бульбашка bg, радіус 16, відступ 10 × 14, праворуч; відповіді — текст 14 ink і перелік подій
+   у сірому блоці bg радіус 12 (рядок: плитка 30 радіус 8 кольору модуля, назва 14/600, дата й час 12 muted; між рядками лінія
+   rgba(60,60,67,.12)); «Скасувати» — мала капсула fill 28, 12/600. Унизу закріплене поле (44, біле, обводка 0.5 separator,
+   радіус 12, текст 14, росте до 5 рядків) і кругла кнопка ink 44 зі стрілкою. Над полем — чип дати клітинки fill 28 з «×». */
+.assistant-dialog { gap: 20px; }
+.chat { display: flex; flex-direction: column; gap: 16px; flex: 1 1 auto; }
+.chat-intro { display: flex; flex-direction: column; gap: 12px; }
+.chat-intro p { margin: 0 0 8px; font-size: 14px; line-height: 1.3; color: var(--ink); }
+.chat-intro .chips { gap: 8px; }
+.chat-example {
+  height: 36px; padding: 0 14px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 999px; background: #fff;
+  color: var(--ink); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer;
+}
+.chat-example:hover { background: var(--bg); }
+.chat-user {
+  align-self: flex-end; max-width: 85%; padding: 10px 14px; border-radius: 16px; background: var(--bg);
+  font-size: 14px; line-height: 1.3; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.chat-bot { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.chat-bot p { margin: 0; font-size: 14px; line-height: 1.3; }
+.chat-items { list-style: none; margin: 0; padding: 0 12px; align-self: stretch; border-radius: 12px; background: var(--bg); }
+.chat-items li { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+.chat-items li + li { border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.chat-tile { width: 30px; height: 30px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.chat-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.chat-item-text b { font-size: 14px; font-weight: 600; line-height: 1.25; }
+.chat-item-text small { font-size: 12px; color: var(--muted); line-height: 1.25; }
+.chat-bot.undone .chat-items { opacity: 0.45; }
+.chat-bot.undone .chat-item-text b { text-decoration: line-through; }
+.chat-undo {
+  height: 28px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink);
+  font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.chat-undone { font-size: 12px; color: var(--muted); line-height: 28px; }
+.dish-dialog .actions.chat-compose { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 8px; }
+.chat-ctx {
+  align-self: flex-start; height: 28px; padding: 0 6px 0 12px; border-radius: 999px; background: var(--fill);
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+}
+.chat-ctx button {
+  width: 18px; height: 18px; padding: 0; border: 0; border-radius: 999px; background: #fff; color: var(--muted);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.chat-row { display: flex; align-items: flex-end; gap: 8px; }
+.chat-row textarea {
+  flex: 1 1 auto; min-width: 0; height: 44px; min-height: 44px; max-height: 120px; padding: 12px; box-sizing: border-box;
+  border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background: #fff; color: var(--ink);
+  font: inherit; font-size: 14px; line-height: 1.3; resize: none;
+}
+.chat-row textarea:focus { outline: none; border: 1px solid var(--ink); padding: 11.5px; }
+.chat-send {
+  width: 44px; height: 44px; flex: none; border: 0; border-radius: 999px; background: var(--ink); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+.chat-send:disabled { background: var(--fill); color: var(--muted); box-shadow: none; cursor: default; }
+@media (max-width: 760px) {
+  .assistant-dialog { min-height: 70dvh; }
+}
+
+/* Асистент (16.11, 11:56): на ноутбуці панель завжди відкрита справа — 528 на всю висоту, лівий край радіус 24,
+   тінь бічної панелі; календар зсувається вліво, щоб панель його не закривала. Кнопка «›» (кругла fill 30) у шапці
+   згортає панель вправо до смуги 56: біла, лівий край радіус 24, угорі за 24 — кругла fill 30 «‹» і під нею за 16
+   іконка хмарки 20; натискання будь-де на смузі розгортає панель. Стан запамʼятовується.
+   Вікна «нова подія», «подія» й картка страви відкриваються поверх панелі.
+   Телефон: «+» додає вручну, ліворуч від нього за 12 — біле коло 52 з хмаркою («Асистент») → вікно знизу. */
+.assistant-dock-wrap { position: fixed; top: 0; right: 0; bottom: 0; z-index: 15; display: flex; }
+.assistant-dock.dialog {
+  width: 528px; max-width: 100vw; height: 100dvh; max-height: 100dvh; box-sizing: border-box;
+  border-radius: 24px 0 0 24px; padding: 24px 24px 20px; animation: dishSheetIn 0.2s ease-out;
+  box-shadow: -1px 0 0 rgba(60, 60, 67, 0.12), -20px 0 60px rgba(0, 0, 0, 0.12);
+}
+@media (prefers-reduced-motion: reduce) { .assistant-dock.dialog { animation: none; } }
+.fab-asst {
+  position: fixed; right: 80px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 10;
+  width: 52px; height: 52px; padding: 0; border: 0; border-radius: 999px; background: var(--card); color: var(--ink);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+/* Асистент відкритий — тиждень вужчий: шапка календаря не переноситься (кнопки праворуч лишаються в одному рядку,
+   «цей тиждень» за потреби переходить під заголовок); «сьогодні» в шапці дня — під числом, якщо поруч не вміщається. */
+@media (min-width: 761px) {
+  .top { flex-wrap: nowrap; }
+  .top > * { flex: none; }
+  .top .title-block { flex: 0 1 auto; min-width: 0; }
+  .top .month-title { white-space: nowrap; }
+}
+.num-line { flex-wrap: wrap; row-gap: 2px; }
+
+/* Бічна панель (16.11, 12:08): на 20 % вужча — 422 (було 528); календар зсувається на ту саму ширину.
+   Під заголовком — таби на всю ширину «асистент» / «страви» (звичайні сегменти 32, текст 13/500, обраний — білий 600);
+   у табі «страви» заголовок «страви» і бібліотека страв (пошук, «Додати страву», рядки страв, які перетягують у тиждень,
+   «Скопіювати минулий тиждень» / «Очистити тиждень»). Окремої панелі страв 320 поруч із тижнем більше немає:
+   кнопка «Страви» в шапці відкриває панель на табі «страви» (увімкнено — ink). Вікна «нова подія» й картка страви — 528. */
+.assistant-dock.dialog { width: 422px; }
+.food-panel.embedded { position: static; max-height: none; overflow: visible; padding: 0; border-radius: 0; background: none; box-shadow: none; flex: 1 1 auto; }
+.food-panel.embedded .food-week { margin-top: auto; }
+
+/* Бічне меню (16.11, 12:19) — як у Google Календарі. Праворуч смуга 56 на всю висоту на фоні сторінки bg (без картки й тіні):
+   угорі за 24 кнопки-іконки 40 (кругла, без фону; при наведенні — rgba(118,118,128,.08); відкрита — fill), між ними 12:
+   «Асистент» — хмарка 20 ink, «Страви» — кругла плитка 24 кольору харчування з іконкою 14. Натискання відкриває панель
+   ліворуч від смуги (422 на всю висоту, лівий край радіус 24, кругла «×» 30 у шапці), повторне — закриває.
+   Календар зсувається: 56 (панель закрита) або 56 + 422. Кнопки «Страви» в шапці календаря більше немає.
+   Вікна «нова подія», «подія» й картка страви відкриваються поряд зі смугою (вона лишається видимою). */
+.side-rail {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 16; width: 56px; box-sizing: border-box; padding-top: 24px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px; background: var(--bg);
+}
+.rail-btn {
+  width: 40px; height: 40px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--ink);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.rail-btn:hover { background: rgba(118, 118, 128, 0.08); }
+.rail-btn.on { background: var(--fill); }
+.rail-tile { width: 24px; height: 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; }
+.rail-tile svg { fill: currentColor; }
+.assistant-dock-wrap { right: 56px; }
+.app.side-open { margin: 0 478px 0 auto; }
+.app.side-closed { margin: 0 56px 0 auto; }
+@media (min-width: 761px) {
+  .dish-overlay { padding-right: 56px; }
+}
+
+/* Бічне меню (16.11, 12:25): шапка календаря — на всю ширину сторінки (акаунт у правому краї над меню);
+   смуга з іконками й панель починаються на рівні сітки тижня — на 16 нижче шапки (--side-top рахує App.tsx),
+   а під час прокручування піднімаються до 16 від верху екрана. Панель — біла картка 422 радіус 24 з тінню картки,
+   знизу 16 від краю екрана, впритул до смуги. Між тижнем і панеллю (або смугою, коли панель закрита) — 16. */
+.app.side-open, .app.side-closed { max-width: none; margin: 0; }
+.app.side-closed > main, .app.side-closed > .notice { margin-right: 44px; }
+.app.side-open > main, .app.side-open > .notice { margin-right: 466px; }
+.side-rail { top: var(--side-top, 88px); padding-top: 0; background: transparent; }
+.assistant-dock-wrap { top: var(--side-top, 88px); bottom: 16px; }
+.assistant-dock.dialog {
+  height: 100%; max-height: 100%; border-radius: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.06);
+}
+/* Іконка акаунта в шапці — по центру смуги меню (праворуч від сторінки 4 + відступ шапки 4) */
+.app.side-open, .app.side-closed { padding-right: 4px; }
+.app.side-closed > main, .app.side-closed > .notice { margin-right: 68px; }
+.app.side-open > main, .app.side-open > .notice { margin-right: 490px; }
+
+/* Бічне меню (16.11, 16:06): одна біла панель праворуч — картка радіус 24 з тінню картки, на рівні сітки тижня
+   (top --side-top), за 12 від правого й нижнього краю екрана. Згорнута — смуга 56 з іконками (угорі за 20, через 12);
+   клік по іконці розширює ту саму панель вліво до 478 (вміст 422 + смуга 56, зсув 0.2 с); повторний клік або «×» — згортає.
+   Іконка акаунта в шапці стоїть над іконками меню. Від тижня до панелі — 16. */
+.side {
+  position: fixed; z-index: 15; top: var(--side-top, 88px); right: 12px; bottom: 12px; width: 56px;
+  display: flex; overflow: hidden; border-radius: 24px; background: var(--card);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.06);
+  transition: width 0.2s ease-out;
+}
+.side.open { width: 478px; }
+@media (prefers-reduced-motion: reduce) { .side { transition: none; } }
+.side .side-rail { position: static; flex: none; width: 56px; height: auto; padding-top: 20px; background: transparent; }
+.side .assistant-dock.dialog {
+  position: static; flex: none; width: 422px; height: 100%; max-height: 100%; margin: 0;
+  border-radius: 0; box-shadow: none; background: transparent; animation: none;
+}
+.app.side-open, .app.side-closed { padding-right: 16px; }
+.app.side-closed > main, .app.side-closed > .notice { margin-right: 68px; }
+.app.side-open > main, .app.side-open > .notice { margin-right: 490px; }
+@media (min-width: 761px) {
+  .dish-overlay { padding-right: 68px; }
+}
+/* Бічне меню (16.11, 16:10): розгорнута панель ще на 20 % вужча — вміст 338 (було 422), разом зі смугою 394 (було 478) */
+.side.open { width: 394px; }
+.side .assistant-dock.dialog { width: 338px; }
+.app.side-open > main, .app.side-open > .notice { margin-right: 406px; }
