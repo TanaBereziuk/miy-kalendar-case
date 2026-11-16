@@ -3,7 +3,7 @@
 **Date:** 16 Nov 2026 · **Status:** accepted
 
 ## Context
-I plan on the phone in places with bad connection: the metro, the vet, the shop.
+Planning often happens on the phone, on the go, where the connection can drop.
 A code review showed that an edit made without connection could be lost after a reload. A calendar that loses a vet appointment is worse than no calendar.
 
 ## Decision

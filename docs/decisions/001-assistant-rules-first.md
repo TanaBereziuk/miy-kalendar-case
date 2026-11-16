@@ -3,7 +3,7 @@
 **Date:** 16 Nov 2026 · **Status:** accepted
 
 ## Context
-Adding events through the form takes 5–7 taps. Most of my entries are short and repetitive: "dance Mon and Wed 6–8", "vet on Thursday at 17:30", "remove yoga".
+Adding an event through the form takes several taps, while many entries are short and repetitive: "dance Mon and Wed 6–8", "vet on Thursday at 17:30", "remove yoga".
 I wanted to add them with one phrase.
 
 ## Options

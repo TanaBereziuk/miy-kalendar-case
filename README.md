@@ -10,12 +10,15 @@ I designed it and built it with Claude Code, and I use it myself.
 
 ---
 
-## The problem
+## Why I built it
 
-My week lived in five places. There was a meal plan in Notes and tax deadlines in a bookmarked government page. The cat's vaccinations were in a paper vet passport, and workouts were in my head.
-General-purpose calendars can hold all of it, but someone still has to *type it all in* and remember the rules: when the next single-tax payment is due for group 3, or when the next rabies shot is due.
+I built it for myself. What I needed to plan lived in different places, so I kept going somewhere to search, check and look things up. Each kind of plan had to be set up separately, again and again.
 
-**Goal:** answer a few questions once, and the calendar fills the coming weeks by itself. After that, adding something takes one short phrase.
+Why not Google Calendar? It has no place for meals, and entering everything there by hand would take too long. I was also curious to try building a real product end to end with AI.
+
+**Goal:** set things up once, and the calendar keeps planning from there. After that, adding something takes one short phrase.
+
+**Scope:** this is designed around one user, me. It is a personal tool, not a validated product. The next step would be talking to other people who juggle the same mix of plans.
 
 ## My role
 
