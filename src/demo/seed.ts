@@ -10,37 +10,46 @@ const id = () =>
     ? crypto.randomUUID()
     : Math.random().toString(36).slice(2) + Date.now().toString(36);
 
-const DISHES: { name: string; prep: number; fav?: boolean; text: string }[] = [
+// Photos: Unsplash (free under the Unsplash License), loaded from the Unsplash CDN.
+const photo = (id: string) => `https://images.unsplash.com/photo-${id}?w=720&q=75&auto=format&fit=crop`;
+
+const DISHES: { name: string; prep: number; fav?: boolean; text: string; photo: string }[] = [
   {
     name: 'Сирники зі сметаною',
     prep: 25,
+    photo: photo('1597990566967-a0cffc700e1a'),
     fav: true,
     text: 'Інгредієнти:\n- сир 400 г\n- яйце 1 шт\n- борошно 3 ст. л.\n- сметана',
   },
   {
     name: 'Вівсянка з ягодами',
     prep: 10,
+    photo: photo('1594490150174-b349c66d93c5'),
     text: 'Інгредієнти:\n- вівсяні пластівці 60 г\n- молоко 200 мл\n- ягоди\n- мед',
   },
   {
     name: 'Борщ',
     prep: 90,
+    photo: photo('1780814303735-686588637714'),
     fav: true,
     text: 'Інгредієнти:\n- буряк\n- капуста\n- картопля\n- морква\n- цибуля\n- томатна паста',
   },
   {
-    name: 'Курка з овочами в духовці',
-    prep: 50,
-    text: 'Інгредієнти:\n- куряче філе 500 г\n- кабачок\n- перець\n- цибуля\n- олія',
+    name: 'Запечена курка',
+    prep: 80,
+    photo: photo('1501200291289-c5a76c232e5f'),
+    text: 'Інгредієнти:\n- курка ціла 1,5 кг\n- часник\n- розмарин\n- лимон\n- олія',
   },
   {
-    name: 'Паста з томатами й базиліком',
+    name: 'Пенне з томатним соусом',
     prep: 20,
-    text: 'Інгредієнти:\n- паста 200 г\n- томати черрі\n- часник\n- базилік\n- пармезан',
+    photo: photo('1776810250123-119d15036790'),
+    text: 'Інгредієнти:\n- пенне 200 г\n- томати в соку\n- часник\n- орегано\n- пармезан',
   },
   {
-    name: 'Салат з булгуром',
+    name: 'Табуле з булгуром',
     prep: 15,
+    photo: photo('1786174044919-c2119725afa1'),
     text: 'Інгредієнти:\n- булгур 100 г\n- огірок\n- помідор\n- петрушка\n- лимон',
   },
 ];
@@ -92,7 +101,7 @@ export function seedTables(today = new Date()) {
     id: id(),
     name: d.name,
     category: null,
-    photo_url: null,
+    photo_url: d.photo,
     prep_min: d.prep,
     ingredients: null,
     steps: null,
@@ -108,13 +117,13 @@ export function seedTables(today = new Date()) {
     [0, 'Вівсянка з ягодами', '08:00'],
     [0, 'Борщ', '13:00'],
     [1, 'Борщ', '13:00'],
-    [1, 'Курка з овочами в духовці', '19:30'],
+    [1, 'Запечена курка', '19:30'],
     [2, 'Сирники зі сметаною', '08:30'],
-    [2, 'Салат з булгуром', '13:00'],
-    [3, 'Паста з томатами й базиліком', '19:30'],
+    [2, 'Табуле з булгуром', '13:00'],
+    [3, 'Пенне з томатним соусом', '19:30'],
     [4, 'Вівсянка з ягодами', '08:00'],
     [5, 'Сирники зі сметаною', '09:30'],
-    [6, 'Курка з овочами в духовці', '14:00'],
+    [6, 'Запечена курка', '14:00'],
   ];
   const plus30 = (t: string) => {
     const [h, m] = t.split(':').map(Number);

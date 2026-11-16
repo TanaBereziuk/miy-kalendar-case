@@ -94,4 +94,4 @@ npm run dev
 
 ---
 
-Fonts: e-Ukraine / e-UkraineHead (CC BY 4.0). The tax deadline rules are a planning aid, not accounting advice.
+Fonts: e-Ukraine / e-UkraineHead (CC BY 4.0). Demo food photos: [Unsplash](https://unsplash.com) (Unsplash License). The tax deadline rules are a planning aid, not accounting advice.
