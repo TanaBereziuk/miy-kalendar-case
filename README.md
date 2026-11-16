@@ -3,7 +3,7 @@
 A personal planning web app (PWA) for meals, sole-proprietor tax deadlines, hobbies and pet care, all in one week view.
 I designed it and built it with Claude Code, and I use it myself.
 
-**Live demo:** _link coming soon_ (no sign-in; sample data lives only in your browser)
+**Live demo:** [miy-kalendar-case.vercel.app](https://miy-kalendar-case.vercel.app) (no sign-in; sample data lives only in your browser)
 **Design system:** [мій календар design system](https://claude.ai/artifact/3vBzMkq3jixvQ184BwDobQ)
 
 ![Week view with the assistant panel](docs/screenshots/assistant.png)
