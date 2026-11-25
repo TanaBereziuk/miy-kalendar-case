@@ -2814,3 +2814,5 @@ textarea.qf-title { display: block; height: auto; min-height: 40px; padding: 6px
 }
 .lp-label svg { fill: currentColor; }
 .tasks-dialog .lp-top { margin-bottom: 4px; }
+/* 25.11 (пізніше): рядок «нова задача» — над нагадуваннями; від його лінії до нагадувань 12 */
+.tasks > .lp-remind-sec { margin-top: 12px; }

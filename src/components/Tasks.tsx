@@ -190,7 +190,7 @@ interface ListProps {
   onChange: (t: Task, next: NewTask, text?: string) => void;
   onRemove: (t: Task) => void;
   onMakeEvent: (t: Task) => void;
-  /** 25.11: нагадування (ФОП, улюбленець) — на самому верху списку, над рядком нової задачі */
+  /** 25.11: нагадування (ФОП, улюбленець) — одразу під рядком нової задачі, над задачами */
   top?: ReactNode;
 }
 
@@ -263,7 +263,6 @@ export function TaskList({ tasks, items, options, sync, onAdd, onChange, onRemov
 
   return (
     <div className="tasks">
-      {top}
       {sync === 'missing' ? (
         <p className="notice warn tasks-missing">
           Щоб задачі запрацювали, оновіть базу: запустіть новий шматок SQL (його надіслано в чаті, файл supabase/schema.sql).
@@ -351,6 +350,7 @@ export function TaskList({ tasks, items, options, sync, onAdd, onChange, onRemov
           )}
         </div>
       )}
+      {top}
       {sync !== 'missing' && shown.length === 0 && (
         <p className="tasks-empty">Тут будуть справи, які треба зробити, але не обовʼязково в певний час. Задачу можна підвʼязати до події — тоді вона зʼявиться в ній чеклістом.</p>
       )}
