@@ -1,7 +1,8 @@
-// Ліва панель (етап 2 плану, 21.11; макети погоджено в чаті): таби «сьогодні / задачі / історія» вгорі,
-// кругла «‹» згортає панель у вузький язичок «сьогодні» біля лівого краю. На телефоні ті самі списки —
-// блок «сьогодні» над списком дня і вкладка «історія» у вікні задач.
-import { useEffect, useState, type ReactNode } from 'react';
+// Ліва панель (етап 2 плану, 21.11; 25.11 — правки власниці): заголовок «задачі», праворуч від нього капсула «історія»
+// і кругла «‹» (згорнути в язичок «задачі» біля лівого краю). Угорі списку задач — нагадування (дедлайни ФОП і процедури
+// улюбленця на сьогодні й прострочені) на тлі кольору модуля з позначкою «нагадування». На телефоні — те саме у вікні задач;
+// блок «сьогодні і прострочене» над списком дня лишився (TodayList).
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { MODULES, type CalendarItem, type Task } from '../types';
 import type { DoneEntry } from '../onboarding/answers';
 import { MONTHS_GEN, fromISO, toISO } from '../lib/dates';
@@ -9,12 +10,7 @@ import type { TodayEvent } from '../lib/today';
 import { Check, dueLabel } from './Tasks';
 import { ICONS, Icon } from './Icon';
 
-export type LeftTab = 'today' | 'tasks' | 'history';
-const TABS: { id: LeftTab; name: string }[] = [
-  { id: 'today', name: 'сьогодні' },
-  { id: 'tasks', name: 'задачі' },
-  { id: 'history', name: 'історія' },
-];
+export type LeftTab = 'tasks' | 'history';
 const MONTHS_NOM = ['січень', 'лютий', 'березень', 'квітень', 'травень', 'червень', 'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'];
 
 function Tile({ module }: { module: CalendarItem['module'] }) {
@@ -162,6 +158,52 @@ export function TodayList({ events, tasks, onDone, onToggleTask, onMoveEvent, on
   );
 }
 
+interface ReminderProps {
+  events: TodayEvent[];
+  onDone: (item: CalendarItem) => void;
+  onMove: (item: CalendarItem) => void;
+  onDelete: (item: CalendarItem) => void;
+}
+
+/**
+ * Нагадування вгорі списку задач (25.11): дедлайни ФОП і процедури улюбленця на сьогодні й прострочені, ще не «Зроблено».
+ * Рядок — тло кольору модуля (30 % з білим), радіус 12; позначка 18 ліворуч — «Зроблено»; під назвою капсула «нагадування»
+ * з іконкою модуля і день (прострочене — колір now-text). «…» — перенести на наступний день або видалити.
+ */
+export function ReminderList({ events, onDone, onMove, onDelete }: ReminderProps) {
+  const [menu, setMenu] = useState<string | null>(null);
+  if (!events.length) return null;
+  return (
+    <section className="lp-sec lp-remind-sec" aria-label="Нагадування">
+      {events.map((e) => {
+        const k = e.item.id + e.item.date;
+        const m = MODULES[e.item.module];
+        const when = dueLabel(e.item.date) + (e.item.allDay || !e.item.start ? '' : ', ' + e.item.start);
+        return (
+          <div
+            key={k}
+            className={'lp-row lp-remind' + (menu === k ? ' menu-open' : '')}
+            style={{ '--mod': m.color } as CSSProperties}
+          >
+            <Check on={false} onClick={() => onDone(e.item)} label={`Зроблено: ${e.item.title}`} />
+            <span className="lp-t">
+              <b>{e.item.title}</b>
+              <span className="lp-meta">
+                <span className="lp-label">
+                  <Icon d={m.icon} size={10} />
+                  нагадування
+                </span>
+                <span className={e.overdue ? 'late' : ''}>{when}</span>
+              </span>
+            </span>
+            <RowMenu open={menu === k} onOpen={() => setMenu(k)} onClose={() => setMenu(null)} onMove={() => onMove(e.item)} onDelete={() => onDelete(e.item)} />
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
 /** Історія: зроблені дедлайни ФОП і процедури улюбленця, нові зверху, за місяцями. Без лічильників. */
 export function HistoryList({ done }: { done: DoneEntry[] }) {
   if (!done.length)
@@ -194,36 +236,47 @@ interface PanelProps {
   tab: LeftTab;
   onTab: (t: LeftTab) => void;
   onToggle: () => void;
-  tasksOn: boolean;
-  today: ReactNode;
+  /** список задач з нагадуваннями вгорі */
   tasks: ReactNode;
   history: ReactNode;
 }
 
-export function LeftPanel({ open, tab, onTab, onToggle, tasksOn, today, tasks, history }: PanelProps) {
+/** Шапка панелі (25.11): заголовок 26 («задачі» / «історія»), праворуч круглі fill 30 — «історія» (годинник; в історії
+ * натиснута, повторне натискання повертає до задач) і «‹» / «×» */
+export function PanelHead({ tab, onTab, closeLabel, closeIcon, onClose }: { tab: LeftTab; onTab: (t: LeftTab) => void; closeLabel: string; closeIcon: string; onClose: () => void }) {
+  const hist = tab === 'history';
+  return (
+    <div className="lp-top">
+      <h2 id="tasks-title" className="head-font lp-title">{hist ? 'історія' : 'задачі'}</h2>
+      <button
+        type="button"
+        className={'round-btn lp-hist' + (hist ? ' on' : '')}
+        aria-label={hist ? 'Повернутися до задач' : 'Історія'}
+        aria-pressed={hist}
+        title={hist ? 'Повернутися до задач' : 'Історія'}
+        onClick={() => onTab(hist ? 'tasks' : 'history')}
+      >
+        <Icon d={ICONS.history} size={14} />
+      </button>
+      <button type="button" className="round-btn" aria-label={closeLabel} title={closeLabel} onClick={onClose}>
+        <Icon d={closeIcon} size={12} />
+      </button>
+    </div>
+  );
+}
+
+export function LeftPanel({ open, tab, onTab, onToggle, tasks, history }: PanelProps) {
   if (!open)
     return (
-      <button type="button" className="lp-tab" onClick={onToggle} aria-label="Відкрити панель «сьогодні»" title="Відкрити панель">
+      <button type="button" className="lp-tab" onClick={onToggle} aria-label="Відкрити панель «задачі»" title="Відкрити панель">
         <Icon d={ICONS.next} size={12} />
-        <span className="lp-vt">сьогодні</span>
+        <span className="lp-vt">задачі</span>
       </button>
     );
-  const tabs = TABS.filter((t) => t.id !== 'tasks' || tasksOn);
   return (
-    <aside className="lp" aria-label="Сьогодні, задачі, історія">
-      <div className="lp-top">
-        <div className="seg fill lp-seg" role="tablist">
-          {tabs.map((t) => (
-            <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} className={tab === t.id ? 'on' : ''} onClick={() => onTab(t.id)}>
-              {t.name}
-            </button>
-          ))}
-        </div>
-        <button type="button" className="round-btn" aria-label="Згорнути панель" title="Згорнути" onClick={onToggle}>
-          <Icon d={ICONS.prev} size={12} />
-        </button>
-      </div>
-      <div className="lp-scroll">{tab === 'today' ? today : tab === 'tasks' ? tasks : history}</div>
+    <aside className="lp" aria-labelledby="tasks-title">
+      <PanelHead tab={tab} onTab={onTab} closeLabel="Згорнути панель" closeIcon={ICONS.prev} onClose={onToggle} />
+      <div className="lp-scroll">{tab === 'history' ? history : tasks}</div>
     </aside>
   );
 }

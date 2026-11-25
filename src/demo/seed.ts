@@ -169,6 +169,8 @@ export function seedTables(today = new Date(), empty = false): Record<string, Re
     { id: friendId, title: 'Зустріч з подругою', module: 'other', date: day(4), allDay: false, start: '18:30', end: '20:00' },
     // день народження: імʼя на синій підкладці у «весь день», кіт із тортом у шапці дня
     { title: 'Мама', module: 'other', date: day(6), allDay: true, repeat: { freq: 'yearly' }, source: 'bday:1968' },
+    // прострочене нагадування ФОП — угорі лівої панелі на підкладці кольору модуля
+    { title: 'Сплатити єдиний податок', module: 'fop', date: toISO(addDays(today, -1)), allDay: true, source: 'demo:fop' },
     // справи без дати — чипи в рядку «цього тижня»
     { title: 'Записатися до стоматолога', module: 'other', date: toISO(today), allDay: false, start: '09:00', end: '10:00', undated: true },
     { title: 'Купити новий килимок для йоги', module: 'hobby', date: toISO(today), allDay: false, start: '09:00', end: '10:00', undated: true },
@@ -191,6 +193,7 @@ export function seedTables(today = new Date(), empty = false): Record<string, Re
     ...extra,
   });
   const tasks = [
+    task('Подзвонити бухгалтеру', { due: toISO(today) }),
     task('Зібрати документи для декларації', { due: toISO(addDays(today, 1)) }),
     task('Обрати подарунок мамі', { due: day(5) }),
     task('Забронювати столик', { item_id: friendId, item_date: day(4) }),

@@ -2792,3 +2792,25 @@ textarea.qf-title { display: block; height: auto; min-height: 40px; padding: 6px
 /* Демоверсія (25.11): позначка в шапці, що зміни не зберігаються */
 .badge.demo-badge { background: #ffe8df; color: #b5401a; white-space: nowrap; }
 .phone-date .badge.demo-badge { margin-left: 8px; font-size: 11px; padding: 2px 8px; vertical-align: 2px; }
+
+/* 25.11 (правки власниці): ліва панель без табів — заголовок «задачі» 26 (e-UkraineHead), праворуч
+   «історія» — кругла fill 30 з годинником зліва від «‹» 30 (в історії натиснута); так само у вікні задач на телефоні (там «×»).
+   Нагадування (ФОП, улюбленець — сьогодні й прострочене) на самому верху списку: рядок на тлі кольору модуля
+   (30 % з білим, наведення 42 %), радіус 12, відступи 10 / 12, між рядками 4; позначка 18 на білому;
+   під назвою — біла капсула 18 «нагадування» з іконкою модуля 10 (11/600 ink) і день 12 muted (прострочене — now-text). */
+.lp-top .lp-title { flex: 1; min-width: 0; margin: 0; }
+.lp-hist.on { background: rgba(118, 118, 128, 0.24); }
+/* 25.11: розділення задач за датою — підписи 12/600 muted («сьогодні, 25 листопада», «завтра, …», «пт, 28 листопада»,
+   «без дня», «виконано»), від попередньої групи 16, до рядків 4 */
+.task-list .task-group { list-style: none; margin: 16px 0 4px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.task-list .task-group:first-child { margin-top: 4px; }
+.lp-remind-sec { gap: 4px; margin-bottom: 12px; }
+.lp-row.lp-remind { margin: 0; padding: 10px 12px; background: color-mix(in srgb, var(--mod) 30%, #fff); }
+.lp-row.lp-remind:hover, .lp-row.lp-remind.menu-open { background: color-mix(in srgb, var(--mod) 42%, #fff); }
+.lp-remind .task-check:not(.on) { background: #fff; }
+.lp-t span.lp-label {
+  display: inline-flex; align-items: center; gap: 4px; height: 18px; padding: 0 7px 0 5px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600; color: var(--ink);
+}
+.lp-label svg { fill: currentColor; }
+.tasks-dialog .lp-top { margin-bottom: 4px; }

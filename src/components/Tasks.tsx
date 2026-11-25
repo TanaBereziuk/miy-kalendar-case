@@ -1,7 +1,7 @@
 // Задачі (етап 1 плану, 18.11; макети TaskRow, EventChecklist, LinkToEvent у дизайн-системі):
 // список задач у бічному меню (на телефоні — вікно знизу), чекліст у короткому перегляді події
 // і вибір події випадним списком (подію обирають лише так, без перетягування — рішення 18.11).
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { MODULES, type CalendarItem, type NewTask, type Task } from '../types';
 import { DAYS_SHORT, MONTHS_GEN, addDays, fromISO, toISO, weekdayIndex } from '../lib/dates';
 import { isVisibleTask, toNewTask, type TaskSync } from '../lib/tasks';
@@ -190,6 +190,8 @@ interface ListProps {
   onChange: (t: Task, next: NewTask, text?: string) => void;
   onRemove: (t: Task) => void;
   onMakeEvent: (t: Task) => void;
+  /** 25.11: нагадування (ФОП, улюбленець) — на самому верху списку, над рядком нової задачі */
+  top?: ReactNode;
 }
 
 /** День задачі для порядку: свій день або день підвʼязаної події */
@@ -197,7 +199,7 @@ function taskDay(t: Task, items: CalendarItem[]): string | undefined {
   return t.due ?? linkedEvent(t.itemId ? { itemId: t.itemId, itemDate: t.itemDate } : undefined, items)?.date;
 }
 
-export function TaskList({ tasks, items, options, sync, onAdd, onChange, onRemove, onMakeEvent }: ListProps) {
+export function TaskList({ tasks, items, options, sync, onAdd, onChange, onRemove, onMakeEvent, top }: ListProps) {
   const [text, setText] = useState('');
   const [menu, setMenu] = useState<string | null>(null);
   const [mode, setMode] = useState<{ id: string; kind: 'link' | 'day' | 'title' } | null>(null);
@@ -227,6 +229,22 @@ export function TaskList({ tasks, items, options, sync, onAdd, onChange, onRemov
     return [...withDay, ...noDay, ...done];
   }, [tasks, items, today]);
 
+  /** Група задачі: день (прострочене — у «сьогодні»), 'none' — без дня, 'done' — виконані */
+  const groupOf = (t: Task) => {
+    if (t.doneAt) return 'done';
+    const d = taskDay(t, items);
+    if (!d) return 'none';
+    return d < today ? today : d;
+  };
+  const groupLabel = (g: string) => {
+    if (g === 'done') return 'виконано';
+    if (g === 'none') return 'без дня';
+    const d = fromISO(g);
+    const dm = `${d.getDate()} ${MONTHS_GEN[d.getMonth()]}`;
+    const rel = dueLabel(g);
+    return rel === 'сьогодні' || rel === 'завтра' ? `${rel}, ${dm}` : rel;
+  };
+
   const [newDue, setNewDue] = useState('');
   const [newEv, setNewEv] = useState<EventRef | undefined>(undefined);
   const [newPick, setNewPick] = useState(false);
@@ -245,6 +263,7 @@ export function TaskList({ tasks, items, options, sync, onAdd, onChange, onRemov
 
   return (
     <div className="tasks">
+      {top}
       {sync === 'missing' ? (
         <p className="notice warn tasks-missing">
           Щоб задачі запрацювали, оновіть базу: запустіть новий шматок SQL (його надіслано в чаті, файл supabase/schema.sql).
@@ -336,12 +355,21 @@ export function TaskList({ tasks, items, options, sync, onAdd, onChange, onRemov
         <p className="tasks-empty">Тут будуть справи, які треба зробити, але не обовʼязково в певний час. Задачу можна підвʼязати до події — тоді вона зʼявиться в ній чеклістом.</p>
       )}
       <ul className="task-list">
-        {shown.map((t) => {
+        {shown.map((t, i) => {
           const ev = linkedEvent(t.itemId ? { itemId: t.itemId, itemDate: t.itemDate } : undefined, items);
           const late = !t.doneAt && !!t.due && t.due < today;
           const editing = mode?.id === t.id ? mode.kind : null;
+          // 25.11: розділення за датою — від сьогодні (разом із простроченим) вниз до найдальших днів, потім «без дня» і «виконано»
+          const group = groupOf(t);
+          const head = i === 0 || groupOf(shown[i - 1]) !== group;
           return (
-            <li key={t.id} className={'task-row' + (t.doneAt ? ' done' : '') + (menu === t.id ? ' menu-open' : '')}>
+            <Fragment key={t.id}>
+            {head && (
+              <li className="task-group" role="presentation">
+                {groupLabel(group)}
+              </li>
+            )}
+            <li className={'task-row' + (t.doneAt ? ' done' : '') + (menu === t.id ? ' menu-open' : '')}>
               <Check on={!!t.doneAt} label={t.title} onClick={() => set(t, { doneAt: t.doneAt ? undefined : new Date().toISOString() })} />
               <div className="task-text">
                 {editing === 'title' ? (
@@ -383,7 +411,7 @@ export function TaskList({ tasks, items, options, sync, onAdd, onChange, onRemov
                       {ev.item.title} · {shortWhen(ev.date, ev.item.allDay ? undefined : ev.item.start)}
                     </span>
                   </span>
-                ) : t.due ? (
+                ) : t.due && (late || t.doneAt) ? (
                   <span className={'task-meta' + (late ? ' late' : '')}>{dueLabel(t.due)}</span>
                 ) : null}
                 {editing === 'day' && (
@@ -503,6 +531,7 @@ export function TaskList({ tasks, items, options, sync, onAdd, onChange, onRemov
                 </div>
               )}
             </li>
+            </Fragment>
           );
         })}
       </ul>

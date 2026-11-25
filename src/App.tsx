@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   MODULES,
   MODULE_ORDER,
@@ -61,7 +61,7 @@ import { GoogleLayerDialog } from "./components/GoogleLayerDialog";
 import { useAssistant } from "./assistant/useAssistant";
 import { isVisibleTask, toNewTask, useTasks } from "./lib/tasks";
 import { Checklist, TaskList } from "./components/Tasks";
-import { HistoryList, LeftPanel, TodayList, type LeftTab } from "./components/LeftPanel";
+import { HistoryList, LeftPanel, PanelHead, ReminderList, TodayList, type LeftTab } from "./components/LeftPanel";
 import { canBeDone, doneKey, nextAfter, todayEvents, todayTasks } from "./lib/today";
 import { useLeaving } from "./lib/useLeaving";
 import type { DoneEntry } from "./onboarding/answers";
@@ -160,12 +160,13 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
   const [asstPhoneOpen, setAsstPhoneOpen] = useState(false);
   // телефон: задачі (етап 1, 18.11) — кнопкою поруч з асистентом, вікном знизу
   const [tasksPhoneOpen, setTasksPhoneOpen] = useState(false);
-  // Ліва панель (етап 2, 21.11): «сьогодні / задачі / історія»; стан — localStorage ('today' | 'tasks' | 'history' | 'none')
+  // Ліва панель (етап 2, 21.11; 25.11 — «задачі» з нагадуваннями вгорі і «історія»); стан — localStorage
+  // ('tasks' | 'history' | 'none'; збережене раніше 'today' стає 'tasks')
   const [left, setLeftState] = useState<LeftTab | null>(() => {
     const v = localStorage.getItem(LEFT_KEY);
-    return v === "today" || v === "tasks" || v === "history" ? v : v === "none" ? null : "today";
+    return v === "history" ? "history" : v === "none" ? null : "tasks";
   });
-  const [leftLast, setLeftLast] = useState<LeftTab>(() => left ?? "today");
+  const [leftLast, setLeftLast] = useState<LeftTab>(() => left ?? "tasks");
   const setLeft = (v: LeftTab | null) => {
     setLeftState(v);
     if (v) setLeftLast(v);
@@ -749,8 +750,9 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
       .sort((a, b) => a.date.localeCompare(b.date) || (a.allDay ? "" : (a.start ?? "")).localeCompare(b.allDay ? "" : (b.start ?? "")));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [datedItems, answers, todayISO]);
-  const taskList = (
+  const renderTaskList = (top?: ReactNode) => (
     <TaskList
+      top={top}
       tasks={tasks}
       items={datedItems}
       options={upcoming}
@@ -832,6 +834,17 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
     />
   );
   const historyList = <HistoryList done={doneList} />;
+  // 25.11: нагадування (ФОП, улюбленець — сьогодні й прострочене) вгорі списку задач
+  const reminders = (
+    <ReminderList events={todayEv} onDone={markDone} onMove={moveTodayEvent} onDelete={deleteTodayEvent} />
+  );
+  const taskList = tasksOn ? (
+    renderTaskList(reminders)
+  ) : todayEv.length ? (
+    reminders
+  ) : (
+    <p className="lp-empty">На сьогодні нагадувань немає.</p>
+  );
 
   const saveDraft = useCallback(
     (a: Answers) => void profile.save(a, false),
@@ -1173,16 +1186,8 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
       {isPhone && tasksPhoneOpen && (
         <div className="overlay dish-overlay asst-overlay" onMouseDown={(e) => e.target === e.currentTarget && setTasksPhoneOpen(false)}>
           <div className="dialog dish-dialog assistant-dialog tasks-dialog" role="dialog" aria-labelledby="tasks-title">
-            {/* 23.11: заголовок, що дублював таб, прибрано — таби й «×» в одному рядку */}
-            <div className="lp-top">
-              <div className="seg fill lp-seg" role="tablist" id="tasks-title" aria-label="Задачі й історія">
-                <button type="button" role="tab" aria-selected={phoneTab === "tasks"} className={phoneTab === "tasks" ? "on" : ""} onClick={() => setPhoneTab("tasks")}>задачі</button>
-                <button type="button" role="tab" aria-selected={phoneTab === "history"} className={phoneTab === "history" ? "on" : ""} onClick={() => setPhoneTab("history")}>історія</button>
-              </div>
-              <button type="button" className="round-btn" aria-label="Закрити" onClick={() => setTasksPhoneOpen(false)}>
-                <Icon d={ICONS.close} size={12} />
-              </button>
-            </div>
+            {/* 25.11: як ліва панель — заголовок «задачі», капсула «історія» і «×» в одному рядку */}
+            <PanelHead tab={phoneTab} onTab={setPhoneTab} closeLabel="Закрити" closeIcon={ICONS.close} onClose={() => setTasksPhoneOpen(false)} />
             {phoneTab === "tasks" ? taskList : <div className="lp-scroll">{historyList}</div>}
           </div>
         </div>
@@ -1204,8 +1209,6 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
           tab={left ?? leftLast}
           onTab={setLeft}
           onToggle={() => setLeft(left ? null : leftLast)}
-          tasksOn={tasksOn}
-          today={todayList}
           tasks={taskList}
           history={historyList}
         />
