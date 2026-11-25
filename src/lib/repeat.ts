@@ -12,6 +12,7 @@ export function occursOn(item: CalendarItem, date: Date): boolean {
   if (iso < item.date) return false;
   if (!r) return iso === item.date;
   if (r.until && iso > r.until) return false;
+  if (r.skip?.includes(iso)) return false;
   const n = Math.max(1, r.interval ?? 1);
   const diff = dayNum(date) - dayNum(first);
 

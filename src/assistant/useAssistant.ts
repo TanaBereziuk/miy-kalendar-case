@@ -1,6 +1,6 @@
 // Асистент (16.11): історія розмови, виконання плану (додати / прибрати події) і скасування.
 import { useCallback, useState } from 'react';
-import type { CalendarItem, ModuleId, NewItem } from '../types';
+import type { CalendarItem, ModuleId, NewItem, NewTask } from '../types';
 import { DAYS_SHORT, MONTHS_GEN, fromISO, toISO, weekdayIndex } from '../lib/dates';
 import { describeRepeat, occursOn } from '../lib/repeat';
 import { parsePhrase, type ParseCtx, type RemoveQuery } from './parse';
@@ -9,9 +9,13 @@ export interface Shown {
   title: string;
   module: ModuleId;
   when: string;
+  /** задача, а не подія (етап 1, 18.11) */
+  task?: boolean;
 }
 
 interface Undo {
+  /** id доданих задач */
+  tasks?: string[];
   added: string[];
   removed: CalendarItem[];
   updated: { id: string; before: NewItem }[];
@@ -31,7 +35,13 @@ interface Store {
   add: (d: NewItem, id?: string) => string;
   update: (id: string, d: NewItem) => void;
   remove: (id: string) => void;
+  /** задачі (етап 1, 18.11): «додай задачу …»; немає — асистент задач не додає */
+  addTask?: (t: NewTask) => string;
+  removeTask?: (id: string) => void;
 }
+
+/** «додай задачу …», «задача: …», «нова задача …» */
+const TASK_RE = /^\s*(?:додай(?:те)?\s+|додати\s+|нова\s+|запиши\s+)?задач[уаі]\s*[:—–-]?\s*(.+)$/i;
 
 /** «пн, 17 листопада» */
 export function dayLabel(iso: string): string {
@@ -75,6 +85,26 @@ export function useAssistant(store: Store, base: Omit<ParseCtx, 'today' | 'date'
       const trimmed = text.trim();
       if (!trimmed) return;
       const user: Msg = { id: ++seq, role: 'user', text: trimmed };
+      // Задача (етап 1, 18.11): назва й необовʼязковий день; час не потрібен
+      const tm = store.addTask ? trimmed.match(TASK_RE) : null;
+      if (tm && store.addTask) {
+        const rest = tm[1].trim();
+        const today = toISO(new Date());
+        const first = parsePhrase(rest, { ...base, today: new Date(), ...ctx }).find((p) => p.kind === 'add');
+        const it = first && first.kind === 'add' ? first.items[0] : undefined;
+        const due = it && (it.date !== today || /сьогодні/i.test(rest)) ? it.date : undefined;
+        const title = (it?.title || rest).replace(/^./, (c) => c.toUpperCase());
+        const id = store.addTask({ title, due });
+        const bot: Msg = {
+          id: ++seq,
+          role: 'bot',
+          text: 'Додано в задачі:',
+          shown: [{ title, module: 'other', when: due ? dayLabel(due) : 'без дня', task: true }],
+          undo: { tasks: [id], added: [], removed: [], updated: [] },
+        };
+        setMessages((m) => [...m, user, bot]);
+        return;
+      }
       const plans = parsePhrase(trimmed, { ...base, today: new Date(), ...ctx });
       const undo: Undo = { added: [], removed: [], updated: [] };
       const added: Shown[] = [];
@@ -141,19 +171,20 @@ export function useAssistant(store: Store, base: Omit<ParseCtx, 'today' | 'date'
       return reveal;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [store.items, store.add, store.update, store.remove, base.dishes, base.petNames],
+    [store.items, store.add, store.update, store.remove, store.addTask, base.dishes, base.petNames],
   );
 
   const undo = useCallback(
     (id: number) => {
       const m = messages.find((x) => x.id === id);
       if (!m || m.role !== 'bot' || !m.undo || m.undone) return;
+      m.undo.tasks?.forEach((x) => store.removeTask?.(x));
       m.undo.added.forEach((x) => store.remove(x));
       m.undo.removed.forEach((it) => store.add(strip(it), it.id));
       m.undo.updated.forEach((u) => store.update(u.id, u.before));
       setMessages((list) => list.map((x) => (x.id === id ? { ...x, undone: true } : x)));
     },
-    [messages, store.add, store.update, store.remove],
+    [messages, store.add, store.update, store.remove, store.removeTask],
   );
 
   return { messages, send, undo };

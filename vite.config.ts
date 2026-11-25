@@ -13,7 +13,7 @@ export default defineConfig({
         short_name: 'календар',
         description: 'Тиждень, який планується сам.',
         lang: 'uk',
-        start_url: '/',
+        start_url: '/demo',
         display: 'standalone',
         background_color: '#F5F5F7',
         theme_color: '#F5F5F7',

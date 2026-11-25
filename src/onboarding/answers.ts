@@ -101,6 +101,10 @@ export interface NotifyAnswers {
 
 export interface GoogleAnswers {
   wanted: boolean;
+  /** секретна адреса Google Календаря у форматі iCal (18.11) — шар лише для перегляду */
+  icalUrl?: string;
+  /** показувати шар у календарі (перемикач у меню акаунта) */
+  show?: boolean;
 }
 
 export interface Answers {
@@ -112,6 +116,19 @@ export interface Answers {
   notify: NotifyAnswers;
   google: GoogleAnswers;
   skipped: Partial<Record<ModKey, boolean>>;
+  /** етап 2 (21.11): позначене «Зроблено» — дедлайни ФОП і процедури улюбленця (для «сьогодні» й історії) */
+  done?: DoneEntry[];
+  /** стікери днів (22.11): { 'рррр-мм-дд': ['cake', 'sun'] } */
+  stickers?: Record<string, string[]>;
+}
+
+/** Запис «Зроблено»: показ події (key = id події + дата показу), назва й модуль на момент позначки */
+export interface DoneEntry {
+  key: string;
+  title: string;
+  module: 'fop' | 'pet';
+  date: string;
+  at: string;
 }
 
 let seq = 0;
@@ -197,6 +214,8 @@ export function withDefaults(saved: Partial<Answers> | null | undefined): Answer
     notify: { ...d.notify, ...saved.notify },
     google: { ...d.google, ...saved.google },
     skipped: { ...saved.skipped },
+    done: Array.isArray(saved.done) ? saved.done : [],
+    stickers: saved.stickers && typeof saved.stickers === 'object' ? saved.stickers : {},
   };
 }
 

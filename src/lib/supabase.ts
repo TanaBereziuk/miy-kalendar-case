@@ -1,11 +1,9 @@
-// Demo build: there is no backend. This file replaces the real Supabase client
-// with a tiny in-browser stand-in that implements only the calls the app makes.
-// Everything is stored in localStorage of the visitor, so each visitor gets
-// their own sandbox and nothing leaves the browser.
+// Демоверсія: бази немає. Цей файл замінює справжній клієнт Supabase
+// маленькою заміною в памʼяті сторінки, яка вміє лише ті запити, що робить застосунок.
+// Нічого не зберігається: після перезавантаження сторінки тиждень знову такий, як у прикладі.
 //
-// In the production app this module exports `createClient(URL, KEY)` from
-// @supabase/supabase-js; the rest of the data layer (store.ts, dishes.ts,
-// profile.ts, outbox.ts) is the same code as in production.
+// У робочому застосунку тут `createClient(URL, KEY)` з @supabase/supabase-js;
+// решта шару даних (store.ts, tasks.ts, dishes.ts, profile.ts, outbox.ts) — той самий код.
 
 import { seedTables } from '../demo/seed';
 
@@ -15,53 +13,34 @@ type DbError = { message: string; code: string };
 type Result = { data: any; error: DbError | null; status: number };
 
 export const DEMO_USER_ID = 'demo-user';
-const PREFIX = 'miy-kalendar-demo:table:';
-const SEEDED = 'miy-kalendar-demo:seeded';
 
-function ensureSeeded() {
-  try {
-    if (localStorage.getItem(SEEDED)) return;
-    const tables = seedTables();
-    for (const [name, rows] of Object.entries(tables)) {
-      localStorage.setItem(PREFIX + name, JSON.stringify(rows));
-    }
-    localStorage.setItem(SEEDED, new Date().toISOString());
-  } catch {
-    /* storage unavailable — the app still works for the session */
-  }
-}
-
-const memory: Record<string, Row[]> = {};
-
-function readTable(name: string): Row[] {
-  ensureSeeded();
-  try {
-    const raw = localStorage.getItem(PREFIX + name);
-    if (raw) return JSON.parse(raw);
-  } catch {
-    /* fall through */
-  }
-  return memory[name] ?? [];
-}
-
-function writeTable(name: string, rows: Row[]) {
-  memory[name] = rows;
-  try {
-    localStorage.setItem(PREFIX + name, JSON.stringify(rows));
-  } catch {
-    /* quota or private mode — keep in memory */
-  }
-}
-
-/** Clears the sandbox; the next load seeds a fresh demo week. */
-export function resetDemo() {
+// Прибираємо все, що могло лишитися від старої демоверсії (вона зберігала дані в браузері)
+// і від черги змін: у демо зміни живуть лише до перезавантаження.
+function clearStoredData() {
   try {
     Object.keys(localStorage)
-      .filter((k) => k.startsWith('miy-kalendar'))
+      .filter((k) => k.startsWith('miy-kalendar-demo:') || k.startsWith('miy-kalendar:outbox') || k === 'miy-kalendar:items:v1')
       .forEach((k) => localStorage.removeItem(k));
   } catch {
-    /* ignore */
+    /* сховище недоступне — нічого прибирати */
   }
+}
+clearStoredData();
+
+const params = new URLSearchParams(window.location.search);
+/** ?start=setup — порожній календар і онбординг з першого кроку */
+export const DEMO_FROM_SETUP = params.get('start') === 'setup';
+
+const tables: Record<string, Row[]> = seedTables(new Date(), DEMO_FROM_SETUP);
+
+const readTable = (name: string): Row[] => tables[name] ?? [];
+const writeTable = (name: string, rows: Row[]) => {
+  tables[name] = rows;
+};
+
+/** «Почати демо заново» — просто перезавантаження: дані в памʼяті зникають. */
+export function resetDemo() {
+  clearStoredData();
 }
 
 type Filter = (r: Row) => boolean;
@@ -156,6 +135,8 @@ class Query implements PromiseLike<Result> {
         });
       }
       if (this.from != null) out = out.slice(this.from, (this.to ?? out.length - 1) + 1);
+      // копії, щоб застосунок не змінював «базу» напряму
+      out = out.map((r) => ({ ...r }));
       return { data: this.single ? out[0] ?? null : out, error: null, status: 200 };
     }
 

@@ -3,7 +3,7 @@
 A personal planning web app (PWA) for meals, sole-proprietor tax deadlines, hobbies and pet care, all in one week view.
 I designed it and built it with Claude Code, and I use it myself.
 
-**Live demo:** [miy-kalendar-case.vercel.app](https://miy-kalendar-case.vercel.app) (no sign-in; sample data lives only in your browser)
+**Live demo:** [miy-kalendar-case.vercel.app](https://miy-kalendar-case.vercel.app): a promo page, then the app at `/demo` (no sign-in; nothing is saved, a page reload brings back the sample week)
 **Design system:** [мій календар design system](https://claude.ai/artifact/3vBzMkq3jixvQ184BwDobQ)
 
 ![Week view with the assistant panel](docs/screenshots/assistant.png)
@@ -68,16 +68,18 @@ The UI has explicit states: "No connection, changes saved on this device" and "T
 
 ## About this repository
 
-This is a **public demo snapshot** of the app. My production repository is private.
+This is a **public demo snapshot** of the app (production code as of 23 Nov 2026). My production repository is private.
 
 | | Production | This demo |
 |---|---|---|
 | Sign-in | Google, allow-list | none |
-| Data | Supabase Postgres + realtime | your browser's localStorage, seeded with an invented week |
+| Data | Supabase Postgres + realtime | in page memory only, seeded with an invented week; a reload resets it |
 | Recipe import by URL | serverless function | disabled |
+| Google Calendar layer | serverless function | disabled |
 
-The only change from production is the data layer: [`src/lib/supabase.ts`](src/lib/supabase.ts) is replaced by a small in-browser stand-in, and [`src/demo/seed.ts`](src/demo/seed.ts) builds the sample week.
-The seed uses the real onboarding generator, so tax deadlines, pet reminders and workouts come from the same logic as in production. To start over, open the account menu and choose **Почати демо заново** ("Start the demo over").
+`/` is a promo page ([`src/landing/`](src/landing/)); `/demo` opens the calendar with the sample week, `/demo?start=setup` opens it empty, starting from onboarding.
+The data layer is the only real change from production: [`src/lib/supabase.ts`](src/lib/supabase.ts) is replaced by a small in-memory stand-in, and [`src/demo/seed.ts`](src/demo/seed.ts) builds the sample week (meals, tasks, things without a date, a birthday, stickers).
+The seed uses the real onboarding generator, so tax deadlines, pet reminders and workouts come from the same logic as in production.
 
 The interface is in Ukrainian, because the product is built for Ukrainian sole proprietors (ФОП).
 
@@ -91,7 +93,8 @@ npm run dev
 - `src/onboarding/`: module steps, answers, event generation (`generate.ts`), tax deadline rules (`fop.ts`)
 - `src/assistant/`: chat panel and the rule-based phrase parser (`parse.ts`)
 - `src/food/`: dish library, dish card, ingredient extraction
-- `src/components/`: week view, today view, event dialog
+- `src/components/`: week view, today view, quick event window and side panel, left panel (today / tasks / history), stickers
+- `src/landing/`: promo page of the demo
 - `src/lib/`: store, offline queue (`outbox.ts`), repeating events, dates
 - `src/styles.css`: styles built on the design system tokens
 

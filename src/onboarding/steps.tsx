@@ -21,6 +21,8 @@ import {
 import { fopDeadlines, fopGroup, fopHasStaff } from "./fop";
 import { addDays, DAYS_SHORT, fromISO, toISO, weekdayIndex } from "../lib/dates";
 import { occursOn } from "../lib/repeat";
+import { validIcalUrl } from "../lib/google";
+import { IcalSteps } from "../components/GoogleLayerDialog";
 import { MODULES, type CalendarItem } from "../types";
 import { generateItems } from "./generate";
 import {
@@ -243,6 +245,38 @@ export function FopStep({
   onChange: (v: FopAnswers) => void;
   nav: StepNavProps;
 }) {
+  return (
+    <div className="step">
+      <ModStepper steps={nav.steps} current="fop" />
+      <StepHead
+        mod="fop"
+        title="ваш профіль ФОП"
+        sub="оберіть параметри — і календар сам поставить дедлайни на поточний і наступний рік."
+      />
+      <FopFields value={value} onChange={onChange} />
+      <StepNav
+        onBack={nav.onBack}
+        onSkip={nav.onSkip}
+        onNext={nav.onNext}
+        nextLabel={nav.nextLabel}
+      />
+    </div>
+  );
+}
+
+/**
+ * Поля профілю ФОП і «що зʼявиться в календарі» — спільні для кроку онбордингу
+ * й вкладки «ФОП» у вікні нової події (17.11). extraNote — додаткове речення в примітці під дедлайнами.
+ */
+export function FopFields({
+  value,
+  onChange,
+  extraNote,
+}: {
+  value: FopAnswers;
+  onChange: (v: FopAnswers) => void;
+  extraNote?: string;
+}) {
   const [open, setOpen] = useState(false);
   const set = (p: Partial<FopAnswers>) => onChange({ ...value, ...p });
   const grp = fopGroup(value);
@@ -282,14 +316,7 @@ export function FopStep({
   const remind = `Нагадаємо за ${value.lead}${value.d3 ? " і 3" : ""} дні${value.d0 ? " та в день дедлайну" : ""}.`;
 
   return (
-    <div className="step">
-      <ModStepper steps={nav.steps} current="fop" />
-      <StepHead
-        mod="fop"
-        title="ваш профіль ФОП"
-        sub="оберіть параметри — і календар сам поставить дедлайни на поточний і наступний рік."
-      />
-
+    <>
       <div className="grouped fop-form">
         <section className="fop-sec">
           <h2 className="fop-q">
@@ -430,17 +457,11 @@ export function FopStep({
             </div>
           </div>
           <p className="hint small">
-            {remind} Календар лише нагадує й не замінює бухгалтера.
+            {remind} Календар лише нагадує й не замінює бухгалтера.{extraNote ? ` ${extraNote}` : ""}
           </p>
         </section>
       )}
-      <StepNav
-        onBack={nav.onBack}
-        onSkip={nav.onSkip}
-        onNext={nav.onNext}
-        nextLabel={nav.nextLabel}
-      />
-    </div>
+    </>
   );
 }
 
@@ -1515,14 +1536,21 @@ export function GoogleStep({
   onBack,
   onFinish,
   onWant,
+  url,
+  onUrl,
   busy,
 }: {
   onBack: () => void;
   onFinish: () => void;
   onWant: () => void;
+  /** секретна адреса у форматі iCal (18.11) */
+  url?: string;
+  onUrl: (url: string | undefined) => void;
   busy: boolean;
 }) {
-  const [asked, setAsked] = useState(false);
+  const [asked, setAsked] = useState(!!url);
+  const [value, setValue] = useState(url ?? "");
+  const bad = !!value.trim() && !validIcalUrl(value);
   return (
     <div className="step">
       <div className="step-head">
@@ -1583,7 +1611,7 @@ export function GoogleStep({
           перетину.
         </p>
         <p>Оновлюється при відкритті застосунку й кожні ~15 хв.</p>
-        <p>Шар вмикається й вимикається перемикачем у фільтрах.</p>
+        <p>Шар вмикається й вимикається в меню акаунта.</p>
       </div>
       <div className="stack small-gap">
         <button
@@ -1598,13 +1626,33 @@ export function GoogleStep({
           Підключити Google Календар
         </button>
         {asked ? (
-          <p role="status" className="notice">
-            Підключення Google Календаря зʼявиться на одному з наступних етапів.
-            Ваш вибір збережено, а поки можна переходити до календаря.
-          </p>
+          <div className="stack small-gap">
+            <IcalSteps />
+            <label className="field">
+              <span className="label-muted">секретна адреса у форматі iCal</span>
+              <input
+                type="url"
+                className="onb-input"
+                value={value}
+                onChange={(e) => {
+                  setValue(e.target.value);
+                  const v = e.target.value.trim();
+                  onUrl(v && validIcalUrl(v) ? v.replace(/^webcal:/i, "https:") : undefined);
+                }}
+                placeholder="https://calendar.google.com/calendar/ical/…/basic.ics"
+                autoComplete="off"
+                spellCheck={false}
+              />
+            </label>
+            <p className={"hint xs" + (bad ? " error-text" : "")}>
+              {bad
+                ? "Це не схоже на секретну адресу iCal: вона починається з https://calendar.google.com/calendar/ical/ і закінчується на .ics"
+                : "Адреса дає змогу лише читати календар. Її бачите тільки ви; змінити можна потім у меню акаунта."}
+            </p>
+          </div>
         ) : (
           <p className="hint xs">
-            Google попросить дозвіл лише на перегляд календаря.
+            Знадобиться секретна адреса календаря з налаштувань Google — лише для перегляду.
           </p>
         )}
       </div>

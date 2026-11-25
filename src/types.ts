@@ -65,6 +65,8 @@ export interface Repeat {
   interval?: number;
   days?: number[];
   until?: string;
+  /** дати ('YYYY-MM-DD'), на які повтор пропущено: змінено чи прибрано лише цю подію (18.11) */
+  skip?: string[];
 }
 
 /** Одна справа в календарі. Дати — 'YYYY-MM-DD', час — 'HH:MM'. */
@@ -81,6 +83,8 @@ export interface CalendarItem {
   repeat?: Repeat;
   /** звідки подія: 'onb:…' — створена онбордингом, порожньо — вручну */
   source?: string;
+  /** справа без дати (етап 1, 18.11): лежить у «цього тижня», доки її не поставлять у календар; date — день, коли її додали */
+  undated?: boolean;
   /** для повторюваної події: id серії, з якої зроблено цей показ */
   seriesId?: string;
   createdAt: string;
@@ -88,3 +92,21 @@ export interface CalendarItem {
 }
 
 export type NewItem = Omit<CalendarItem, 'id' | 'createdAt' | 'updatedAt' | 'seriesId'>;
+
+/** Задача (етап 1, 18.11): окремий список; необовʼязковий день; можна підвʼязати до події. */
+export interface Task {
+  id: string;
+  title: string;
+  /** день без часу ('YYYY-MM-DD') */
+  due?: string;
+  /** подія, до якої підвʼязано (для повторюваної — id серії) */
+  itemId?: string;
+  /** для повторюваної події — дата показу */
+  itemDate?: string;
+  /** коли позначено «зроблено» (ISO); виконана видно до кінця дня */
+  doneAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type NewTask = Omit<Task, 'id' | 'createdAt' | 'updatedAt'>;

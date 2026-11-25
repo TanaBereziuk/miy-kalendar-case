@@ -1,9 +1,16 @@
+import { Fragment, useRef, type ReactNode } from 'react';
 import { MODULES, type CalendarItem } from '../types';
-import { DAYS_FULL, DAYS_SHORT, MONTHS_GEN, sameDay, toISO, weekdayIndex } from '../lib/dates';
-import { groupOf, sortByTime } from '../lib/layout';
+import type { CellSel } from './QuickAdd';
+import { DAYS_SHORT, sameDay, toISO, toMinutes } from '../lib/dates';
+import { groupOf, isPast, pad2, sortByTime } from '../lib/layout';
 import { useNow } from '../lib/useNow';
 import { Icon } from './Icon';
 import type { PendingAct } from '../App';
+import { isSlot } from '../food/dishes';
+import { isGoogle } from '../lib/google';
+import { PendingChips } from './PendingChips';
+import { bdayName, bdaySub, isBirthday } from '../lib/birthday';
+import { Sticker } from './Stickers';
 
 interface Props {
   day: Date;
@@ -11,11 +18,18 @@ interface Props {
   items: CalendarItem[];
   pending: PendingAct[];
   onPlan: (p: PendingAct) => void;
+  /** справи без дати (етап 1, 18.11) */
+  undated: CalendarItem[];
+  onOpenUndated: (item: CalendarItem) => void;
   onPickDay: (d: Date) => void;
   onOpen: (item: CalendarItem) => void;
   onCreate: (date: string, start?: string) => void;
-  /** Харчування (14.11): «+ страва» в групі дня → вибір страви */
-  onAddDish?: (sectionId: string, start: string) => void;
+  /** свайп (18.11): по списку — ±1 день, по смузі днів — ±7 */
+  onSwipe?: (days: number) => void;
+  /** клітинка, з якої зараз додають подію (швидке додавання) — виділена */
+  selected?: CellSel | null;
+  /** етап 2 (21.11): блок «сьогодні» над списком дня */
+  top?: ReactNode;
 }
 
 const SECTIONS = [
@@ -25,7 +39,7 @@ const SECTIONS = [
   { id: 'night', name: 'ніч', range: '22:00–06:00', start: '22:00' },
 ];
 
-export function TodayView({ day, days, items, pending, onPlan, onPickDay, onOpen, onCreate, onAddDish }: Props) {
+export function TodayView({ day, days, items, pending, onPlan, undated, onOpenUndated, onPickDay, onOpen, onCreate, onSwipe, selected, top }: Props) {
   const now = useNow();
   const iso = toISO(day);
   const dayItems = items.filter((i) => i.date === iso);
@@ -40,53 +54,69 @@ export function TodayView({ day, days, items, pending, onPlan, onPickDay, onOpen
 
   const isToday = sameDay(day, now);
 
+  // Свайп ліворуч / праворуч (18.11, аудит, п. 8): горизонтальний рух від 60 px і помітно більший за вертикальний
+  const touch = useRef<{ x: number; y: number } | null>(null);
+  const swipeProps = (step: number) => ({
+    onTouchStart: (e: React.TouchEvent) => {
+      const t = e.touches[0];
+      touch.current = { x: t.clientX, y: t.clientY };
+    },
+    onTouchEnd: (e: React.TouchEvent) => {
+      const s0 = touch.current;
+      touch.current = null;
+      if (!s0 || !onSwipe) return;
+      // смуга днів гортає тижні сама — список дня її рух не враховує
+      if (step === 1 && (e.target as Element).closest?.('.day-strip')) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - s0.x;
+      const dy = t.clientY - s0.y;
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      onSwipe(dx < 0 ? step : -step);
+    },
+  });
+
   return (
-    <div className="today-view">
-      <div className="day-strip" role="tablist" aria-label="Дні тижня">
+    <div className="today-view" {...swipeProps(1)}>
+      <div className="day-strip" role="tablist" aria-label="Дні тижня" {...swipeProps(7)}>
         {days.map((d, i) => {
           const on = sameDay(d, day);
-          const has = items.some((it) => it.date === toISO(d));
+          // 18.11: крапки кольору модулів (до 3), щоденні повтори не рахуються — інакше крапка стоїть під кожним днем
+          const mods = Array.from(
+            new Set(items.filter((it) => it.date === toISO(d) && it.repeat?.freq !== 'daily' && !isGoogle(it)).map((it) => it.module)),
+          ).slice(0, 3);
+          // день з подією на весь день — у колір її модуля (17.11)
+          const whole = items.find((it) => it.date === toISO(d) && it.allDay && !isGoogle(it) && !isBirthday(it));
           return (
             <button
               type="button"
               role="tab"
               aria-selected={on}
               key={toISO(d)}
-              className={'strip-day' + (on ? ' on' : '') + (sameDay(d, now) ? ' is-today' : '')}
+              className={'strip-day' + (on ? ' on' : '') + (sameDay(d, now) ? ' is-today' : '') + (whole ? ' day-tint' : '')}
+              style={whole ? ({ ['--day-tint' as string]: MODULES[whole.module].color, ['--day-tint-pct' as string]: whole.module === 'other' ? '10%' : '30%' } as React.CSSProperties) : undefined}
               onClick={() => onPickDay(d)}
             >
               <span className="dow">{DAYS_SHORT[i]}</span>
               <span className="num">{d.getDate()}</span>
-              <span className={'mark' + (has ? ' has' : '')} aria-hidden="true" />
+              <span className="marks" aria-hidden="true">
+                {mods.map((m) => (
+                  <span key={m} className="mark has" style={{ background: MODULES[m].dot }} />
+                ))}
+              </span>
             </button>
           );
         })}
       </div>
 
-      <div className="today-title">
-        <h1 className="head-font">{isToday ? 'сьогодні' : DAYS_FULL[weekdayIndex(day)]}</h1>
-        <span className="today-date">
-          {day.getDate()} {MONTHS_GEN[day.getMonth()]}
-        </span>
-      </div>
+      {top}
 
-      {pending.length > 0 && (
+      {(pending.length > 0 || undated.length > 0) && (
         <section className="group-card">
           <h2 className="group-card-title">
-            ще цього тижня <span className="group-card-range">натисніть, щоб поставити на цей день</span>
+            цього тижня <span className="group-card-range">натисніть, щоб поставити на цей день</span>
           </h2>
           <div className="chips-wrap">
-            {pending.map((p) => (
-              <button type="button" key={p.name} className="pending-chip" onClick={() => onPlan(p)}>
-                <span className="pending-tile" style={{ background: MODULES.hobby.color }}>
-                  <Icon d={MODULES.hobby.icon} size={12} />
-                </span>
-                {p.name}
-                <span className="pending-count">
-                  {p.done} з {p.total}
-                </span>
-              </button>
-            ))}
+            <PendingChips acts={pending} undated={undated} onPlan={onPlan} onOpenUndated={onOpenUndated} />
           </div>
         </section>
       )}
@@ -111,21 +141,45 @@ export function TodayView({ day, days, items, pending, onPlan, onPickDay, onOpen
               <h2 className="group-card-title">
                 {s.name} <span className="group-card-range">{s.range}</span>
               </h2>
-              {onAddDish && s.id !== 'night' && (
-                <button type="button" className="text-add" onClick={() => onAddDish(s.id, s.start)}>
-                  <Icon d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z" size={12} />
-                  Додати страву
-                </button>
-              )}
+              <button
+                type="button"
+                className={'text-add' + (selected?.date === iso && selected.start === s.start ? ' cell-selected' : '')}
+                onClick={() => onCreate(iso, s.start)}
+              >
+                <Icon d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z" size={12} />
+                Додати
+              </button>
             </div>
             {list.length > 0 ? (
               <div className="list">
-                {list.map((it) => (
-                  <Row key={it.id} item={it} onOpen={onOpen} />
-                ))}
+                {list.map((it, i) => {
+                  // 18.11: позначка «зараз» між подіями сьогодні — перед першою, що ще не почалась
+                  const nowMin = now.getHours() * 60 + now.getMinutes();
+                  const startsLater = (x: CalendarItem) => !!x.start && toMinutes(x.start) > nowMin;
+                  const g = SECTION_RANGE[s.id];
+                  const inGroup = s.id === 'night' ? nowMin >= 22 * 60 || nowMin < 6 * 60 : nowMin >= g[0] * 60 && nowMin < g[1] * 60;
+                  const marker =
+                    isToday && inGroup && startsLater(it) && (i === 0 || !startsLater(list[i - 1]));
+                  return (
+                    <Fragment key={it.id}>
+                      {marker && <NowRow now={now} />}
+                      <Row item={it} onOpen={onOpen} past={isPast(it, now)} />
+                    </Fragment>
+                  );
+                })}
+                {isToday && list.length > 0 && !list.some((x) => !!x.start && toMinutes(x.start) > now.getHours() * 60 + now.getMinutes()) &&
+                  (() => {
+                    const nowMin = now.getHours() * 60 + now.getMinutes();
+                    const g = SECTION_RANGE[s.id];
+                    return s.id !== 'night' && nowMin >= g[0] * 60 && nowMin < g[1] * 60 ? <NowRow now={now} /> : null;
+                  })()}
               </div>
             ) : (
-              <button type="button" className="empty-add" onClick={() => onCreate(iso, s.start)}>
+              <button
+                type="button"
+                className={'empty-add' + (selected?.date === iso && selected.start === s.start ? ' cell-selected' : '')}
+                onClick={() => onCreate(iso, s.start)}
+              >
                 Додати подію
               </button>
             )}
@@ -136,17 +190,36 @@ export function TodayView({ day, days, items, pending, onPlan, onPickDay, onOpen
   );
 }
 
-function Row({ item, onOpen }: { item: CalendarItem; onOpen: (i: CalendarItem) => void }) {
+const SECTION_RANGE: Record<string, [number, number]> = { morning: [6, 12], day: [12, 18], evening: [18, 22], night: [22, 30] };
+
+function NowRow({ now }: { now: Date }) {
+  return (
+    <div className="now-row" aria-label="зараз">
+      <span>{`${pad2(now.getHours())}:${pad2(now.getMinutes())}`}</span>
+    </div>
+  );
+}
+
+function Row({ item, onOpen, past }: { item: CalendarItem; onOpen: (i: CalendarItem) => void; past?: boolean }) {
   const m = MODULES[item.module];
   return (
-    <button type="button" className="row-item" onClick={() => onOpen(item)}>
-      <span className="row-tile" style={{ background: m.color, color: m.text }}>
-        <Icon d={m.icon} size={16} />
-      </span>
+    <button type="button" className={'row-item' + (past ? ' past' : '') + (isGoogle(item) ? ' google-row' : '')} onClick={() => onOpen(item)}>
+      {isBirthday(item) ? (
+        <span className="row-tile cake-tile"><Sticker id="cake" size={44} /></span>
+      ) : isGoogle(item) ? (
+        <span className="row-tile google-tile" aria-hidden="true">
+          G
+        </span>
+      ) : (
+        <span className="row-tile" style={{ background: m.color, color: m.text }}>
+          <Icon d={m.icon} size={16} />
+        </span>
+      )}
       <span className="row-main">
-        <span className="row-title">{item.title}</span>
+        <span className="row-title">{isBirthday(item) ? bdayName(item) : item.title}</span>
         <span className="row-sub">
-          {item.allDay ? 'весь день' : `${item.start}${item.end ? `–${item.end}` : ''}`} · {m.name}
+          {isBirthday(item) ? bdaySub(item, item.date) : item.allDay ? 'весь день' : isSlot(item.source) ? 'без точного часу' : `${item.start}${item.end ? `–${item.end}` : ''}`}
+          {isGoogle(item) ? ' · Google' : ''}
         </span>
       </span>
     </button>

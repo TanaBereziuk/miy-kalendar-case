@@ -1,9 +1,33 @@
 // Бічна панель бібліотеки страв (ноутбук, 14.11; 15.11 — без категорій): пошук, улюблені зверху;
 // страви перетягують у сітку тижня. Унизу — «Скопіювати минулий тиждень» і «Очистити тиждень».
+import { DishRow } from './DishRow';
 import { useMemo, useState } from 'react';
-import { MODULES } from '../types';
 import { ICONS, Icon } from '../components/Icon';
 import type { Dish, DishSync } from './dishes';
+import { MODULES } from '../types';
+
+/** Лупа: суцільна, прямі краї */
+const SEARCH = 'M3 3h12v12H3zM6 6v6h6V6zM13.5 16 16 13.5l5 5-2.5 2.5z';
+
+/** Поле пошуку з іконкою лупи (16.11) */
+export function DishSearch({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="food-search-wrap">
+      <Icon d={SEARCH} size={16} />
+      <input className="food-search" type="search" value={value} onChange={(e) => onChange(e.target.value)} placeholder="пошук страви" aria-label="Пошук страви" />
+    </div>
+  );
+}
+
+/** Блок з пунктирною рамкою перед списком страв: швидко додати нову страву */
+export function DishAddBlock({ onClick }: { onClick: () => void }) {
+  return (
+    <button type="button" className="food-add-block" onClick={onClick}>
+      <Icon d={MODULES.food.icon} size={20} />
+      Додати страву
+    </button>
+  );
+}
 
 export const DISH_MIME = 'application/x-miy-dish';
 
@@ -32,11 +56,38 @@ export function filterDishes(dishes: Dish[], q: string) {
     .sort((a, b) => Number(b.fav) - Number(a.fav) || a.name.localeCompare(b.name, 'uk'));
 }
 
+/** Дублювати (23.11): два квадрати один за одним — суцільні, прямі краї, evenodd */
+const DUPLICATE = 'M8 2h14v14H8zM11 5v8h8V5zM2 8h4v3H5v8h8v-1h3v4H2z';
+
+/**
+ * Кнопки поруч із заголовком «страви» (23.11 — лише дві): «+» — додати страву;
+ * «Дублювати на наступний тиждень» — страви показаного тижня на ті самі дні й час наступного тижня (з «Скасувати»).
+ * Меню «…» («Скопіювати минулий тиждень», «Очистити тиждень») прибрано.
+ */
+export function FoodHeadActions({ onAdd, onDuplicate, weekFoodCount }: { onAdd: () => void; onDuplicate: () => void; weekFoodCount: number }) {
+  return (
+    <div className="food-head-actions">
+      <button type="button" className="round-btn" aria-label="Додати страву" title="Додати страву" onClick={onAdd}>
+        <Icon d={ICONS.plus} size={12} />
+      </button>
+      <button
+        type="button"
+        className="round-btn"
+        aria-label="Дублювати на наступний тиждень"
+        title={weekFoodCount ? 'Дублювати на наступний тиждень' : 'На цьому тижні ще немає страв'}
+        disabled={weekFoodCount === 0}
+        onClick={onDuplicate}
+      >
+        <Icon d={DUPLICATE} size={14} />
+      </button>
+    </div>
+  );
+}
+
 export function FoodPanel({ dishes, sync, embedded, onClose, onAdd, onOpen, onCopyWeek, onClearWeek, weekFoodCount, prevWeekFoodCount }: Props) {
   const [q, setQ] = useState('');
   const [confirmClear, setConfirmClear] = useState(false);
   const list = useMemo(() => filterDishes(dishes, q), [dishes, q]);
-  const m = MODULES.food;
 
   return (
     <aside className={'food-panel' + (embedded ? ' embedded' : '')} aria-label="Бібліотека страв">
@@ -55,22 +106,24 @@ export function FoodPanel({ dishes, sync, embedded, onClose, onAdd, onOpen, onCo
         </p>
       ) : (
         <>
-          <input className="food-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="пошук страви або тегу" aria-label="Пошук страви" />
+          <DishSearch value={q} onChange={setQ} />
 
-          <button type="button" className="add-act-btn food-add" onClick={onAdd}>
-            <Icon d={ICONS.plus} size={12} />
-            Додати страву
-          </button>
+          {!embedded && (
+            <button type="button" className="add-act-btn food-add" onClick={onAdd}>
+              <Icon d={ICONS.plus} size={12} />
+              Додати страву
+            </button>
+          )}
 
           <div className="food-list">
+            {embedded && <DishAddBlock onClick={onAdd} />}
             {list.length === 0 && (
               <p className="muted-text food-empty">{dishes.length ? 'Нічого не знайдено.' : 'Бібліотека порожня. Додайте першу страву — за посиланням на рецепт або вручну.'}</p>
             )}
             {list.map((d) => (
-              <button
-                type="button"
+              <DishRow
                 key={d.id}
-                className="food-row"
+                dish={d}
                 draggable
                 onDragStart={(e) => {
                   e.dataTransfer.setData(DISH_MIME, d.id);
@@ -79,30 +132,12 @@ export function FoodPanel({ dishes, sync, embedded, onClose, onAdd, onOpen, onCo
                 }}
                 onClick={() => onOpen(d)}
                 title="Перетягніть у тиждень або натисніть, щоб відкрити"
-              >
-                {d.photoUrl ? (
-                  <img className="food-thumb" src={d.photoUrl} alt="" loading="lazy" />
-                ) : (
-                  <span className="food-thumb" style={{ background: m.color, color: m.text }}>
-                    <Icon d={m.icon} size={14} />
-                  </span>
-                )}
-                <span className="food-text">
-                  <span className="food-name">
-                    {d.fav && (
-                      <span className="food-fav" aria-label="улюблена">
-                        <Icon d={MODULES.other.icon} size={10} />
-                      </span>
-                    )}
-                    {d.name}
-                  </span>
-                  {dishMeta(d) && <span className="food-meta">{dishMeta(d)}</span>}
-                </span>
-              </button>
+              />
             ))}
           </div>
-          {dishes.length > 0 && <p className="hint xs">Перетягніть страву на день і час у тижні. На підпис групи — у звичний час прийому їжі.</p>}
+          {dishes.length > 0 && <p className="hint xs">Перетягніть страву на день і час у тижні або на смугу «ранок», «день», «вечір», якщо точний час не важливий.</p>}
 
+          {!embedded && (
           <div className="food-week">
             <button type="button" className="btn tinted small" disabled={prevWeekFoodCount === 0} onClick={onCopyWeek}>
               Скопіювати минулий тиждень
@@ -124,6 +159,7 @@ export function FoodPanel({ dishes, sync, embedded, onClose, onAdd, onOpen, onCo
               </button>
             )}
           </div>
+          )}
         </>
       )}
     </aside>

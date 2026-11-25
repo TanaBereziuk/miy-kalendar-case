@@ -8,7 +8,7 @@ import { supabase } from './supabase';
  * (наприклад, назва задовга), зміну прибираємо й показуємо попередження.
  */
 
-export type Table = 'items' | 'dishes';
+export type Table = 'items' | 'dishes' | 'tasks';
 
 export type Op =
   /** створити або повністю замінити рядок (повтор безпечний) */

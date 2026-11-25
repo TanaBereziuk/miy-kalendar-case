@@ -67,3 +67,46 @@ export function DishDialog({ dish, onClose, onSave, onDelete }: Props) {
     </div>
   );
 }
+
+/** Картка страви всередині бічної панелі «страви» (16.11): поля зʼявляються поверх бібліотеки, угорі стрілка «назад» (заголовок — в AssistantPanel) */
+export function DishPanelForm({ dish, onBack, onSave, onDelete }: { dish?: Dish; onBack: () => void; onSave: (d: NewDish, id?: string) => void; onDelete?: (id: string) => void }) {
+  const f = useDishForm(dish);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onBack();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onBack]);
+  return (
+    <form
+      className="dish-panel-form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const d = f.build();
+        if (d) onSave(d, dish?.id);
+      }}
+    >
+      <DishFormFields f={f} />
+      <div className="actions">
+        {dish &&
+          onDelete &&
+          (confirmDelete ? (
+            <button type="button" className="btn danger" onClick={() => onDelete(dish.id)}>
+              Видалити остаточно
+            </button>
+          ) : (
+            <button type="button" className="text-danger" onClick={() => setConfirmDelete(true)}>
+              Видалити
+            </button>
+          ))}
+        <span className="spacer" />
+        <button type="button" className="btn secondary" onClick={onBack}>
+          Скасувати
+        </button>
+        <button type="submit" className="btn primary" disabled={f.busy}>
+          Зберегти
+        </button>
+      </div>
+    </form>
+  );
+}

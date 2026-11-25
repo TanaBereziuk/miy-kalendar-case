@@ -43,7 +43,12 @@ export interface Placed {
   height: number;
   lane: number;
   lanes: number;
+  /** коротка подія (до 20 хв, напр. ліки): тонкий рядок, 18.11 */
+  short?: boolean;
 }
+
+/** Подія до 20 хв — коротка: у тижні тонким рядком (18.11) */
+export const SHORT_MAX_MIN = 20;
 
 /** Розкладає справи одного дня в межах години from–to, щоб ті, що перетинаються, стояли поруч. */
 export function placeDay(items: CalendarItem[], range: [number, number]): Placed[] {
@@ -54,7 +59,8 @@ export function placeDay(items: CalendarItem[], range: [number, number]): Placed
       const s = toMinutes(i.start!);
       let e = i.end ? toMinutes(i.end) : s + 60;
       if (e <= s) e = s + 60;
-      return { item: i, s, e: Math.max(e, s + MIN_EVENT_MIN) };
+      const short = e - s <= SHORT_MAX_MIN;
+      return { item: i, s, e: Math.max(e, s + (short ? SHORT_MAX_MIN : MIN_EVENT_MIN)), short };
     })
     // справа належить групі, в якій починається
     .filter((x) => x.s >= fromH * 60 && x.s < toH * 60)
@@ -73,9 +79,10 @@ export function placeDay(items: CalendarItem[], range: [number, number]): Placed
       out.push({
         item: c.x.item,
         top: ((s - fromH * 60) / 60) * HOUR_PX,
-        height: Math.max(((e - s) / 60) * HOUR_PX, 24),
+        height: Math.max(((e - s) / 60) * HOUR_PX, c.x.short ? 18 : 24),
         lane: c.lane,
         lanes,
+        short: c.x.short,
       });
     }
     cluster = [];
@@ -109,4 +116,23 @@ export function eventsWord(n: number): string {
   if (a === 1 && b !== 11) return 'подія';
   if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return 'події';
   return 'подій';
+}
+
+/** «раз / рази / разів» */
+export function timesWord(n: number): string {
+  const a = n % 10;
+  const b = n % 100;
+  if (a === 1 && b !== 11) return 'раз';
+  if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return 'рази';
+  return 'разів';
+}
+
+/** Чи вже минула подія (18.11: минуле приглушене) */
+export function isPast(item: { date: string; allDay: boolean; start?: string; end?: string }, now: Date): boolean {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  if (item.date < today) return true;
+  if (item.date > today || item.allDay || !item.start) return false;
+  const end = item.end ? toMinutes(item.end) : toMinutes(item.start) + 60;
+  return end <= now.getHours() * 60 + now.getMinutes();
 }

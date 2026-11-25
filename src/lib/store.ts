@@ -20,6 +20,7 @@ interface Row {
   note: string | null;
   repeat: Repeat | null;
   source: string | null;
+  undated?: boolean | null;
   created_at: string;
   updated_at: string;
 }
@@ -38,13 +39,16 @@ function fromRow(r: Row): CalendarItem {
     note: r.note ?? undefined,
     repeat: r.repeat ?? undefined,
     source: r.source ?? undefined,
+    undated: r.undated || undefined,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
 }
 
 function toRow(d: NewItem) {
+  // undated (18.11) пишемо лише тоді, коли його задано: старі події зберігаються й без нового стовпця в базі
   return {
+    ...(d.undated !== undefined ? { undated: d.undated } : {}),
     title: d.title.slice(0, 300),
     module: d.module,
     date: d.date,
@@ -217,14 +221,19 @@ export function useItems(userId: string) {
 
   /** Замінює всі події, створені онбордингом, новим набором. */
   const replaceGenerated = useCallback(
-    async (fresh: NewItem[]) => {
+    /** source — замінити лише події з цим точним source (напр. 'onb:fop'); без нього — усі події онбордингу */
+    async (fresh: NewItem[], source?: string) => {
       const now = new Date().toISOString();
       const withIds = fresh.map((d) => ({ ...d, id: uid() }));
+      // 23.11: source із «*» у кінці — усі події з таким початком (напр. 'onb:pet*' — ліки, щеплення, ветеринар…)
+      const prefix = source?.endsWith('*') ? source.slice(0, -1) : undefined;
+      const old = (s?: string) => (prefix ? !!s?.startsWith(prefix) : source ? s === source : !!s?.startsWith('onb:'));
       setItems((prev) => [
-        ...prev.filter((i) => !i.source?.startsWith('onb:')),
+        ...prev.filter((i) => !old(i.source)),
         ...withIds.map((d) => ({ ...d, createdAt: now, updatedAt: now })),
       ]);
-      const del = await supabase.from('items').delete().like('source', 'onb:%');
+      const q = supabase.from('items').delete();
+      const del = await (prefix ? q.like('source', `${prefix}%`) : source ? q.eq('source', source) : q.like('source', 'onb:%'));
       if (del.error) {
         setSync('error');
         return false;

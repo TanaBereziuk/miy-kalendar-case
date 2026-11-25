@@ -13,7 +13,7 @@ const addMonths = (iso: string, n: number) => {
 };
 
 /** Наступна дата після last з кроком iv місяців, не раніше сьогодні. */
-function nextDue(last: string, iv: number, today: string): string {
+export function nextDue(last: string, iv: number, today: string): string {
   let d = addMonths(last, iv);
   while (d < today) d = addMonths(d, iv);
   return d;

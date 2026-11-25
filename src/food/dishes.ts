@@ -29,7 +29,8 @@ export const MEAL_CATS: { v: MealCat; l: string; start: string }[] = [
 ];
 export const DISH_TAGS = ['швидко', 'пісне', 'на 2 дні'];
 /** Тривалість страви в календарі, хв */
-export const MEAL_MIN = 30;
+/** Стандартна тривалість страви в тижні (16.11, 19:27: 1 година, було 30 хв) */
+export const MEAL_MIN = 60;
 
 interface Row {
   id: string;
@@ -95,7 +96,7 @@ export function useDishes(userId: string, seed: string[]) {
     const { left } = await flush();
     const { data, error } = await supabase.from('dishes').select('*').order('name');
     if (error) {
-      // 42P01 — таблиці ще немає: новий SQL ще не запущено
+      // 42P01 — таблиці ще немає: власниця не запустила новий SQL
       const missing = /dishes|42P01|PGRST205/.test(`${error.code} ${error.message}`) && error.code !== '';
       setSync(missing ? 'missing' : left ? 'offline' : 'error');
       return null;
@@ -179,8 +180,28 @@ export function useDishes(userId: string, seed: string[]) {
   return { dishes, sync, rejected, dismissRejected: () => setRejected(false), addDish, updateDish, removeDish, reload: load };
 }
 
-/** Імпорт за посиланням. У продакшн-версії це серверна функція /api/import-recipe
- * (читає розмітку schema.org/Recipe, доступ лише після входу). У демо сервера немає. */
+/** Імпорт за посиланням: у робочому застосунку серверна функція /api/import-recipe читає розмітку schema.org/Recipe.
+ * У демоверсії сервера немає. */
 export async function importFromUrl(_url: string): Promise<NewDish> {
   throw new Error('У демоверсії імпорт за посиланням вимкнено. Додайте назву й опис вручну.');
 }
+
+/** Страва в тижні (16.11, 17:18): source події — `dish:<id>`; `#slot` — страва лежить у смузі групи
+ *  («ранок», «день», «вечір») без точного часу (start — звичний час групи, щоб на телефоні йшла по порядку). */
+export const SLOT_MARK = '#slot';
+/** `#period` (23.11, етап 4) — страва на весь період («ранок», «день», «вечір»): start–end = межі групи,
+ *  у тижні фото фоном на всю висоту періоду під іншими подіями, назва вгорі картки. */
+export const PERIOD_MARK = '#period';
+/** Куди поклали страву: true — у смугу групи, 'period' — на весь період, інакше — на годину */
+export type DishPlace = boolean | 'period';
+export const dishIdOf = (source?: string) => (source?.startsWith('dish:') ? source.slice(5).split('#')[0] : undefined);
+export const isSlot = (source?: string) => !!source?.startsWith('dish:') && source.endsWith(SLOT_MARK);
+export const isPeriod = (source?: string) => !!source?.startsWith('dish:') && source.endsWith(PERIOD_MARK);
+export const dishSource = (id: string, slot?: DishPlace) => `dish:${id}${slot === 'period' ? PERIOD_MARK : slot ? SLOT_MARK : ''}`;
+/** Підпис під назвою в бібліотеці (16.11, 17:18): продукти через кому, а якщо їх немає — опис */
+export const dishSubtitle = (d: Dish) =>
+  (d.ingredients ?? '')
+    .split(/\n|;/)
+    .map((x) => x.replace(/^[-•\s]+/, '').trim())
+    .filter(Boolean)
+    .join(', ') || (d.note ?? '').replace(/\s+/g, ' ').trim();

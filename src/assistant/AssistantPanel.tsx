@@ -31,10 +31,15 @@ interface Props {
   /** таб «страви» (16.11, 12:08): бібліотека страв, яку перетягують у тиждень; немає — табів немає */
   food?: ReactNode;
   tab?: 'chat' | 'food';
+  /** кнопки поруч із заголовком таба «страви» */
+  foodHead?: ReactNode;
+  /** картка страви поверх бібліотеки: заголовок і стрілка «назад» замість кнопок біля «страви» */
+  foodTitle?: string;
+  onBack?: () => void;
   onTab?: (t: 'chat' | 'food') => void;
 }
 
-export function AssistantPanel({ mode, focusKey = 0, messages, onSend, onUndo, onClose, food, tab = 'chat', onTab }: Props) {
+export function AssistantPanel({ mode, focusKey = 0, messages, onSend, onUndo, onClose, food, tab = 'chat', onTab, foodHead, foodTitle, onBack }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -81,9 +86,15 @@ export function AssistantPanel({ mode, focusKey = 0, messages, onSend, onUndo, o
         aria-labelledby="asst-title"
       >
         <div className="dialog-head">
+          {showFood && onBack && (
+            <button type="button" className="round-btn" aria-label="Назад до страв" onClick={onBack}>
+              <Icon d={ICONS.prev} size={12} />
+            </button>
+          )}
           <h2 id="asst-title" className="head-font">
-            {showFood ? 'страви' : 'що запланувати'}
+            {showFood ? (onBack && foodTitle ? foodTitle : 'страви') : 'що запланувати'}
           </h2>
+          {showFood && !onBack && foodHead}
           {/* 16:17: у бічній панелі «×» немає — панель ховає повторний клік по її іконці в меню */}
           {!dock && (
             <button type="button" className="round-btn" aria-label="Закрити" onClick={onClose}>
@@ -144,9 +155,15 @@ export function AssistantPanel({ mode, focusKey = 0, messages, onSend, onUndo, o
                       const mod = MODULES[s.module];
                       return (
                         <li key={i}>
-                          <span className="chat-tile" style={{ background: mod.color, color: mod.text }}>
-                            <Icon d={mod.icon} size={16} />
-                          </span>
+                          {s.task ? (
+                            <span className="chat-tile task-tile">
+                              <Icon d={ICONS.tasks} size={16} />
+                            </span>
+                          ) : (
+                            <span className="chat-tile" style={{ background: mod.color, color: mod.text }}>
+                              <Icon d={mod.icon} size={16} />
+                            </span>
+                          )}
                           <span className="chat-item-text">
                             <b>{s.title}</b>
                             <small>{s.when}</small>

@@ -1646,9 +1646,6 @@ main.with-food { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap
 .assistant-dock-wrap { right: 56px; }
 .app.side-open { margin: 0 478px 0 auto; }
 .app.side-closed { margin: 0 56px 0 auto; }
-@media (min-width: 761px) {
-  .dish-overlay { padding-right: 56px; }
-}
 
 /* Бічне меню (16.11, 12:25): шапка календаря — на всю ширину сторінки (акаунт у правому краї над меню);
    смуга з іконками й панель починаються на рівні сітки тижня — на 16 нижче шапки (--side-top рахує App.tsx),
@@ -1688,10 +1685,1110 @@ main.with-food { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap
 .app.side-open, .app.side-closed { padding-right: 16px; }
 .app.side-closed > main, .app.side-closed > .notice { margin-right: 68px; }
 .app.side-open > main, .app.side-open > .notice { margin-right: 490px; }
-@media (min-width: 761px) {
-  .dish-overlay { padding-right: 68px; }
-}
 /* Бічне меню (16.11, 16:10): розгорнута панель ще на 20 % вужча — вміст 338 (було 422), разом зі смугою 394 (було 478) */
 .side.open { width: 394px; }
 .side .assistant-dock.dialog { width: 338px; }
 .app.side-open > main, .app.side-open > .notice { margin-right: 406px; }
+
+/* Картка страви в бібліотеці (16.11, 17:18; варіант B): сіра підкладка bg радіус 16, відступ 8, між картками 8;
+   фото 72 радіус 12 (без фото — плитка кольору харчування з іконкою 24); назва 14/600 до двох рядків, улюблена —
+   зірочка 10 ліворуч; під нею продукти (або опис) 12 muted до двох рядків. Часу й категорії немає. Так само на телефоні. */
+.food-list { gap: 8px; }
+.food-row.card { gap: 12px; padding: 8px; border-radius: 16px; background: var(--bg); align-items: center; }
+.food-row.card:hover { background: #ececf0; }
+.food-row.card .food-thumb { width: 72px; height: 72px; border-radius: 12px; }
+.food-row.card .food-text { gap: 4px; }
+.food-row.card .food-name { display: flex; align-items: flex-start; gap: 4px; -webkit-line-clamp: unset; }
+.food-name-t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.food-row.card .food-fav { margin: 3px 0 0; flex: none; }
+.food-sub { font-size: 12px; line-height: 1.25; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+/* Страва в тижні (16.11, 17:18; варіант E): фото фоном із затемненням зліва (rgba(0,0,0,.6) → .25), назва біла 12/600;
+   без фото — колір харчування, назва ink. Лише назва, без часу; улюблена — зірочка 9 ліворуч. */
+.event.dish-event { justify-content: center; padding: 0 8px; }
+.event.dish-event:not(.compact) { justify-content: flex-start; padding-top: 6px; }
+.ev-dish-title { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: 12px; font-weight: 600; line-height: 1.25; }
+.ev-dish-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ev-fav { display: inline-flex; flex: none; }
+.ev-fav svg { fill: currentColor; }
+
+/* Страви в смузі групи «ранок», «день», «вечір» (16.11, 17:18): без точного часу. Смуга росте під картки:
+   картка 22, радіус 8, відступ 0 8, між картками 2, від країв клітинки 3; вигляд — як у страви в тижні. */
+.group-head > div { height: auto; min-height: 26px; }
+.group-cell.has-slots { flex-direction: column; align-items: stretch; justify-content: center; gap: 2px; padding: 3px; }
+.group-cell.has-slots .range-chip { align-self: flex-start; margin-left: 5px; }
+.event.slot-event { position: static; flex: none; height: 22px; padding: 0 8px; border-radius: 8px; justify-content: center; z-index: 1; }
+/* Бічне меню (16.11, 17:37): згорнутий білий блок — завширшки як іконка акаунта (40) і точно під нею
+   (праворуч 20 від краю екрана); іконки 40 без відступів зверху; розгорнутий — 378 (вміст 338 + смуга 40).
+   Від тижня до блоку — 16. */
+.side { right: 20px; width: 40px; }
+.side.open { width: 378px; }
+.side .side-rail { width: 40px; padding-top: 0; }
+.app.side-closed > main, .app.side-closed > .notice { margin-right: 60px; }
+.app.side-open > main, .app.side-open > .notice { margin-right: 398px; }
+/* Іконка акаунта (16.11, 17:46): рівне коло 40 × 40 — раніше .pill-btn.icon звужувало її до 34 і коло було сплющене */
+.pill-btn.icon.account-btn { width: 40px; height: 40px; }
+
+/* Короткий перегляд події (16.11): клік по події відкриває невелику білу картку (радіус 24, тінь картки, відступ 20,
+   ширина 320) з назвою 16 bold, датою й часом 12 muted, плиткою модуля 30 (радіус 8), «×» 30 і двома капсулами 40:
+   «Змінити» (fill) і «Видалити» (fill, текст danger-text); підтвердження — «Скасувати» і «Видалити остаточно» (danger).
+   Примітки 12 ink, між блоками 12, між елементами 8. Ноутбук — поруч із подією, телефон — вікно знизу (верхні кути 24). */
+.event-view-overlay { position: fixed; inset: 0; z-index: 60; background: transparent; }
+.event-view {
+  position: absolute; width: 320px; max-width: calc(100vw - 32px); box-sizing: border-box; padding: 20px; display: flex; flex-direction: column; gap: 12px;
+  background: #fff; border-radius: 24px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.06), 0 0 0 0.5px rgba(60, 60, 67, 0.18);
+}
+.event-view-head { display: flex; align-items: flex-start; gap: 12px; }
+.event-view-tile { width: 30px; height: 30px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.event-view-tile svg { fill: currentColor; }
+.event-view-text { flex: 1 1 auto; min-width: 0; }
+.event-view-text h2 { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.25; color: var(--ink); overflow-wrap: anywhere; }
+.event-view-text p { margin: 4px 0 0; font-size: 12px; line-height: 1.25; color: var(--muted); }
+.event-view-body { display: flex; flex-direction: column; gap: 8px; }
+.event-view-row { margin: 0; font-size: 12px; line-height: 1.3; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.event-view-hint { margin: 0; font-size: 11px; line-height: 1.3; color: var(--muted); }
+.event-view-actions { display: flex; gap: 8px; }
+.event-view-actions .btn { flex: 1 1 0; min-width: 0; height: 40px; padding: 0 12px; font-size: 12px; font-weight: 600; justify-content: center; }
+.event-view-actions .btn.danger-text { color: #b3261e; }
+.event-view-actions .btn.danger { background: var(--danger); color: #fff; }
+.event-view-overlay.phone { background: rgba(0, 0, 0, 0.3); display: flex; align-items: flex-end; }
+.event-view-overlay.phone .event-view { position: static; width: 100%; max-width: none; border-radius: 24px 24px 0 0; padding-bottom: 28px; box-shadow: none; }
+
+/* Бічне меню й страви (16.11, 20:00): «Страви» в меню — лише іконка 20 без кольорової плитки (ink); активна секція — іконка
+   зеленого кольору харчування (#7aa876), без підкладки fill; те саме для «Асистента». Пояснення в «що запланувати» — 11 muted.
+   У «страви»: пошук — поле з дизайн-системи (44, біле, обводка 0.5 separator, радіус 12, текст 12; активне — обводка 1 px ink);
+   поруч із заголовком — кругла «+» 30 (fill) і кругла «…» 30 (fill) з меню «Скопіювати минулий тиждень» / «Очистити тиждень»
+   (біла картка радіус 12, тінь випадного списку, рядки 40, текст 12/600). */
+.rail-btn svg { fill: currentColor; }
+.rail-btn.on { background: transparent; color: #7aa876; }
+.rail-btn:hover { background: rgba(118, 118, 128, 0.08); }
+.chat-intro p { font-size: 11px; line-height: 1.3; color: var(--muted); }
+.food-panel.embedded .food-search {
+  height: 44px; padding: 0 12px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background: #fff; font-size: 12px;
+}
+.food-panel.embedded .food-search:focus { outline: none; box-shadow: none; border: 1px solid var(--ink); }
+.dialog-head { position: relative; }
+.food-head-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.food-menu {
+  position: absolute; top: calc(100% + 4px); right: 0; z-index: 5; min-width: 220px; padding: 4px; display: flex; flex-direction: column;
+  background: #fff; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+.food-menu button { height: 40px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font: inherit; font-size: 12px; font-weight: 600; text-align: left; cursor: pointer; }
+.food-menu button:hover:not(:disabled) { background: var(--fill); }
+.food-menu button:disabled { color: var(--muted); cursor: default; }
+.food-menu button.danger { color: #b3261e; }
+/* Бічне меню (16.11, 20:00): іконка «Асистент» стоїть на одному рівні із заголовком панелі — шапка панелі 40, відступ згори 24,
+   іконки меню — з відступом 24 згори (центри збігаються) */
+.side .side-rail { padding-top: 24px; }
+.side .assistant-dock .dialog-head { height: 40px; min-height: 40px; }
+
+/* Список страв (16.11, 20:10): пошук — поле з дизайн-системи (44, біле, обводка 0.5 separator, радіус 12, текст 12) з іконкою лупи 16
+   ліворуч (відступ 14, muted); перед списком — прямокутний блок з пунктирною рамкою (1.5 px, rgba(60,60,67,.28), радіус 16, висота 56)
+   з іконкою страви 20 і текстом «Додати страву» 12/600 — швидко додати нову страву. Так само в бічній панелі й у вікні на телефоні. */
+.food-search-wrap { position: relative; width: 100%; }
+.food-search-wrap > svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); fill: var(--muted); pointer-events: none; }
+.food-search-wrap .food-search {
+  height: 44px; padding: 0 12px 0 40px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background: #fff; font-size: 12px;
+}
+.food-search-wrap .food-search:focus { outline: none; box-shadow: none; border: 1px solid var(--ink); }
+.food-add-block {
+  width: 100%; height: 56px; flex: none; border: 1.5px dashed rgba(60, 60, 67, 0.28); border-radius: 16px; background: transparent;
+  color: var(--ink); font: inherit; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+}
+.food-add-block svg { fill: currentColor; }
+.food-add-block:hover { background: rgba(118, 118, 128, 0.08); }
+.food-panel.embedded .food-search-wrap .food-search { padding: 0 12px 0 40px; }
+.food-search-wrap > svg { width: 18px; height: 18px; }
+
+/* Короткий перегляд події (16.11, 20:15): «Змінити» і «Видалити» — кругі іконки-кнопки 30 (fill, олівець й кошик 14) у верхньому ряду
+   справа, поруч із «×» (через 8); назва, дата й час — під іконками (плитка 30, назва 16 bold, дата 12 muted). Текстові кнопки лишились
+   лише в підтвердженні видалення. Картка: відступ 20, між блоками 12. */
+.event-view-tools { display: flex; justify-content: flex-end; gap: 8px; }
+.event-view-tools .round-btn svg { fill: currentColor; }
+.event-view-tools .round-btn.active-danger { color: #b3261e; }
+
+/* Повідомлення знизу (16.11, 20:20): після видалення події — чорна капсула ink внизу по центру (за 24 від краю; на телефоні вище
+   кнопок «+» — за 92): текст 13 білий, «Скасувати» 13/600 білий з підкресленням; зникає за 5 секунд. */
+.snackbar {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 80; display: flex; align-items: center; gap: 20px;
+  max-width: calc(100vw - 32px); box-sizing: border-box; padding: 12px 12px 12px 20px; border-radius: 999px; background: var(--ink); color: #fff;
+  font-size: 13px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); animation: snackIn 0.2s ease-out;
+}
+.snackbar button { height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.16); color: #fff; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.snackbar button:hover { background: rgba(255, 255, 255, 0.24); }
+@keyframes snackIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@media (max-width: 760px) { .snackbar { bottom: 92px; } }
+
+/* Картка страви всередині бічної панелі (16.11, 20:25): поля зʼявляються поверх бібліотеки; у шапці стрілка «назад» (кругла fill 30,
+   стрілка 12) перед заголовком «нова страва» / «страва», кнопок «+» і «…» немає. Поля й кнопки — як у картці страви. */
+.dish-panel-form { display: contents; }
+.dialog-head:has(> .round-btn:first-child + h2) { justify-content: flex-start; }
+.dialog-head > .round-btn:first-child + h2 { margin-right: auto; }
+/* Повідомлення про видалення (16.11, 20:25): 40 % ширини екрана; текст ліворуч, «Скасувати» праворуч */
+.snackbar { width: 40vw; min-width: 280px; justify-content: space-between; }
+@media (max-width: 760px) { .snackbar { width: calc(100vw - 32px); } }
+
+/* Нова подія, вкладка «хобі» (16.11, 20:50): поля заняття з онбордингу — назва, розклад (сегменти на всю ширину
+   «фіксовані дні й час» / «N разів на тиждень»), рядки «підпис ліворуч 14/600 ink — значення праворуч»
+   (дні — кружки 32 через 4, час — поле 40 радіус 12, лічильник, сегменти тривалості; якщо не вміщається — значення
+   під підписом, теж праворуч), примітка 11 muted. Між елементами 20. */
+.hobby-form { display: flex; flex-direction: column; gap: 20px; }
+.hobby-form .field input[type="text"] { height: 44px; }
+.hobby-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; min-height: 40px; }
+.hobby-row > :last-child { margin-left: auto; }
+.hobby-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+.hobby-days { display: flex; gap: 4px; justify-content: flex-end; }
+.hobby-form .day-pill { width: 32px; height: 32px; }
+.hobby-time { height: 40px; padding: 0 10px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background: #fff; font: inherit; font-size: 14px; color: var(--ink); }
+.hobby-time:focus { outline: none; border: 1px solid var(--ink); }
+.hobby-note { margin: -4px 0 0; font-size: 11px; line-height: 1.3; color: var(--muted); }
+@media (max-width: 520px) {
+  .hobby-row .seg { min-width: 0; }
+  .hobby-row .seg button { padding: 0 9px; flex: 1 1 auto; min-width: 0; }
+}
+
+/* Нова подія, вкладка «улюбленець» (16.11, 21:10): поля кроку «улюбленець» з онбордингу в тих самих стилях (.pet-step:
+   рядки «підпис 14/600 ink — значення праворуч», поле назви 44, чип «часто додають» малий, сегменти, кружки днів 32,
+   малий перемикач 26 × 16); тип запису — випадний список 44 (як решта списків вікна), над ним — «тварина», якщо їх кілька. Між елементами 20. */
+.pet-form { display: flex; flex-direction: column; gap: 20px; }
+.pet-form .med-fields { display: flex; flex-direction: column; gap: 12px; }
+.pet-form .ios-switch { width: 26px; height: 16px; }
+.pet-form .ios-switch span { top: 2px; left: 2px; width: 12px; height: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); }
+.pet-form .ios-switch.on span { left: 12px; }
+.pet-form .often { margin-top: 0; }
+.pet-form .hint.small { margin: -8px 0 0; font-size: 11px; line-height: 1.3; }
+.event-dialog .pet-form .pet-input:focus, .event-dialog .pet-form .act-time:focus, .event-dialog .pet-form .row-select:focus { outline: none; border: 1px solid var(--ink); }
+
+/* Вкладка «улюбленець» (16.11, 21:20): «тварина» і «тип» — два випадні списки 44 в одному ряду порівну, через 20 (завжди, навіть для однієї тварини). */
+.pet-form .pet-pick { align-items: flex-start; gap: 20px; }
+.pet-form .pet-pick .field { flex: 1 1 0; min-width: 0; }
+
+/* Вікно створення / редагування події й картка страви (17.11): панель притиснута до правого краю екрана
+   й лягає поверх бічного меню (раніше стояла ліворуч від смуги меню, відступ 60). */
+
+/* Нова подія, вкладка «ФОП» (17.11): поля кроку ФОП з онбордингу в тих самих стилях — сірий блок із секціями
+   (група — випадний список 44, ставка, ЄСВ за себе, виплати іншим), під ним за 20 «що зʼявиться в календарі»
+   (оранжевий блок з найближчим дедлайном і переліком) і примітка 11. «Зберегти» оновлює профіль ФОП і замінює
+   автоматичні дедлайни (source 'onb:fop'). Стилі онбордингу з префіксом .onb продубльовано для вікна події. */
+.fop-tab { display: flex; flex-direction: column; gap: 20px; }
+.fop-tab .fop-form { border-radius: 24px; }
+.fop-tab .fop-preview { margin-top: 0; }
+.event-dialog .fop-select {
+  width: 100%; height: 44px; padding: 0 40px 0 14px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px; background-color: #fff; color: var(--ink);
+  font: inherit; font-size: 14px; font-weight: 600; outline: none; box-shadow: none; appearance: none; -webkit-appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%231d1d1f' d='M3.5 8.5 6 6l6 6 6-6 2.5 2.5L12 17z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 12px 12px;
+}
+.event-dialog .fop-select:focus, .event-dialog .fop-select:focus-visible { border: 1px solid var(--ink); box-shadow: none; outline: none; }
+.event-dialog .hint.fop-help { margin-top: -8px; font-size: 11px; line-height: 1.3; }
+.fop-tab .fop-preview > .hint.small { font-size: 11px; line-height: 1.3; }
+
+/* Подія на весь день (17.11, 22:29): день фарбується в колір модуля цієї події — світлий відтінок (30 % кольору на білому),
+   щоб події дня лишались помітними («інше» — чорне, тому 10 %); кілька подій на весь день — колір першої. Тиждень: шапка дня, «весь день», смуги груп
+   і колонка годин; телефон — день у смузі днів (обраний лишається чорним). Назва в «весь день» — до 2 рядків. */
+.day-head.day-tint, .allday-cell.day-tint, .group-cell.day-tint, .day-col.day-tint,
+.strip-day.day-tint:not(.on) { background-color: color-mix(in srgb, var(--day-tint) var(--day-tint-pct, 30%), #fff) !important; }
+.allday-cell .pill {
+  white-space: normal; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2;
+}
+
+/* Вкладка «ФОП», профіль уже налаштовано (17.11, 22:29): заголовок «нагадування» 16 bold, за 16 — сірий блок радіус 24
+   з радіокнопками (18) — найближчий дедлайн кожного виду за профілем (назва 14, під нею «до дд.мм.рррр» 12 muted)
+   і «своє нагадування»; рядок 16 з усіх боків, між рядками лінія rgba(60,60,67,.12). Своє нагадування — поле «назва» 44.
+   Далі «дата» і «час» (поля 44 у ряд через 20), примітка 11. Між елементами 20. Поля онбордингу — лише якщо крок ФОП пропущено. */
+.fop-remind { display: flex; flex-direction: column; gap: 16px; }
+.fop-remind-list { border-radius: 24px; }
+.fop-remind-row { align-items: flex-start; padding: 16px; }
+.fop-remind-row .radio-dot { margin-top: 1px; }
+.fop-remind-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fop-remind-date { font-size: 12px; color: var(--muted); }
+.fop-tab .hint.fop-note { margin-top: -8px; font-size: 11px; line-height: 1.3; }
+
+/* Подія на весь день (17.11, 22:35): назва — без власної підкладки, просто текст ink 11/600 (до 2 рядків) на зафарбованому дні;
+   наведення — легке затемнення rgba(0,0,0,.06). */
+.allday-cell .pill.allday-text { background: transparent; color: var(--ink); padding: 4px 6px; }
+.allday-cell .pill.allday-text:hover { background: rgba(0, 0, 0, 0.06); }
+
+/* Швидке додавання з клітинки (18.11). Клік по порожньому місцю тижня (на телефоні — «Додати подію» в дні):
+   1) перелік «що додати» — біла картка 280 поруч із годиною, на яку натиснули (праворуч, а якщо не вміщається — ліворуч;
+      радіус 24, тінь картки, відступ 20, між блоками 12): заголовок 16 bold, під ним день і година 12 muted, «×» 30;
+      рядки 44 (радіус 12, відступ 0 8, між плиткою й назвою 12): плитка модуля 30 радіус 8 з іконкою 16, назва 14/600 ink,
+      наведення — fill. Лише увімкнені модулі й «інша подія».
+   2) після вибору на тому ж місці — компактне вікно 400 (радіус 24, тінь картки, відступ 20, між елементами 20,
+      не вище екрана мінус 32, поля прокручуються, кнопки 48 закріплені внизу): угорі кругла «назад» 30 (стрілка 12),
+      назва того, що додаємо, 16 bold і день з годиною 12 muted, «×» 30; далі поля модуля з уже заповненими днем і годиною.
+   На телефоні обидва кроки — вікно знизу. «+» у шапці, як і раніше, відкриває бічну панель «нова подія» з табами. */
+.quick-add { width: 280px; }
+.quick-add-head, .quick-head { display: flex; align-items: flex-start; gap: 12px; }
+.quick-head .event-view-text { padding-top: 4px; }
+.quick-add-list { display: flex; flex-direction: column; gap: 2px; margin: 0 -8px; }
+.quick-add-row {
+  height: 44px; padding: 0 8px; border: 0; border-radius: 12px; background: transparent; color: var(--ink);
+  font: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer;
+}
+.quick-add-row:hover, .quick-add-row:focus-visible { background: var(--fill); outline: none; }
+.event-view-overlay.phone .quick-add { width: 100%; }
+.quick-overlay .quick-dialog {
+  position: absolute; width: 400px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); margin: 0;
+  padding: 20px 20px 0; border-radius: 24px; overflow-y: auto; box-sizing: border-box; gap: 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.06), 0 0 0 0.5px rgba(60, 60, 67, 0.18);
+}
+.quick-overlay .quick-dialog .actions { position: sticky; bottom: 0; margin: auto -20px 0; padding: 12px 20px 20px; background: #fff; }
+.quick-dialog .dish-photo-empty { height: 96px; }
+.quick-dialog .field textarea { min-height: 96px; flex: none; }
+
+/* Швидке додавання (18.11, 10:11): блоки компактніші — відступи 16 замість 20.
+   Перелік «що додати»: відступ 16, між блоками 8, рядки 40 (радіус 10).
+   Компактне вікно: відступ 16, між елементами 16 (і всередині полів модуля); на ноутбуці «Скасувати» і «Зберегти» —
+   за шириною тексту, висота 48, праворуч через 8 («Зберегти» 13/600, відступи 24; «Скасувати» 12/600, відступи 20);
+   на телефоні кнопки 48 лишаються на всю ширину. */
+.quick-add { padding: 16px; gap: 8px; }
+.event-view-overlay.phone .quick-add { padding-bottom: 24px; }
+.quick-add-row { height: 40px; border-radius: 10px; }
+.quick-dialog { gap: 16px; }
+.quick-dialog .hobby-form, .quick-dialog .pet-form, .quick-dialog .fop-tab { gap: 16px; }
+.quick-overlay .quick-dialog { padding: 16px 16px 0; gap: 16px; }
+.quick-overlay .quick-dialog .actions { margin: auto -16px 0; padding: 12px 16px 16px; justify-content: flex-end; flex-wrap: nowrap; }
+.quick-overlay .quick-dialog .actions .btn { flex: none; height: 48px; }
+.quick-overlay .quick-dialog .actions .btn.primary { padding: 0 24px; }
+.quick-overlay .quick-dialog .actions .btn.secondary { padding: 0 20px; }
+
+/* Виділена клітинка (18.11, 10:20): поки відкрито перелік «що додати» або компактне вікно, на місці майбутньої події —
+   блок як подія (відступ 3 з боків, радіус 10): спершу сірий rgba(118,118,128,.24) з обводкою 1.5 ink,
+   після вибору модуля — колір модуля з тією ж обводкою. «Весь день» — клітинка з обводкою 1.5 ink усередині і сірим тлом.
+   Телефон: «Додати подію» у групі дня — суцільна обводка 1.5 ink і тло fill. */
+.cell-selected-block {
+  position: absolute; left: 3px; right: 3px; border-radius: 10px; pointer-events: none; z-index: 3;
+  background: rgba(118, 118, 128, 0.24); box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.allday-cell.cell-selected { box-shadow: inset 0 0 0 1.5px var(--ink); border-radius: 6px; background-color: rgba(118, 118, 128, 0.16) !important; }
+.empty-add.cell-selected { border: 1.5px solid var(--ink); background: var(--fill); color: var(--ink); }
+
+/* ===== 18.11: повторювані події, перетягування й тривалість ===== */
+/* Нижній край події — тягнемо, щоб змінити тривалість (крок 15 хв) */
+
+.event .ev-resize {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  cursor: ns-resize;
+  touch-action: none;
+}
+.event.resizing { box-shadow: 0 0 0 1.5px var(--ink); z-index: 3; }
+.pill.allday-text[draggable='true'] { cursor: grab; }
+
+/* Короткий перегляд: кошик повторюваної події питає, що прибрати */
+.event-view .round-btn.on { background: var(--ink); color: #fff; }
+.scope-ask { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.scope-ask-title { margin: 0; font-size: 12px; font-weight: 600; color: var(--ink); }
+.scope-ask-btn {
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fill);
+  color: #b3261e;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.scope-ask-btn:hover { background: rgba(118, 118, 128, 0.2); }
+
+/* Вікно події повторюваної події: «змінити — лише цю / цю й наступні / усі» */
+.scope-pick { display: flex; flex-direction: column; gap: 6px; }
+.scope-pick-label { font-size: 12px; font-weight: 600; color: var(--ink); }
+
+/* ===== 18.11: вигляд тижня (аудит, п. 4, 9, 14) ===== */
+/* Коротка подія до 20 хв (ліки тощо) — тонкий рядок: світліший колір модуля, час і назва в один рядок 10/600 */
+.event.short {
+  padding: 0 6px;
+  border-radius: 6px;
+  justify-content: center;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45));
+}
+.event.short .ev-time { font-size: 10px; line-height: 12px; gap: 4px; }
+.event.short .ev-title-inline { font-weight: 600; }
+/* Минуле — приглушене */
+.event.past, .pill.allday-text.past, .row-item.past { opacity: 0.5; }
+.event.past:hover, .row-item.past:hover { opacity: 0.8; }
+/* Вузькі дні (коли відкрито бічну панель): назва важливіша за час */
+.day-col { container-type: inline-size; }
+.ev-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+@container (max-width: 150px) {
+  .event.compact .ev-time-t, .event.short .ev-time-t { display: none; }
+}
+/* Телефон: крапки кольору модулів під днем; позначка «зараз» у списку дня */
+.marks { display: flex; gap: 3px; height: 5px; }
+.now-row { position: relative; height: 2px; margin: 12px 16px 12px 16px; background: var(--now); border-radius: 1px; }
+.now-row span {
+  position: absolute;
+  left: 0;
+  top: -9px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #f6e3db;
+  color: #9a4a2c;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+/* Назва в «весь день» обрізається до 2 рядків у самому тексті, щоб третій рядок не виглядав з-під відступу */
+.allday-cell .pill.allday-text { display: block; }
+.allday-cell .pill .allday-t { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+
+/* ===== 18.11: швидке додавання в одному вікні (аудит, п. 6, 13) ===== */
+/* Типи під заголовком «нова подія»: малі капсули 32 (fill), обрана — ink з білим текстом; крапка 8 кольору модуля */
+.quick-types { display: flex; flex-wrap: wrap; gap: 6px; }
+.quick-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fill);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.quick-type:hover { background: rgba(118, 118, 128, 0.2); }
+.quick-type.on { background: var(--ink); color: #fff; }
+.quick-type-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.quick-type.on .quick-type-dot { box-shadow: 0 0 0 1.5px #fff; }
+
+/* Підказки під назвою: страви з бібліотеки й заняття з налаштувань */
+.suggest { display: flex; flex-direction: column; margin-top: -12px; border: 0.5px solid var(--sep); border-radius: 12px; overflow: hidden; background: #fff; }
+.suggest-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.suggest-row + .suggest-row { border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.suggest-row:hover { background: var(--fill); }
+.suggest-tile { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; flex: none; }
+.suggest-name { font-size: 14px; font-weight: 600; color: var(--ink); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.suggest-kind { font-size: 11px; color: var(--muted); flex: none; }
+
+/* Вкладка «їжа»: спершу бібліотека (пошук, «Додати страву», картки страв), натискання ставить страву в календар */
+.dish-pick { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.dish-pick .food-list { display: flex; flex-direction: column; gap: 8px; }
+.quick-dialog .dish-pick .food-list { max-height: 320px; overflow-y: auto; }
+.back-to-list { align-self: flex-start; }
+
+/* Протягнутий мишею діапазон: блок з обводкою 1.5 ink і часом 11/600 */
+.range-block span { position: absolute; left: 8px; top: 4px; font-size: 11px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.dish-pick .food-row { flex: none; }
+.range-block, .day-col { user-select: none; -webkit-user-select: none; }
+/* Повідомлення з «Скасувати» не закриває відкриті вікна: лежить під ними */
+.snackbar { z-index: 18; }
+
+/* ===== 18.11: перехід до дати, пошук, клавіші (аудит, п. 7, 10, 12) ===== */
+/* Заголовок шапки — кнопка: дати тижня + стрілка 14; відкриває міні-календар */
+.title-btn {
+  display: inline-flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent;
+  font: inherit; color: inherit; letter-spacing: inherit; cursor: pointer; text-align: left;
+}
+.title-btn svg { fill: var(--muted); flex: none; margin-top: 4px; }
+.title-btn:hover svg { fill: var(--ink); }
+/* Лупа в шапці — біле коло 40, як акаунт */
+.search-btn svg { fill: var(--ink); }
+
+/* Міні-календар: біла картка 320, під заголовком (ноутбук) або знизу (телефон) */
+.event-view.month-picker { top: 84px; left: 24px; width: 320px; gap: 12px; }
+.month-picker-head { display: flex; align-items: center; gap: 8px; }
+.month-picker-head h2 { flex: 1; margin: 0; font-size: 16px; font-weight: 700; }
+.month-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px; }
+.month-dow { height: 24px; display: grid; place-items: center; font-size: 11px; color: var(--muted); }
+.month-day {
+  height: 40px; padding: 0; border: 0; background: transparent; font: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--ink);
+}
+.month-day .month-num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.month-day:hover .month-num { background: var(--fill); }
+.month-day.out { color: var(--muted); }
+.month-day.shown { background: var(--fill); }
+.month-grid .month-day.shown:nth-child(7n + 1) { border-radius: 10px 0 0 10px; }
+.month-grid .month-day.shown:nth-child(7n) { border-radius: 0 10px 10px 0; }
+.event-view-overlay.phone .month-day.shown { border-radius: 10px; }
+.month-day.today .month-num { background: var(--ink); color: #fff; }
+.month-marks { display: flex; gap: 2px; height: 4px; }
+.month-marks span { width: 4px; height: 4px; border-radius: 50%; }
+.month-today {
+  align-self: flex-start; height: 28px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--fill);
+  font: inherit; font-size: 12px; font-weight: 600; color: var(--ink); cursor: pointer;
+}
+
+/* Пошук і «найближче»: біла картка 400 праворуч під шапкою, список прокручується */
+.event-view.search-panel { top: 84px; right: 24px; width: 400px; max-height: calc(100dvh - 108px); gap: 12px; }
+.event-view-overlay.phone .search-panel { max-height: 85dvh; }
+.search-head { display: flex; align-items: center; gap: 8px; }
+.search-head .search-field { flex: 1; }
+.search-caption { margin: 0; font-size: 12px; font-weight: 600; color: var(--ink); }
+.search-list { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; min-height: 0; margin: 0 -20px; padding: 0 20px; }
+.search-day h3 { margin: 0 0 4px; font-size: 11px; font-weight: 600; color: var(--muted); }
+.search-row {
+  width: 100%; display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 8px; border: 0; border-radius: 10px;
+  background: transparent; font: inherit; text-align: left; cursor: pointer;
+}
+.search-row:hover { background: var(--fill); }
+.search-title { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.search-time { flex: none; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Перелік клавіш (?) */
+.event-view.keys-help { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 360px; }
+.keys-list { margin: 0; display: flex; flex-direction: column; }
+.keys-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 36px; }
+.keys-row + .keys-row { border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.keys-row dt { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); }
+.keys-row dd { margin: 0; font-size: 12px; color: var(--ink); text-align: right; }
+kbd {
+  min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box; display: inline-grid; place-items: center;
+  border-radius: 6px; background: var(--fill); font: inherit; font-size: 11px; font-weight: 600; color: var(--ink);
+}
+.keys-row dt { flex: none; }
+kbd { white-space: nowrap; }
+
+/* ===== 18.11: телефон (аудит, п. 8) ===== */
+/* Шапка в один рядок: ліворуч день («сьогодні» / день тижня, 30) і дата 15/500 muted під ним; праворуч — «Сьогодні»
+   (лише коли відкрито інший день), лупа й акаунт. Дати тижня — у смузі днів, тож окремого «сьогодні 18 листопада» немає. */
+@media (max-width: 760px) {
+  .top { flex-wrap: nowrap; align-items: flex-start; }
+  .top .title-block { flex: 1 1 auto; flex-basis: auto; min-width: 0; flex-direction: column; align-items: flex-start; gap: 2px; }
+  .top .title-block .month-title { white-space: nowrap; }
+  .top .account { margin-left: 0; }
+  .phone-date { font-size: 15px; font-weight: 500; color: var(--muted); }
+  .today-pill { height: 40px; padding: 0 14px; flex: none; }
+  .top > .pill-btn, .top > .account { margin-top: 2px; }
+}
+/* «+ Додати» в кожній групі дня відкриває «нова подія» на початок групи; поки вікно відкрите — з обводкою */
+.group-card-head .text-add.cell-selected { box-shadow: inset 0 0 0 1.5px var(--ink); border-radius: 999px; padding: 0 10px; background: var(--fill); }
+.today-pill { background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 18px rgba(0, 0, 0, 0.06); font-weight: 600; }
+
+/* ===== 18.11: шар Google Календаря (аудит, п. 17) — лише перегляд ===== */
+/* Подія з Google — біла з пунктиром 1.5 px (як у дизайн-системі), текст ink; не перетягується й не розтягується */
+.event.google-event {
+  background: #fff;
+  color: var(--ink);
+  border: 1.5px dashed rgba(60, 60, 67, 0.45);
+  box-sizing: border-box;
+}
+.event.google-event.short { background-image: none; }
+.pill.allday-text.google-pill { background: #fff; border: 1.5px dashed rgba(60, 60, 67, 0.45); margin-bottom: 2px; }
+/* Своя подія, що перетинається з Google: крапка 8 кольору now у правому верхньому куті з білою обводкою */
+.event .ev-clash {
+  position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--now); box-shadow: 0 0 0 1.5px #fff;
+}
+/* Плитка Google (короткий перегляд, список дня): біла з пунктиром, літера G 13/700 */
+.google-tile {
+  background: #fff; color: var(--ink); border: 1.5px dashed rgba(60, 60, 67, 0.45); box-sizing: border-box;
+  font-size: 13px; font-weight: 700; display: inline-grid; place-items: center;
+}
+.muted-row { color: var(--muted) !important; }
+/* Меню акаунта: перемикач шару */
+.account-check { display: flex; align-items: center; gap: 8px; height: 32px; font-size: 12px; font-weight: 600; color: var(--ink); cursor: pointer; }
+.account-check input { width: 16px; height: 16px; accent-color: var(--ink); }
+/* Вікно налаштування: картка 420 по центру (на телефоні — знизу) */
+.event-view.google-dialog { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; gap: 16px; }
+.event-view-overlay.phone .google-dialog { transform: none; }
+.ical-steps { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; line-height: 1.3; color: var(--ink); }
+.ical-steps b { font-weight: 600; }
+.google-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; font-weight: 600; }
+.google-dialog .actions { padding-top: 0; }
+/* Онбординг, крок Google: поле адреси */
+.onb-input {
+  width: 100%; height: 44px; box-sizing: border-box; padding: 0 12px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px;
+  background: #fff; font: inherit; font-size: 12px; color: var(--ink);
+}
+.onb-input:focus { outline: none; border: 1px solid var(--ink); }
+.error-text { color: var(--danger) !important; }
+/* Меню акаунта — над бічною панеллю */
+.account-menu { z-index: 30; }
+.google-dialog .field { display: flex; flex-direction: column; gap: 6px; }
+.google-dialog .field > span { font-size: 12px; font-weight: 600; color: var(--ink); }
+.google-dialog .field input {
+  height: 44px; box-sizing: border-box; padding: 0 12px; border: 0.5px solid rgba(60, 60, 67, 0.18); border-radius: 12px;
+  background: #fff; font: inherit; font-size: 12px; color: var(--ink);
+}
+.google-dialog .field input:focus { outline: none; border: 1px solid var(--ink); }
+
+/* ===== 18.11, вечір: етап 1 плану — справи без дати, задачі, чекліст у події, вибір події випадним списком
+   (макети PendingRow, QuickEventUndated, TaskRow, EventChecklist, LinkToEvent у дизайн-системі) ===== */
+
+/* «цього тижня»: чип — біла капсула 28 з пунктиром 1.5 кольору крапки модуля (колір — у style), плитка 20 з іконкою 12 */
+.pending-row .side-label { line-height: 1.25; }
+.pending-body { padding: 8px; }
+.pending-hint { margin-right: 2px; font-size: 11px; }
+.pending-chip { height: 28px; box-sizing: border-box; padding: 0 10px 0 3px; color: var(--ink); font: inherit; font-size: 12px; font-weight: 600; cursor: grab; max-width: 100%; }
+.pending-chip:active { cursor: grabbing; }
+.pending-chip.dragging { opacity: 0.35; }
+.pending-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pending-tile { flex: none; }
+.pending-add { height: 28px; padding: 0 4px; }
+.chips-wrap .pending-add { align-self: center; }
+/* Куди ляже справа: блок кольору модуля з обводкою 1.5 ink, назва 12/600 і час 11/500 */
+.drop-preview { display: flex; flex-direction: column; gap: 1px; padding: 4px 8px; box-sizing: border-box; overflow: hidden; }
+.drop-preview b { font-size: 12px; font-weight: 600; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.drop-preview span { font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* Тип «задача» у швидкому вікні: замість крапки — квадрат 8 з обводкою 1.5 */
+.quick-type-dot.task-dot { box-sizing: border-box; border-radius: 2px; border: 1.5px solid currentColor; background: transparent; }
+.quick-type.on .quick-type-dot.task-dot { box-shadow: none; }
+/* «без дати»: рядок «підпис 14/600 — перемикач»; примітка 11 під ним */
+.undated-line { display: flex; flex-direction: column; gap: 6px; }
+.undated-line .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 40px; }
+.undated-line .row-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+.undated-line .hint.small { font-size: 11px; }
+/* Поле з кружком «прибрати» 20 праворуч (необовʼязковий день задачі) */
+.field-x { position: relative; }
+.field-x input { padding-right: 44px; }
+.x20 { width: 20px; height: 20px; flex: none; padding: 0; border: 0; border-radius: 50%; background: var(--fill); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.x20:hover { background: rgba(118, 118, 128, 0.2); }
+.field-x .x20 { position: absolute; right: 12px; top: 12px; }
+
+/* Плитка модуля з іконкою для подій поза сіткою: 24 (список, поле) і 16 (рядок задачі) */
+.ev-tile { flex: none; display: inline-flex; align-items: center; justify-content: center; }
+.ev-tile.s24 { width: 24px; height: 24px; border-radius: 6px; }
+.ev-tile.s16 { width: 16px; height: 16px; border-radius: 4px; }
+
+/* Вибір події — випадний список «подія»: поле 44 зі стрілкою 12; відкрите — обводка 1 ink; список — біла картка 12 під полем */
+.ev-picker { position: relative; display: flex; flex-direction: column; gap: 4px; }
+.ev-picker-field {
+  height: 44px; width: 100%; box-sizing: border-box; padding: 0 40px 0 14px; border: 0.5px solid var(--sep); border-radius: 12px;
+  background: #fff; color: var(--muted); font: inherit; font-size: 12px; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer;
+}
+.ev-picker-field.open { border: 1px solid var(--ink); }
+.ev-picker-field.filled { padding-left: 10px; padding-right: 66px; color: var(--ink); }
+.ev-picker-field b { min-width: 0; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev-picker-field small { flex: none; font-size: 12px; color: var(--muted); }
+.ev-picker-chev { position: absolute; right: 14px; top: 16px; fill: var(--ink); transition: transform 0.15s; }
+.ev-picker-field.open .ev-picker-chev { transform: rotate(180deg); }
+.ev-picker-clear { position: absolute; right: 36px; top: 12px; }
+.ev-picker-list {
+  display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; padding: 8px; box-sizing: border-box;
+  border-radius: 12px; background: var(--card); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.12), 0 0 0 0.5px var(--sep);
+}
+.ev-picker-search .food-search { height: 40px; }
+.ev-picker-list .search-day h3 { padding: 0 8px; }
+.ev-picker-list .search-row.on { background: var(--fill); }
+.ev-picker-empty { margin: 0; padding: 4px 8px; font-size: 12px; color: var(--muted); }
+
+/* Задачі: панель у бічному меню (вміст 338) і вікно знизу на телефоні */
+.tasks-dialog { gap: 20px; }
+.tasks { display: flex; flex-direction: column; gap: 12px; }
+.tasks-add .food-search { height: 44px; background: #fff; border: 0.5px solid var(--sep); font-size: 12px; padding-left: 42px; }
+.tasks-add > svg { fill: var(--ink); }
+.tasks-empty { margin: 0; font-size: 11px; line-height: 1.3; color: var(--muted); }
+.tasks-missing { margin: 0; }
+.task-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.task-row { position: relative; display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; }
+.task-row + .task-row { border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.task-row:hover, .task-row.menu-open { margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 12px; background: rgba(118, 118, 128, 0.08); }
+.task-row:hover + .task-row, .task-row.menu-open + .task-row, .task-row + .task-row:hover, .task-row + .task-row.menu-open { border-top-color: transparent; }
+/* Позначка 18: радіус 5, обводка 1.5; зроблено — ink з білою галочкою 12 */
+.task-check {
+  flex: none; width: 18px; height: 18px; margin-top: 1px; box-sizing: border-box; padding: 0; border-radius: 5px; cursor: pointer;
+  border: 1.5px solid rgba(60, 60, 67, 0.29); background: #fff; color: #fff; display: inline-flex; align-items: center; justify-content: center;
+}
+.task-check.on { border: 0; background: var(--ink); }
+.task-check.ghost { opacity: 0.4; cursor: default; }
+.task-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.task-title { padding: 0; border: 0; background: none; text-align: left; font: inherit; font-size: 14px; font-weight: 600; line-height: 1.25; color: var(--ink); cursor: text; overflow-wrap: anywhere; }
+.task-row.done .task-title { color: var(--muted); font-weight: 500; text-decoration: line-through; cursor: default; }
+.task-title-input { height: 32px; margin: -6px 0 -2px; padding: 0 8px; border: 1px solid var(--ink); border-radius: 8px; background: #fff; font: inherit; font-size: 14px; font-weight: 600; outline: none; }
+.task-meta { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 12px; line-height: 1.25; color: var(--muted); }
+.task-meta-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.task-meta.late { color: var(--now-text, #9a4a2c); }
+.task-day-edit { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+.task-day-edit input { height: 40px; padding: 0 10px; border: 0.5px solid var(--sep); border-radius: 12px; background: #fff; font: inherit; font-size: 12px; }
+.task-text .ev-picker-list { margin-top: 4px; }
+.task-more { flex: none; margin-top: -4px; opacity: 0; }
+.task-row:hover .task-more, .task-row.menu-open .task-more, .task-more:focus-visible { opacity: 1; }
+@media (hover: none) { .task-more { opacity: 1; } }
+/* Меню рядка: біла картка 220, радіус 12, тінь випадного списку, рядки 40 з іконкою 14, 12/600 */
+.task-menu {
+  position: absolute; z-index: 5; right: 0; top: 40px; width: 220px; padding: 4px 0; border-radius: 12px; background: var(--card);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.12), 0 0 0 0.5px var(--sep);
+}
+.task-menu button { width: 100%; height: 40px; padding: 0 14px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 10px; text-align: left; cursor: pointer; }
+.task-menu button:hover { background: rgba(118, 118, 128, 0.08); }
+.task-menu button.danger { color: var(--danger-text, #b3261e); }
+.task-menu hr { margin: 4px 0; border: 0; border-top: 1px solid rgba(60, 60, 67, 0.12); }
+
+/* Чекліст у короткому перегляді: лінія, «задачі» 12/600, рядки 32 (позначка 18, текст 12/500), «×» 20 — відвʼязати */
+.checklist { display: flex; flex-direction: column; padding-top: 12px; border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.checklist.empty { padding-top: 0; border-top: 0; }
+.checklist h3 { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--ink); }
+.cl-row { display: flex; align-items: center; gap: 10px; min-height: 32px; font-size: 12px; font-weight: 500; line-height: 1.25; }
+.cl-row .task-check { margin-top: 0; }
+.cl-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.cl-row.done .cl-text { color: var(--muted); text-decoration: line-through; }
+.cl-unlink { opacity: 0; }
+.cl-row:hover { margin: 0 -8px; padding: 0 8px; border-radius: 8px; background: rgba(118, 118, 128, 0.08); }
+.cl-row:hover .cl-unlink, .cl-unlink:focus-visible { opacity: 1; }
+@media (hover: none) { .cl-unlink { opacity: 1; } }
+.cl-input { flex: 1 1 auto; min-width: 0; height: 32px; padding: 0 10px; border: 1px solid var(--ink); border-radius: 12px; background: #fff; font: inherit; font-size: 12px; outline: none; }
+.cl-add svg, .pending-add svg { width: 12px; height: 12px; }
+
+/* Асистент: задача в переліку доданого — нейтральна плитка з квадратом-галочкою */
+.chat-tile.task-tile { background: #e5e5ea; color: var(--ink); }
+
+/* Телефон: кнопка «Задачі» — біле коло 52 ліворуч від асистента за 12 */
+.fab-tasks { right: 144px; }
+.ev-picker-list .food-search-wrap .food-search { padding: 0 12px 0 40px; border: 0.5px solid var(--sep); background: #fff; font-size: 12px; }
+.ev-picker-list .food-search-wrap .food-search:focus { border: 0.5px solid var(--sep-strong); }
+.ev-picker-list .food-search-wrap > svg { left: 12px; fill: var(--ink); }
+.field-x input { padding-right: 76px; }
+.field-x .x20 { right: 44px; }
+
+/* Етап 2 (21.11): ліва панель «сьогодні / задачі / історія» — біла картка 394 радіус 24 з тінню картки, за 12 від лівого
+   й нижнього краю, на рівні сітки тижня (--side-top). Угорі таби-сегменти 32 і кругла «‹» 30 (згорнути), заголовок 26.
+   Згорнута — язичок 28 біля лівого краю (праві кути 12): стрілка 12 і вертикальний підпис «сьогодні» 12/600.
+   Тиждень зсувається: від панелі (або язичка) до сітки — 16. */
+.lp {
+  position: fixed; z-index: 15; top: var(--side-top, 88px); left: 12px; bottom: 12px; width: 394px;
+  display: flex; flex-direction: column; gap: 20px; padding: 20px 24px; border-radius: 24px; background: var(--card);
+  box-shadow: var(--shadow-card); overflow: hidden;
+}
+.lp-top { display: flex; align-items: center; gap: 8px; }
+.lp-seg { flex: 1; }
+.lp-title { font-size: 26px; }
+.lp-scroll { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 20px; margin: 0 -8px; padding: 0 8px; }
+.lp-sec { display: flex; flex-direction: column; gap: 2px; }
+.lp-h { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.lp-month { margin-top: 12px; }
+.lp-month:first-child { margin-top: 0; }
+.lp-row { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 8px; border-radius: 12px; margin: 0 -8px; }
+.lp-row:hover { background: rgba(118, 118, 128, 0.08); }
+.lp-tile { flex: none; width: 24px; height: 24px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; }
+.lp-tile svg { fill: currentColor; }
+.lp-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.lp-t b { font-size: 14px; font-weight: 600; }
+.lp-t span { font-size: 12px; color: var(--muted); }
+.lp-t span.late { color: #9a4a2c; }
+.lp-row.done .lp-t b { text-decoration: line-through; color: var(--muted); font-weight: 500; }
+.lp-row .task-check { flex: none; margin: 0 3px; }
+.lp-done {
+  flex: none; height: 28px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--fill);
+  font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+}
+.lp-done:hover { background: rgba(118, 118, 128, 0.2); }
+.lp-done svg { fill: currentColor; }
+.lp-empty { margin: 0; font-size: 12px; color: var(--muted); }
+.lp-tab {
+  position: fixed; z-index: 15; top: var(--side-top, 88px); left: 0; width: 28px; padding: 10px 0; border: 0;
+  border-radius: 0 12px 12px 0; background: var(--card); box-shadow: var(--shadow-card); color: var(--ink);
+  display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer;
+}
+.lp-tab svg { fill: currentColor; }
+.lp-vt { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 12px; font-weight: 600; color: var(--label2); }
+.app.left-open > main, .app.left-open > .notice { margin-left: 394px; }
+.app.left-closed > main, .app.left-closed > .notice { margin-left: 16px; }
+.app.left-open, .app.left-closed { max-width: none; }
+
+/* Етап 2 (21.11): праве меню згорнуте — без білої підкладки й тіні, лише іконки; натиснута — біле коло 40 з тінню */
+.side:not(.open) { background: transparent; box-shadow: none; }
+.side:not(.open) .rail-btn:hover { background: transparent; }
+.side .rail-btn:active { background: #fff; box-shadow: var(--shadow-pill); }
+
+/* Етап 2 (21.11): «Зроблено» в короткому перегляді подій ФОП і улюбленця — сіра капсула 28 з галочкою (чорна кнопка
+   на екрані одна — «+»), поруч 11 muted «наступне — дд.мм.рррр»; позначене — «зроблено» і текстова «Зняти позначку». */
+.ev-done { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ev-done-note { font-size: 11px; color: var(--muted); }
+
+/* Етап 2 (21.11), телефон: згортуваний блок «сьогодні» над «цього тижня»; у вікні задач — таби «задачі / історія» */
+.ph-today-head { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0; border: 0; background: transparent; text-align: left; }
+.ph-today-chev { display: inline-flex; transition: transform 0.15s; }
+.ph-today-chev.up { transform: rotate(180deg); }
+.ph-today-chev svg { fill: currentColor; }
+.ph-today-list { display: flex; flex-direction: column; gap: 12px; }
+.tasks-dialog .lp-seg { flex: none; }
+
+/* Дні народження (22.11): день не фарбується; у «весь день» — імена на синій підкладці: капсули радіус 8, відступи 4/8,
+   кремовий 11/700, через 4, переносяться; одне імʼя — ще й вік 10/500 у тому ж рядку. Телефон: тортик 44 замість плитки. */
+.cake-tile { background: transparent !important; overflow: visible; }
+.bday-names { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 4px; }
+.bday-name {
+  display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 8px; border: 0; border-radius: 8px;
+  background: #1340B8; color: #FFF8EC; font-size: 11px; font-weight: 700; line-height: 1.2; text-align: left; cursor: pointer;
+}
+.bday-name small { font-size: 10px; font-weight: 500; opacity: 0.8; }
+.bday-name:hover { background: #0f349a; }
+
+/* Стікери дня (22.11; 23.11 — коти з колажу власниці, public/stickers): наліпки (Stickers.tsx) з білою обводкою 1.5, без тіні, нахил −7…7°.
+   Натискання на шапку дня (усю область над «весь день») — картка вибору 290 (біла, радіус 16, тінь випадного списку):
+   «стікери · 24 листопада» 11/600 muted, сітка 5 × 2 кнопок 52 (9 стікерів) (радіус 12; обраний — fill і обводка 1.5 ink),
+   «Прибрати всі». До 4 своїх на день; день народження — тортик автоматично. У шапці стікери праворуч угорі
+   (52, при 3+ — 40, накладаються на −10). */
+.day-head { position: relative; }
+.day-head-btn { position: absolute; inset: 0; z-index: 1; border: 0; padding: 0; background: transparent; cursor: pointer; border-radius: 12px 12px 0 0; }
+.day-head-btn:hover { background: rgba(118, 118, 128, 0.06); }
+.day-stickers { position: absolute; z-index: 2; top: 4px; right: 4px; display: flex; pointer-events: none; }
+.day-stickers .sticker + .sticker { margin-left: -10px; }
+.sticker { display: inline-block; flex: none; }
+.sticker img {
+  display: block; width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff) drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff);
+}
+.sticker-pop {
+  position: absolute; z-index: 30; top: calc(100% + 4px); left: 0; width: 290px; padding: 12px; border-radius: 16px;
+  background: #fff; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14), 0 0 0 0.5px rgba(60, 60, 67, 0.18);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.sticker-pop-title { margin: 0; font-size: 11px; font-weight: 600; color: var(--muted); }
+.sticker-grid { display: grid; grid-template-columns: repeat(5, 52px); gap: 2px; }
+.sticker-opt { width: 52px; height: 52px; padding: 0; border: 1.5px solid transparent; border-radius: 12px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.sticker-opt:hover { background: rgba(118, 118, 128, 0.08); }
+.sticker-opt.on { background: var(--fill); border-color: var(--ink); }
+.sticker-clear { align-self: flex-start; height: 24px; color: #b3261e; }
+/* Стікери не перекривають позначку «сьогодні» (23.11): рядок із числом — над стікерами, натискання проходять до шапки */
+.day-head .num-line, .day-head .dow { position: relative; z-index: 3; pointer-events: none; }
+
+/* ===== 23.11: форма додавання з календаря у два кроки (макет погоджено в чаті) ===== */
+
+/* Виділена клітинка й діапазон мишею — прямокутник рівно по лініях сітки: від лінії початку до лінії кінця,
+   від межі до межі колонки, без заокруглення; сірий rgba(118,118,128,.24) або колір модуля, обводка 1.5 ink */
+.cell-selected-block.cell-rect { left: -0.5px; right: 0; border-radius: 0; }
+
+/* Плитка типу: 24 (радіус 6, іконка 13), мала 20 (іконка 11), сіра fill — для «+» */
+.qf-tile { width: 24px; height: 24px; border-radius: 6px; flex: none; display: inline-flex; align-items: center; justify-content: center; }
+.qf-tile.sm { width: 20px; height: 20px; }
+.qf-tile.fill { background: var(--fill); color: var(--ink); }
+
+/* Крок 1 — перелік «що створити»: картка 300 поруч із клітинкою (телефон — знизу); угорі день 16 bold і час 12 muted,
+   «×» 30; рядки 40 (радіус 10, плитка 24, назва 14/600), наведення rgba(118,118,128,.08); під лінією — «швидке нагадування» */
+.event-view.quick-pick { width: 300px; padding: 20px 8px 12px; gap: 0; }
+.quick-pick-head { display: flex; align-items: flex-start; gap: 12px; padding: 0 12px 12px; }
+.quick-pick-head p { margin: 2px 0 0; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.quick-pick-list { display: flex; flex-direction: column; }
+.quick-pick-row {
+  height: 40px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--ink);
+  font: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer;
+}
+.quick-pick-row:focus-visible { background: rgba(118, 118, 128, 0.08); outline: none; }
+@media (hover: hover) { .quick-pick-row:hover { background: rgba(118, 118, 128, 0.08); } }
+.quick-pick-sep { height: 1px; background: rgba(60, 60, 67, 0.12); margin: 8px 12px; }
+.quick-pick-fast { height: 40px; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; gap: 12px; cursor: text; }
+@media (hover: hover) { .quick-pick-fast:hover { background: rgba(118, 118, 128, 0.08); } }
+.quick-pick-fast.on, .quick-pick-fast:focus-within { background: transparent; box-shadow: inset 0 0 0 1px var(--ink); }
+.quick-pick-fast input { flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; font-size: 14px; font-weight: 500; }
+.quick-pick-fast input:focus-visible { outline: none; }
+.quick-pick-hint { margin: 6px 0 0; padding: 0 12px 0 48px; font-size: 11px; color: var(--muted); }
+.event-view-overlay.phone .event-view.quick-pick { width: 100%; padding: 20px 8px 28px; }
+
+/* Крок 2 — форма: угорі капсула типу (fill 32, плитка 20, 12/600, стрілка 12 muted) і «×» 30;
+   список типів — біла картка 220 (радіус 12, тінь випадного списку), рядки 40 (плитка 24, 12/600), обраний — fill з галочкою */
+.quick-overlay .quick-dialog { padding: 20px 20px 0; }
+.qf-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.qf-type-wrap { position: relative; }
+.qf-type {
+  height: 32px; padding: 0 10px 0 6px; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink);
+  font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;
+}
+.qf-type:hover, .qf-type.open { background: rgba(118, 118, 128, 0.2); }
+.qf-chev { color: var(--muted); }
+.qf-menu {
+  position: absolute; left: 0; top: 36px; z-index: 6; width: 220px; padding: 6px; background: #fff; border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.12); display: flex; flex-direction: column;
+}
+.qf-menu-row {
+  height: 40px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink);
+  font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 10px; text-align: left;
+}
+@media (hover: hover) { .qf-menu-row:hover { background: rgba(118, 118, 128, 0.08); } }
+.qf-menu-row.on { background: var(--fill); }
+.qf-menu-check { margin-left: auto; }
+
+/* Назва — на 24 нижче капсули, 20 bold, без рамки, лише лінія знизу (наведення темніша, фокус — 1.5 ink) */
+.qf-title {
+  margin-top: 8px; width: 100%; height: 40px; padding: 0 0 6px; border: 0; border-bottom: 1px solid rgba(60, 60, 67, 0.18);
+  border-radius: 0; background: transparent; font-size: 20px; font-weight: 700; color: var(--ink); outline: none;
+}
+.qf-title::placeholder { color: rgba(60, 60, 67, 0.35); }
+.qf-title:hover { border-bottom-color: rgba(60, 60, 67, 0.29); }
+.qf-title:focus, .qf-title:focus-visible { outline: none; border-bottom-color: var(--ink); box-shadow: 0 0.5px 0 var(--ink); }
+
+/* Поля «підпис — значення» у стилі Notion: підписи 128 зліва 12/600 muted, значення 14/500 праворуч; рядки 32 через 8.
+   Значення виглядають як текст (відступи 0 8, радіус 8), наведення — rgba(118,118,128,.08), редагування — біле з обводкою 1 ink. */
+.qf-grid { margin-top: 4px; display: grid; grid-template-columns: 128px minmax(0, 1fr); column-gap: 0; row-gap: 8px; align-items: center; }
+.qf-k { font-size: 12px; font-weight: 600; color: var(--muted); align-self: start; line-height: 32px; }
+.qf-v { display: flex; align-items: center; gap: 2px; min-width: 0; margin-left: -8px; }
+.qf-prop {
+  position: relative; height: 32px; padding: 0 8px; border: 1px solid transparent; border-radius: 8px; background: transparent;
+  color: var(--ink); font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; white-space: nowrap; cursor: pointer; outline: none;
+}
+@media (hover: hover) { .qf-prop:hover { background: rgba(118, 118, 128, 0.08); } }
+.qf-prop:focus, .qf-prop:focus-within, .qf-prop:focus-visible { background: #fff; border-color: var(--ink); outline: none; }
+.qf-prop.empty { color: var(--muted); font-weight: 400; }
+.qf-date input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; cursor: pointer; }
+.qf-time { font-variant-numeric: tabular-nums; }
+.qf-arrow { color: var(--muted); font-size: 13px; padding: 0 2px; }
+.qf-dur { margin-left: 6px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.qf-select { -webkit-appearance: none; appearance: none; max-width: 100%; }
+.qf-select.empty { color: var(--muted); font-weight: 400; }
+.qf-static { cursor: default; }
+.qf-static:hover { background: transparent; }
+.qf-year { width: 140px; cursor: text; }
+.qf-year::placeholder { color: var(--muted); font-weight: 400; }
+.qf-note { width: 100%; height: auto; min-height: 64px; padding: 6px 8px; white-space: normal; resize: vertical; cursor: text; line-height: 1.3; }
+.qf-picker { margin-left: 0; display: block; }
+
+/* «весь день» під днем: позначка 14 (радіус 4, обводка 1.5 separator-strong; обрана — ink з галочкою 10), текст 12/500 ink;
+   впритул до дня, до часу — більший відступ */
+.qf-check { height: 20px; margin: -10px 0 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--ink); cursor: pointer; justify-self: start; position: relative; }
+.qf-check input { position: absolute; opacity: 0; width: 14px; height: 14px; margin: 0; }
+.qf-box { width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(60, 60, 67, 0.29); background: #fff; color: transparent; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; }
+.qf-check input:checked + .qf-box { background: var(--ink); border-color: var(--ink); color: #fff; }
+.qf-check input:focus-visible + .qf-box { outline: 3px solid rgba(0, 0, 0, 0.45); outline-offset: 1px; }
+.qf-check.locked { cursor: default; }
+
+/* Кнопки вікна: висота 42 у всіх вікнах (бічна панель, швидке вікно, телефон).
+   У швидкому вікні — лінія rgba(60,60,67,.12) над кнопками: від полів до лінії 28, від лінії до кнопок 16, знизу 20 */
+.dish-dialog .actions .btn, .quick-overlay .quick-dialog .actions .btn { height: 42px; }
+.dish-dialog .actions .text-danger { height: 42px; }
+.quick-overlay .quick-dialog .actions { margin: 12px -20px 0; margin-top: auto; padding: 16px 20px 20px; border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.quick-overlay .quick-dialog > .qf-grid + .actions, .quick-overlay .quick-dialog > .error + .actions { margin-top: 12px; }
+
+/* ===== 23.11 (після обіду): дрібні правки власниці ===== */
+
+/* Наведення на порожню годину в тижні — прямокутник по лініях сітки (як виділена клітинка) з тлом fill */
+.cell-hover { position: absolute; left: -0.5px; right: 0; background: var(--fill); pointer-events: none; z-index: 0; }
+
+/* Праве меню відкрите: панель — окрема біла картка (радіус 24, тінь картки), іконки лишаються поза нею праворуч за 8;
+   обрана іконка — біле коло 40 (ink) з зеленою смугою 2 × 32 (#7aa876) ліворуч, між карткою й колом */
+.side.open { width: 386px; justify-content: flex-end; gap: 8px; overflow: visible; background: transparent; box-shadow: none; transition: none; }
+.side.open .assistant-dock.dialog { width: 338px; height: 100%; background: var(--card); border-radius: 24px; box-shadow: var(--shadow-card); }
+.side.open .side-rail { flex: none; width: 40px; }
+.side.open .rail-btn.on { position: relative; background: #fff; color: var(--ink); }
+.side.open .rail-btn.on::before { content: ''; position: absolute; left: -8px; top: 4px; bottom: 4px; width: 2px; border-radius: 1px; background: #7aa876; }
+.app.side-open > main, .app.side-open > .notice { margin-right: 406px; }
+
+/* Без тіней на кнопках: основна чорна, капсула «‹ Сьогодні ›», кола пошуку й акаунта, «Сьогодні» на телефоні,
+   кола асистента й задач на телефоні, «Додати фото», натиснута іконка правого меню. Білі кнопки на сірому тлі — з обводкою 0.5 */
+.btn.primary, .pill-group, .account-btn, .today-pill, .fab-asst, .dish-photo-btn, .food-toggle, .side .rail-btn:active { box-shadow: none; }
+.fab-asst { border: 0.5px solid rgba(0, 0, 0, 0.08); }
+
+/* 23.11 (вечір): страва, заняття, улюбленець і ФОП у швидкому вікні — ті самі поля «підпис — значення» в стилі Notion.
+   Текстове значення без рамки (порожнє — сіра підказка); дні тижня — кружки 28 (12/600, обрані — ink з білим) через 4;
+   довгі значення списків обрізаються трьома крапками; примітка під полями — 11 muted. */
+.qf-input { cursor: text; min-width: 0; width: 100%; font-family: inherit; }
+.qf-input::placeholder { color: var(--muted); font-weight: 400; }
+.qf-select { overflow: hidden; text-overflow: ellipsis; }
+.qf-v { flex-wrap: wrap; }
+.qf-days { display: inline-flex; gap: 4px; padding-left: 8px; }
+.qf-day { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); font-size: 12px; font-weight: 600; }
+.qf-day.on { background: var(--ink); color: #fff; }
+.qf-hint { grid-column: 1 / -1; margin: 0; font-size: 11px; color: var(--muted); line-height: 1.3; }
+.quick-dialog > .qf-hint { margin-top: -8px; }
+/* Назва у швидкому вікні — поле, що росте в кілька рядків (довгі назви дедлайнів ФОП видно повністю) */
+textarea.qf-title { display: block; height: auto; min-height: 40px; padding: 6px 0 6px; resize: none; overflow: hidden; line-height: 1.25; font-family: inherit; }
+
+/* 23.11 (вечір, правки власниці) */
+/* Питання онбордингу модуля в швидкому вікні (крок пропускали): картка 520 поруч із клітинкою, відступ 24, прокрутка;
+   «×» 30 праворуч угорі; смуга прогресу онбордингу прихована; телефон — вікно знизу на всю ширину */
+.event-view.quick-onb { width: 520px; max-height: calc(100dvh - 32px); overflow-y: auto; padding: 24px; gap: 0; }
+.quick-onb .mod-stepper { display: none; }
+.quick-onb-close { position: absolute; top: 20px; right: 20px; z-index: 1; }
+.quick-onb .step-head { padding-right: 40px; }
+.event-view-overlay.phone .event-view.quick-onb { position: relative; width: 100%; max-height: 90dvh; padding: 24px 20px 28px; }
+
+/* ФОП у швидкому вікні: перелік найближчих дедлайнів — рядки від 44, радіокнопка 18, назва 14/500, «до дд.мм.рррр» 12 muted;
+   обраний — тло fill радіус 10; «своє нагадування» — поле без рамки в тому самому рядку */
+.qf-list { display: flex; flex-direction: column; gap: 2px; margin: 0 -8px; }
+.qf-list-row { position: relative; min-height: 44px; padding: 6px 8px; border-radius: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+@media (hover: hover) { .qf-list-row:hover { background: rgba(118, 118, 128, 0.08); } }
+.qf-list-row.on { background: var(--fill); }
+.qf-list-row .radio-input { position: absolute; opacity: 0; pointer-events: none; }
+.qf-list-text { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 500; line-height: 1.25; min-width: 0; }
+.qf-list-sub { font-size: 12px; font-weight: 400; color: var(--muted); }
+.qf-list-muted { color: var(--muted); font-weight: 400; }
+.qf-list-input { flex: 1; min-width: 0; height: 32px; border: 0; outline: none; background: transparent; font-size: 14px; font-weight: 500; }
+.qf-list-input:focus-visible { outline: none; }
+.qf-list-input::placeholder { color: var(--muted); font-weight: 400; }
+/* Улюбленець у швидкому вікні: «додати ще одного» — той самий рядок «улюбленець» стає полем імені (біле, обводка 1 ink)
+   з «×» 20 праворуч — повернутися до списку збережених */
+.qf-input-edit { flex: 1; background: #fff; border-color: var(--ink); margin-right: 6px; }
+/* ФОП у швидкому вікні (23.11): позначки 18 (радіус 5, обводка 1.5 separator-strong; обрана — ink з галочкою 12) замість
+   радіокнопок — можна обрати кілька; позначка й текст вирівняні по верху рядка */
+.qf-list-row { align-items: flex-start; padding: 10px 8px; }
+.qf-box.qf-box-18 { flex: none; width: 18px; height: 18px; border-radius: 5px; margin-top: 0; }
+.qf-list-row input:checked + .qf-box { background: var(--ink); border-color: var(--ink); color: #fff; }
+.qf-list-row input:focus-visible + .qf-box { outline: 3px solid rgba(0, 0, 0, 0.45); outline-offset: 1px; }
+.qf-list-text { padding-top: 0; }
+.qf-list-input { height: 18px; line-height: 18px; padding: 0; }
+
+/* 23.11: ліва панель — без заголовків, що дублюють таби (і у вікні задач на телефоні). «сьогодні»: рядки вирівняні по верху,
+   ліворуч позначка 18 — «Зроблено» (події ФОП і улюбленця) або виконано (задачі); назва 14/600, під нею плитка 16 модуля
+   і час 12 muted; під курсором — «…» 30 з меню «Перенести на наступний день» / «Видалити» (danger-text).
+   «задачі»: поле нової задачі — як назва у вікнах календаря (20 bold, лише лінія знизу). */
+.lp-row { position: relative; align-items: flex-start; min-height: 0; padding: 10px 8px; }
+.lp-row .task-check { margin: 1px 0 0; }
+.lp-meta { display: flex; align-items: center; gap: 6px; }
+.lp-t span.lp-meta.late { color: #9a4a2c; }
+.lp-tile.sm { width: 16px; height: 16px; border-radius: 4px; }
+.lp-row .task-more { margin-top: -6px; }
+.lp-row:hover .task-more, .lp-row.menu-open .task-more { opacity: 1; }
+.lp-row.menu-open { background: rgba(118, 118, 128, 0.08); }
+.lp-row .task-menu { top: 36px; right: 8px; }
+.qf-title.tasks-line { margin-top: 0; }
+.tasks-dialog .lp-top { margin-bottom: 0; }
+.lp-row .task-menu { width: 250px; }
+.lp-row .task-menu button { white-space: nowrap; }
+.tasks-dialog .lp-top .lp-seg { flex: 1; }
+.task-menu button svg { flex: none; }
+/* Нова задача (23.11) — як незаповнений рядок задачі: порожня позначка 18 (напівпрозора), поле без рамки 14/600,
+   підказка «нова задача» muted; лінія під рядком, як між задачами */
+.task-row.task-new { align-items: flex-start; border-bottom: 1px solid rgba(60, 60, 67, 0.12); }
+.task-row.task-new:hover { margin: 0; padding-left: 0; padding-right: 0; border-radius: 0; background: transparent; }
+.task-new .task-check { margin-top: 1px; }
+.task-new-input { flex: 1; min-width: 0; height: 20px; padding: 0; border: 0; outline: none; background: transparent; font-size: 14px; font-weight: 600; color: var(--ink); }
+.task-new-input:focus-visible { outline: none; }
+.task-new-input::placeholder { color: var(--muted); font-weight: 500; }
+.task-new:focus-within .task-check { opacity: 1; }
+
+/* Стікер у будь-якій клітинці (23.11): у переліку «що створити» під лінією — рядок «стікер» (плитка fill з наліпкою,
+   праворуч обрані 24); натискання — сітка 5 × 2 (до двох стікерів на клітинку), «Назад», «Прибрати всі».
+   У тижні — праворуч угорі клітинки, 36, біла обводка, поверх подій; кліки проходять до клітинки й подій. */
+.quick-pick-chosen { margin-left: auto; display: inline-flex; }
+.quick-pick-chosen .sticker + .sticker { margin-left: -8px; }
+.quick-pick-stickers { display: flex; flex-direction: column; gap: 8px; padding: 0 12px; }
+.quick-pick-stickers .sticker-grid { grid-template-columns: repeat(5, 1fr); }
+.quick-pick-stickers .sticker-opt { width: 100%; }
+.quick-pick-sticker-foot { display: flex; align-items: center; justify-content: space-between; }
+.quick-pick-sticker-foot .text-add svg { fill: currentColor; }
+.cell-stickers { position: absolute; right: 4px; z-index: 4; display: flex; pointer-events: none; }
+.cell-stickers .sticker + .sticker { margin-left: -10px; }
+/* Нова задача (23.11): поки вводите назву — праворуч кола 28 без тла (іконка 14 muted; наведення — fill):
+   «день» (системний календар) і «підвʼязати до події» (той самий список подій під рядком, обране — fill і ink).
+   Обране — під назвою капсулами fill 24 (12/500) з «×» 20: «завтра», «пт, 28 листопада» або плитка 16 + «Назва · пт, 11:00». */
+.task-new-tools { flex: none; display: flex; gap: 2px; margin: -5px -4px 0 0; }
+.task-new-tool { position: relative; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.task-new-tool svg { fill: currentColor; }
+.task-new-tool:hover, .task-new-tool:focus-within { background: var(--fill); color: var(--ink); }
+.task-new-tool.on { background: var(--fill); color: var(--ink); }
+.task-new-tool.date-tool input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; cursor: pointer; }
+.task-new-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.task-new-chip { height: 24px; max-width: 100%; padding: 0 2px 0 8px; border-radius: 999px; background: var(--fill); display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--ink); }
+.task-new-chip .x20 { background: transparent; }
+
+/* ===== 23.11 (ніч): бічна панель «+», анімації закриття, праве меню, список страв ===== */
+
+/* Бічна панель («+» у шапці, клавіша C, «Зробити подією») і вікно «подія» — та сама форма, що й швидке вікно:
+   капсула типу, назва з лінією, поля «підпис — значення». Праворуч від капсули — «без дати» (позначка 14, 12/500) і «×» 30.
+   Ширина 528, відступи 24 / 24 / 20, між елементами 16. Кнопки 42 праворуч за шириною тексту, над ними лінія;
+   «Видалити» — ліворуч у тому ж рядку. Телефон — вікно знизу, кнопки 42 на всю ширину. */
+.panel-dialog { gap: 16px; }
+.qf-head .qf-head-check { margin: 0 4px 0 auto; }
+.qf-type.locked { cursor: default; padding-right: 12px; }
+.qf-type.locked:hover { background: var(--fill); }
+@media (min-width: 761px) {
+  .dish-overlay .panel-dialog .actions { flex-wrap: nowrap; justify-content: flex-end; padding-top: 16px; }
+  .panel-dialog .actions .spacer { display: block; flex: 1; }
+  .panel-dialog .actions .btn.secondary { flex: none; padding: 0 20px; }
+  .panel-dialog .actions .btn.primary { flex: none; padding: 0 24px; }
+  .panel-dialog .actions .text-danger, .panel-dialog .actions .btn.danger { flex: none; }
+}
+
+/* Анімації закриття: бічна панель заїжджає праворуч за край екрана (0.2 с, ease-in); швидке вікно гасне й трохи
+   зменшується (0.15 с); на телефоні вікно опускається вниз, затемнення гасне. Поки йде анімація, натискання не працюють. */
+.overlay.closing, .event-view-overlay.closing, .overlay.closing .dialog, .event-view-overlay.closing .dialog { pointer-events: none; }
+@media (min-width: 761px) {
+  .dish-overlay.closing .dish-dialog { animation: panelOut 0.2s ease-in forwards; }
+}
+@keyframes panelOut { from { transform: none; } to { transform: translateX(100%); } }
+.quick-overlay.closing .quick-dialog { animation: popOut 0.15s ease-in forwards; }
+@keyframes popOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(0.98); } }
+@media (max-width: 760px) {
+  .overlay.closing { animation: fadeOut 0.2s ease-in forwards; }
+  .overlay.closing .dialog { animation: sheetOut 0.2s ease-in forwards; }
+}
+@keyframes fadeOut { to { background-color: rgba(0, 0, 0, 0); } }
+@keyframes sheetOut { from { transform: none; } to { transform: translateY(100%); } }
+
+/* Праве меню: іконки стоять на місці; картка виїжджає з-під іконок уліво (0.22 с) і заїжджає назад під них (0.2 с) —
+   видимий правий край картки весь час на своєму місці. Наведення на іконку — біле коло 40 (без тіні) і в згорнутому меню;
+   обрана — те саме коло лишається (з зеленою смугою, коли картка відкрита). */
+.side.open .assistant-dock.dialog { animation: sideCardIn 0.22s ease-out; }
+.side.closing .assistant-dock.dialog { animation: sideCardOut 0.2s ease-in forwards; pointer-events: none; }
+@keyframes sideCardIn {
+  from { transform: translateX(calc(100% + 8px)); clip-path: inset(0 calc(100% + 8px) 0 0 round 24px); }
+  to { transform: none; clip-path: inset(0 0 0 0 round 24px); }
+}
+@keyframes sideCardOut {
+  from { transform: none; clip-path: inset(0 0 0 0 round 24px); }
+  to { transform: translateX(calc(100% + 8px)); clip-path: inset(0 calc(100% + 8px) 0 0 round 24px); }
+}
+.side .rail-btn { transition: background-color 0.15s; }
+.side .rail-btn:hover, .side:not(.open) .rail-btn:hover, .side .rail-btn.on { background: #fff; }
+
+/* Картка страви в бібліотеці — фото 67 (було 72), назва до 2 рядків, опис / продукти — 1 рядок
+   (панель «страви», бібліотека в бічній панелі події, телефон). Біля заголовка «страви» — дві кнопки:
+   «+» і «Дублювати на наступний тиждень» (без страв на тижні — неактивна, 0.4). */
+.food-row.card .food-thumb { width: 67px; height: 67px; }
+.food-sub { -webkit-line-clamp: 1; }
+.food-name-t { -webkit-line-clamp: 2; }
+.food-head-actions .round-btn:disabled { opacity: 0.4; cursor: default; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dish-overlay.closing .dish-dialog, .quick-overlay.closing .quick-dialog, .overlay.closing, .overlay.closing .dialog,
+  .side.open .assistant-dock.dialog, .side.closing .assistant-dock.dialog { animation: none; }
+}
+
+/* ===== 23.11 (етап 4): страва на весь період і підсвітка зони при перетягуванні страви ===== */
+/* Страва на весь період «ранок / день / вечір»: фото на всю висоту періоду під іншими подіями (z-index 0),
+   радіус 10, відступ 3 з боків; назва вгорі (12/600 біла на затемненні 180deg .55 → 0 до 45 %).
+   Без фото — колір харчування на 45 % з білим, назва ink. Кліки проходять крізь картку — натискати й тягнути за назву. */
+.period-dish {
+  position: absolute; z-index: 0; border-radius: 10px; overflow: hidden; pointer-events: none;
+  background-size: cover; background-position: center;
+}
+.period-dish.past { opacity: 0.5; }
+.period-dish-head {
+  pointer-events: auto; display: flex; width: 100%; min-height: 28px; padding: 6px 8px; border: 0;
+  background: transparent; color: inherit; text-align: left; cursor: pointer;
+}
+.period-dish-head:hover { background: rgba(0, 0, 0, 0.08); }
+.period-dish:not(.with-photo) .period-dish-head:hover { background: rgba(0, 0, 0, 0.04); }
+
+/* Куди ляже страва: година / весь період — прямокутник по лініях сітки, #a3c6a0 на 28 % з обводкою 1.5 ink,
+   угорі час 11/600; смуга групи — уся клітинка смуги з тією ж обводкою */
+.drop-zone {
+  position: absolute; left: -0.5px; right: 0; z-index: 3; pointer-events: none; box-sizing: border-box;
+  background: rgba(163, 198, 160, 0.28); box-shadow: inset 0 0 0 1.5px var(--ink);
+  padding: 4px 8px; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink);
+}
+.drop-zone.period { background: rgba(163, 198, 160, 0.4); }
+.drop-zone span { display: inline-block; padding: 1px 4px; border-radius: 4px; background: #fff; line-height: 1.25; }
+.group-cell.drop-zone-head { box-shadow: inset 0 0 0 1.5px var(--ink); }
+
+/* Смуга «весь період» — лише поки тягнемо страву: праворуч у кожній колонці періоду, 28 завширшки,
+   тло fill, пунктир 1.5 зліва, вертикальний підпис 11/600 muted; під стравою — ink з білим текстом */
+.period-drop {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 28px; z-index: 5; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(118, 118, 128, 0.16); border-left: 1.5px dashed rgba(60, 60, 67, 0.45);
+}
+.period-drop span {
+  writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; font-weight: 600; color: var(--muted);
+  white-space: nowrap; pointer-events: none;
+}
+.period-drop.on { background: var(--ink); border-left-color: var(--ink); }
+.period-drop.on span { color: #fff; }
+
+/* Демоверсія (25.11): позначка в шапці, що зміни не зберігаються */
+.badge.demo-badge { background: #ffe8df; color: #b5401a; white-space: nowrap; }
+.phone-date .badge.demo-badge { margin-left: 8px; font-size: 11px; padding: 2px 8px; vertical-align: 2px; }

@@ -346,7 +346,7 @@ function buildItems(p: Parsed, ctx: ParseCtx): NewItem[] {
   // час з клітинки, на якій відкрили асистента, — лише якщо у фразі немає ні дня, ні часу
   const start = p.start ?? (ctx.start && ctx.date && !p.dates.length && !p.weekdays.length ? ctx.start : undefined);
   const allDay = !start;
-  const defDur = module === 'food' ? 30 : 60;
+  const defDur = 60; // і страва, і решта подій — 1 година (16.11, 19:27)
   const end = start ? p.end ?? fromMinutes(Math.min(toMinutes(start) + (p.durMin ?? defDur), 24 * 60 - 1)) : undefined;
   const base = { title, module, allDay, start, end, source } as const;
 

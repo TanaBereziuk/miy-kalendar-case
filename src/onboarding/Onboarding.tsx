@@ -109,7 +109,14 @@ export function Onboarding({ initial, onDraft, onFinish, onClose }: Props) {
         )}
         {step === 'google' && (
           <>
-            <GoogleStep onBack={() => go(-1)} onFinish={finish} onWant={() => set('google', { wanted: true })} busy={busy} />
+            <GoogleStep
+              onBack={() => go(-1)}
+              onFinish={finish}
+              onWant={() => set('google', { ...a.google, wanted: true })}
+              url={a.google.icalUrl}
+              onUrl={(u) => set('google', { ...a.google, wanted: true, icalUrl: u, show: true })}
+              busy={busy}
+            />
             {error && (
               <p className="error" role="alert">
                 {error}
