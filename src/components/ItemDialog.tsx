@@ -10,6 +10,7 @@ import { describeRepeat } from '../lib/repeat';
 import { SCOPE_LABELS, type Scope } from '../lib/series';
 import { ICONS, Icon } from './Icon';
 import { DishFormFields, useDishForm } from '../food/DishForm';
+import { DeleteButton } from './DeleteButton';
 import { dishIdOf, type Dish, type NewDish } from '../food/dishes';
 import { DishRow } from '../food/DishRow';
 import { DishAddBlock, DishSearch, filterDishes } from '../food/FoodPanel';
@@ -170,6 +171,8 @@ export function ItemDialog({ state, onClose, onSave, onDelete, onSaveDish, dishe
   // Наявну подію редагуємо звичайними полями; якщо це страва з бібліотеки — полями картки страви.
   const isNew = !state.item;
   const foodTab = (isNew && module === 'food') || !!linkedDish;
+  // 26.11: страва з бібліотеки в календарі — кошик у заголовку замість «Видалити» внизу
+  const dishHeadDelete = !!state.item && !!linkedDish;
   // Вкладка «хобі» (нова подія) — поля заняття з онбордингу
   const hobbyForm = useHobbyForm(base.date ?? '', base.allDay ? undefined : base.start, base.allDay ? undefined : base.end);
   const hobbyTab = isNew && module === 'hobby';
@@ -455,6 +458,13 @@ export function ItemDialog({ state, onClose, onSave, onDelete, onSaveDish, dishe
               </span>
               без дати
             </label>
+          )}
+          {/* 26.11: у страви з календаря «Видалити» — кошиком у заголовку, поруч із «×» */}
+          {dishHeadDelete && (
+            <DeleteButton
+              onDelete={() => onDelete(state.item!.id, occ ? scope : undefined)}
+              confirmLabel={occ ? (scope === 'one' ? 'Видалити лише цю' : scope === 'following' ? 'Видалити цю й наступні' : 'Видалити всі повтори') : undefined}
+            />
           )}
           <button type="button" className="round-btn" aria-label="Закрити" onClick={onClose}>
             <Icon d={ICONS.close} size={12} />
@@ -814,11 +824,15 @@ export function ItemDialog({ state, onClose, onSave, onDelete, onSaveDish, dishe
                 Обрати з бібліотеки
               </button>
             )}
-            <DishFormFields f={dishForm} />
-            <label className="field">
-              <span>дата</span>
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-            </label>
+            {/* 26.11: картка страви в новому стилі; дата — рядок «день» серед полів */}
+            <DishFormFields
+              f={dishForm}
+              rows={
+                <QfRow k="день">
+                  <DateProp value={date} onChange={setDate} label="День" />
+                </QfRow>
+              }
+            />
             {error && (
               <p className="error" role="alert">
                 {error}
@@ -959,6 +973,7 @@ export function ItemDialog({ state, onClose, onSave, onDelete, onSaveDish, dishe
 
         <div className="actions">
           {state.item &&
+            !dishHeadDelete &&
             (confirmDelete ? (
               <button type="button" className="btn danger" onClick={() => onDelete(state.item!.id, occ ? (bdayOn ? 'all' : scope) : undefined)}>
                 Видалити остаточно

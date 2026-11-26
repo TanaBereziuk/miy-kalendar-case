@@ -154,3 +154,62 @@ export function Field({ label, children }: { label: string; children: ReactNode 
     </label>
   );
 }
+
+/**
+ * Рядок з позначкою 18 у стилі форми календаря (25.11): як перелік нагадувань ФОП у швидкому вікні —
+ * позначка, (необовʼязково) плитка модуля 30, назва 14/600 і опис 12 muted; позначений рядок — тло fill радіус 10.
+ */
+export function CheckRow({
+  on,
+  onChange,
+  name,
+  desc,
+  tile,
+  plain,
+  toggle,
+}: {
+  on: boolean;
+  onChange: (v: boolean) => void;
+  name: string;
+  desc?: ReactNode;
+  tile?: keyof typeof ONB_MOD;
+  /** без тла в позначеному стані (заголовок розділу) */
+  plain?: boolean;
+  /** перемикач 51 × 31 праворуч замість позначки (25.11, вечір: модулі, прийоми їжі) */
+  toggle?: boolean;
+}) {
+  if (toggle)
+    return (
+      <label className="qf-list-row onb-check onb-toggle">
+        {tile && <ModTile k={tile} size={30} />}
+        <span className="qf-list-text">
+          <span className="onb-check-name">{name}</span>
+          {desc && <span className="qf-list-sub">{desc}</span>}
+        </span>
+        <Switch on={on} onChange={onChange} label={name} />
+      </label>
+    );
+  return (
+    <label className={'qf-list-row onb-check' + (on ? ' on' : '') + (plain ? ' plain' : '')}>
+      <input type="checkbox" className="radio-input" checked={on} onChange={(e) => onChange(e.target.checked)} />
+      <span className="qf-box qf-box-18" aria-hidden="true">
+        <Icon d={OI.check} size={12} />
+      </span>
+      {tile && <ModTile k={tile} size={30} />}
+      <span className="qf-list-text">
+        <span className="onb-check-name">{name}</span>
+        {desc && <span className="qf-list-sub">{desc}</span>}
+      </span>
+    </label>
+  );
+}
+
+/** Розділ кроку (ліки, щеплення…): угорі рядок з позначкою, позначений — поля «підпис — значення» під ним; між розділами лінія */
+export function OnbSection({ title, sub, on, onToggle, children }: { title: string; sub: string; on: boolean; onToggle: (v: boolean) => void; children: ReactNode }) {
+  return (
+    <section className="onb-sec" aria-label={title}>
+      <CheckRow on={on} onChange={onToggle} name={title} desc={sub} plain />
+      {on && <div className="onb-sec-body">{children}</div>}
+    </section>
+  );
+}

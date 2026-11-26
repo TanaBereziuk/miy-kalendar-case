@@ -2816,3 +2816,245 @@ textarea.qf-title { display: block; height: auto; min-height: 40px; padding: 6px
 .tasks-dialog .lp-top { margin-bottom: 4px; }
 /* 25.11 (пізніше): рядок «нова задача» — над нагадуваннями; від його лінії до нагадувань 12 */
 .tasks > .lp-remind-sec { margin-top: 12px; }
+
+
+/* Асистент (25.11): готові відповіді на уточнення — чипи під питанням */
+.chat-options {
+  margin-top: 8px;
+}
+
+/* 26.11 — модалка страви: «Видалити» — кошиком у заголовку (кругла fill 30, кошик 14, як у короткому перегляді).
+   Перше натискання — капсула 30 «Видалити» danger-text 12/600 на тому самому місці; друге — видаляє. */
+.head-delete { cursor: pointer; }
+.head-delete:hover { background: rgba(118, 118, 128, 0.2); }
+.head-delete svg { fill: currentColor; }
+.head-delete.armed { width: auto; gap: 6px; padding: 0 12px 0 10px; color: #b3261e; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.qf-head .head-delete { margin-left: auto; }
+.qf-head .qf-head-check + .head-delete { margin-left: 0; }
+.qf-head .head-delete + .round-btn { margin-left: -4px; }  /* між кошиком і «×» — 8, як у короткому перегляді */
+/* 26.11 — список покупок з інгредієнтів у Telegram: мала капсула fill 28, 12/600, іконка «надіслати» 12 */
+.tg-share { align-self: flex-start; white-space: nowrap; height: 28px; margin-top: 8px; padding: 0 12px 0 10px; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.tg-share:hover { background: rgba(118, 118, 128, 0.2); }
+.tg-share svg { fill: currentColor; }
+/* 26.11, вечір — «Надіслати список покупок»: капсула зі стрілкою 10 → меню 220 (як меню задачі) під нею:
+   Telegram, Viber, WhatsApp, під лінією «Скопіювати список» */
+.share-wrap { position: relative; align-self: flex-start; }
+.share-wrap .tg-share svg:last-child { color: var(--muted); margin-left: 2px; }
+.share-menu { left: 0; right: auto; top: 40px; }
+
+/* 26.11 — картка страви в новому стилі (без полів-інпутів): назва 20/700 з лінією, поля «підпис — значення» в стилі Notion.
+   Інгредієнти — текст 14/500 через кому, переноситься (наведення — hover, натискання — поле з обводкою 1 ink);
+   «опис» — під текстовою кнопкою «Більше» (ink 12/600, стрілка 10, відкрита — стрілка вгору). */
+.qf-text { height: auto; min-height: 32px; padding: 6px 8px; white-space: normal; text-align: left; line-height: 1.3; width: 100%; font-family: inherit; }
+.qf-text-edit { min-height: 32px; resize: none; overflow: hidden; }
+.dish-title { margin-top: 0; }
+.dish-grid { margin-top: -4px; }
+.dish-grid .share-wrap { margin-left: 8px; }
+.dish-grid .tg-share { margin-top: 4px; }
+.dish-more { margin-top: -8px; }
+.dish-more svg { color: var(--muted); }
+.dish-more[aria-expanded='true'] svg { transform: rotate(180deg); }
+/* у вузькій панелі «страви» (картка 338) колонка підписів — 96 */
+.dish-panel-form .qf-grid { grid-template-columns: 96px minmax(0, 1fr); }
+
+/* 26.11: праве меню — іконки не рухаються при закритті картки. Раніше після анімації картки панель .side
+   звужувалася з 386 до 40 з transition width і несла іконки за собою; тепер ширина змінюється одразу.
+   Анімоване лише наведення — біле коло (background-color 0.15 с) — і виїзд / заїзд самої картки. */
+.side, .side.open { transition: none; }
+
+/* 26.11: круглі кнопки-іконки 30 у вікнах (швидке вікно, бічна панель, короткий перегляд, перелік «що створити»,
+   пошук, міні-календар, картка страви, вікна на телефоні) — без сірої підкладки; наведення — rgba(118,118,128,.08);
+   іконки 16 (були 12–14). Ліва панель і картка правого меню на ноутбуці — як раніше (fill, іконки 12–14).
+   Підтвердження «Видалити» (капсула з текстом) лишається на fill, натиснутий кошик у короткому перегляді — ink. */
+.round-btn:where(:not(.big, .lp *, .side *)) { background: transparent; transition: background-color 0.15s; }
+.round-btn:where(:not(.big, .lp *, .side *)):hover { background: rgba(118, 118, 128, 0.08); }
+.round-btn:where(:not(.big, .lp *, .side *)) svg { width: 16px; height: 16px; }
+.round-btn.head-delete.armed { background: var(--fill); }
+.round-btn.head-delete.armed svg { width: 14px; height: 14px; }
+.round-btn.head-delete.armed:hover { background: rgba(118, 118, 128, 0.2); }
+@media (prefers-reduced-motion: reduce) { .round-btn { transition: none; } }
+/* 26.11 (13:18, правки власниці) — картка страви: перегляд без «Скасувати» / «Зберегти» (олівець 30 у заголовку — редагування).
+   Розділи «опис» і «інгредієнти» (останній): заголовок 12/600 muted угорі (рядок 28; праворуч — «Надіслати покупки»),
+   під ним текст 14/500 ink, інтервал 1.4; опис у перегляді — до 4 рядків, далі «Більше». */
+.dish-body { display: contents; }
+.head-edit { cursor: pointer; }
+.head-edit:hover { background: rgba(118, 118, 128, 0.2); }
+.head-edit svg { fill: currentColor; }
+.dish-sec { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.dish-sec-head { min-height: 28px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.dish-sec-text { margin: 0; font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dish-sec-text.empty { color: var(--muted); font-weight: 400; }
+.dish-sec-text.clamp { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.dish-sec .dish-more { margin-top: 0; height: 28px; }
+.dish-sec .qf-prop { margin: 0 -8px; width: calc(100% + 16px); }
+.dish-sec-edit { min-height: 56px; line-height: 1.4; }
+.dish-sec-head .share-wrap { margin: 0; }
+.dish-sec-head .tg-share { margin-top: 0; }
+.dish-sec-head .share-menu { top: 32px; left: auto; right: 0; }
+.dish-view-title { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.25; color: var(--ink); overflow-wrap: anywhere; }
+.dish-link { max-width: 100%; overflow: hidden; text-overflow: ellipsis; color: var(--ink); text-decoration: underline; text-decoration-color: rgba(60, 60, 67, 0.29); text-underline-offset: 3px; }
+
+/* 26.11: ліва панель «задачі» і картка правого меню — однакової ширини 340 (було 394 і 338).
+   Ліва: картка 340 за 12 від краю, тиждень — margin-left 340. Права: картка 340 + 8 + іконки 40 = 388, тиждень — margin-right 408. */
+.lp { width: 340px; }
+.app.left-open > main, .app.left-open > .notice { margin-left: 340px; }
+.side.open { width: 388px; }
+.side.open .assistant-dock.dialog { width: 340px; }
+.app.side-open > main, .app.side-open > .notice { margin-right: 408px; }
+/* у вужчій панелі день нагадування не ламається посередині — переходить під капсулу цілим */
+.lp-remind .lp-meta { flex-wrap: wrap; row-gap: 2px; }
+.lp-remind .lp-meta > span { white-space: nowrap; }
+
+/* 26.11: кнопки-іконки в заголовку лівої панелі («історія», «‹») і картки правого меню («+», «Дублювати», «назад»,
+   олівець і кошик страви) — теж без сірої підкладки, іконки 16, наведення rgba(118,118,128,.08), як в інших вікнах.
+   Натиснута «історія» лишається з тлом rgba(118,118,128,.24). */
+.round-btn:where(.lp-top *, .side .dialog-head *) { background: transparent; transition: background-color 0.15s; }
+.round-btn:where(.lp-top *, .side .dialog-head *):hover { background: rgba(118, 118, 128, 0.08); }
+.round-btn:where(.lp-top *, .side .dialog-head *) svg { width: 16px; height: 16px; }
+/* ===== 25.11: кроки онбордингу — у стилі форми календаря ===== */
+/* Вибір модулів, прийомів їжі й розділів улюбленця — рядки з позначкою 18, як перелік нагадувань ФОП у швидкому вікні:
+   позначка, (у модулях) плитка 30, назва 14/600, опис 12 muted; позначений рядок — тло fill радіус 10. Перемикачів немає. */
+.onb-list { margin: 0 -8px; }
+.onb-check-name { font-weight: 600; }
+.onb-check .qf-list-sub { line-height: 1.25; }
+.onb-check .mod-tile { flex: none; margin: -6px 0 -6px; }
+.onb-check.plain.on { background: transparent; }
+@media (hover: hover) { .onb-check.plain.on:hover { background: rgba(118, 118, 128, 0.08); } }
+/* Поля «підпис — значення» (підписи 128 зліва 12/600 muted, значення 14/500, рядки 32 через 8) — ті самі .qf-grid / .qf-prop */
+.onb-grid { margin-top: 0; }
+.onb-grid.fop-form { overflow: visible; }
+.onb-chips { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
+.onb-chips .task-new-chip { max-width: 100%; }
+/* ФОП «виплати іншим» — позначки 14 стовпчиком у колонці значень, рядки 32 */
+.qf-v.onb-checks { flex-direction: column; align-items: flex-start; margin-left: 0; }
+.qf-check.onb-check-14 { height: 32px; margin: 0; }
+/* Заняття: плитка-іконка 30 (радіус 8, іконка 16) зі стрілкою 12, назва 20/700 з лінією, «×» 30; між заняттями лінія */
+.onb-act { display: flex; flex-direction: column; gap: 12px; }
+.onb-act + .onb-act { padding-top: 20px; border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.onb-act .act-head { gap: 8px; align-items: flex-end; }
+.onb-act .act-head .round-btn { flex: none; margin-bottom: 6px; }
+.onb-act .icon-dd-btn { height: 40px; gap: 4px; padding-right: 4px; color: var(--muted); }
+.onb-act .icon-dd-tile { width: 30px; height: 30px; border-radius: 8px; color: var(--ink); }
+.onb-act .icon-dd-grid { top: 40px; }
+.qf-title.act-title { flex: 1; min-width: 0; margin-top: 0; }
+/* Розділи улюбленця: над кожним лінія rgba(60,60,67,.12), заголовок — рядок з позначкою (без тла), під ним поля; між ліками — лінія */
+.onb-secs { display: flex; flex-direction: column; }
+.onb-sec { padding: 8px 0; border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.onb-sec:last-child { border-bottom: 1px solid rgba(60, 60, 67, 0.12); }
+.onb-sec > .onb-check { margin: 0 -8px; }
+.onb-sec-body { display: flex; flex-direction: column; gap: 12px; padding: 8px 0 8px; }
+.onb-item + .onb-item { padding-top: 12px; border-top: 1px solid rgba(60, 60, 67, 0.12); }
+.onb-sec-body .text-add svg { fill: currentColor; }
+.onb-often { display: flex; align-items: center; gap: 8px; }
+.onb-often-chip { border: 0; cursor: pointer; }
+.onb-often-chip:hover { background: rgba(118, 118, 128, 0.2); }
+.onb-remove { grid-column: 1 / -1; height: 32px; font-size: 12px; }
+/* 25.11 (вечір): у перших трьох кроках (модулі, харчування, ФОП) — перемикачі 51 × 31 праворуч замість позначок;
+   рядок без тла (наведення — rgba(118,118,128,.08)), вирівняний по центру. ФОП «виплати іншим» — рядки 36: текст 14/500 і перемикач */
+.onb-toggle { align-items: center; padding: 8px; }
+.onb-toggle .mod-tile { margin: 0; }
+.onb-toggle .qf-list-text { flex: 1; }
+.onb-toggle .ios-switch { flex: none; margin-left: 8px; }
+.qf-v.onb-switches { flex-direction: column; align-items: stretch; flex: 1; margin-left: 0; gap: 4px; }
+.onb-switch-row { min-height: 36px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; font-weight: 500; color: var(--ink); cursor: pointer; }
+.qf-k:has(+ .onb-switches) { line-height: 36px; }
+/* 26.11: модулі й прийоми їжі — усі рядки в одному сірому блоці, як «як ви працюєте» у ФОП:
+   тло bg #f5f5f7, радіус 24, від країв блоку до вмісту 24 з усіх боків, між рядками 12;
+   рядки без рамок, тла й власних відступів; плитка, текст і перемикач вирівняні по верху; перемикач вигляд блоку не змінює */
+.onb-list:has(.onb-toggle) { gap: 12px; margin: 0; padding: 24px; background: var(--bg); border-radius: 24px; }
+.onb-toggle { align-items: flex-start; min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.onb-toggle .ios-switch { margin-top: 0; }
+@media (hover: hover) { .onb-toggle:hover { background: transparent; } }
+/* 26.11: онбординг, харчування — поле «додати страву» лінією на всю ширину: без рамки, текст 14/500, висота 40,
+   лінія знизу separator (наведення separator-strong, фокус 1.5 ink), як назва у формі події */
+.qf-title.onb-line { grid-column: 1 / -1; margin-top: 0; height: 40px; min-height: 40px; font-size: 14px; font-weight: 500; letter-spacing: 0; }
+/* 26.11: у полях-лініях онбордингу (страва, назва заняття) фокус — лише лінія знизу 1.5 ink, без рамки з усіх боків
+   (загальне `.onb input:focus` додавало рамку) */
+.onb .qf-title:focus, .onb .qf-title:focus-visible { border: 0; border-bottom: 1px solid var(--ink); box-shadow: 0 0.5px 0 var(--ink); outline: none; }
+/* 26.11: перемикачі в перших трьох кроках онбордингу (модулі, харчування, ФОП «виплати іншим») — на 4 менші:
+   47 × 27 (було 51 × 31), кулька 23 (було 27), відступ кульки 2 */
+.onb-toggle .ios-switch, .onb-switch-row .ios-switch { width: 47px; height: 27px; }
+.onb-toggle .ios-switch span, .onb-switch-row .ios-switch span { width: 23px; height: 23px; }
+.onb-toggle .ios-switch.on span, .onb-switch-row .ios-switch.on span { left: 22px; }
+
+/* 26.11 (13:45) — картка страви: текст під заголовками розділів («опис», «інгредієнти») — Regular 14/400.
+   Інгредієнти — список: рядок на продукт, назва ліворуч (ink), кількість чи вага праворуч (muted), рядки 36,
+   між рядками лінія separator-row. */
+.dish-sec-text { font-weight: 400; }
+.ingr-list { list-style: none; margin: 0; padding: 0; width: 100%; }
+.ingr-list li { min-height: 36px; padding: 8px 0; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 14px; font-weight: 400; line-height: 1.3; color: var(--ink); border-bottom: 1px solid rgba(60, 60, 67, 0.12); box-sizing: border-box; }
+.ingr-list li:last-child { border-bottom: 0; }
+.ingr-name { min-width: 0; overflow-wrap: anywhere; }
+.ingr-amount { flex: none; max-width: 45%; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+.qf-prop.ingr-edit { padding: 0 8px; font-weight: 400; }
+.qf-prop.ingr-edit.empty { min-height: 32px; }
+.dish-sec-edit, .dish-sec .qf-text-edit { font-weight: 400; }
+
+/* 26.11, вечір: ліва панель «задачі» притиснута до лівого краю екрана — left 0, заокруглені лише праві кути 24
+   (як язичок згорнутої панелі). Верх (--side-top) і низ (12) — як були. Тиждень — margin-left 328, щоб від панелі
+   до сітки лишалося ті самі 16. */
+.lp { left: 0; border-radius: 0 24px 24px 0; }
+.app.left-open > main, .app.left-open > .notice { margin-left: 328px; }
+
+/* ===== 26.11: весь період ===== */
+/* Будь-яка подія, крім страви, на весь період «ранок / день / вечір» — картка на всю висоту періоду під іншими
+   подіями (радіус 10, відступ 3 з боків): колір модуля 30 % з білим («інше» — 10 %), угорі по центру назва 12/600
+   (до 2 рядків) і час 11/500 muted. Кліки проходять крізь картку — натискати й тягнути за назву. */
+.period-card {
+  position: absolute; z-index: 0; border-radius: 10px; overflow: hidden; pointer-events: none;
+  background: color-mix(in srgb, var(--pc) var(--pc-pct), #fff);
+}
+.period-card.past { opacity: 0.5; }
+.period-head {
+  pointer-events: auto; position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  width: 100%; padding: 10px 8px 8px; border: 0; background: transparent; color: var(--ink); text-align: center; cursor: pointer;
+}
+.period-head:hover { background: rgba(118, 118, 128, 0.08); }
+.period-title {
+  font-size: 12px; font-weight: 600; line-height: 1.25; overflow-wrap: break-word; hyphens: auto;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.period-sub { font-size: 11px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Страви на весь період (26.11, ніч; ескіз власниці за референсом Oku): стопка фото віялом стирчить зі смуги
+   групи вгору — по центру колонки (у першій колонці тоді не показується підпис часу групи), низ обрізано лінією
+   смуги. Фото горизонтальні, висота 44 (26.11, ніч — правки власниці: менше перекривають рядок над смугою; стопка
+   розтягнута на всю ширину колонки — від країв 20): одне — на всю ширину, два — по 62 % (друге з 38 %), три — по 46 %
+   (з 0 / 27 / 54 %); радіус 6, тінь 0 4 12 (.16), видно 36 (на 10 вище смуги); нахил −2° (одне), −3° / 2.5° (два),
+   −4° / −1° / 3° (три); права поверх лівої. Наведення — фото піднімається на 6 (0.15 с).
+   Без фото — #a3c6a0 на 45 %. Назва страви — вгорі фото (див. нижче) і в підказці при наведенні. */
+.group-cell { position: relative; }
+.period-stack {
+  position: absolute; bottom: 0; left: 20px; right: 20px; z-index: 6; height: 64px;
+  overflow: hidden; pointer-events: none;
+}
+.period-stack.past { opacity: 0.5; }
+.stack-cover {
+  --r: 0deg; --y: 0px;
+  pointer-events: auto; position: absolute; bottom: -8px; width: 100%; height: 44px; padding: 0; border: 0; border-radius: 6px;
+  background-color: color-mix(in srgb, #a3c6a0 45%, #fff); background-size: cover; background-position: center;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.16);
+  display: flex; align-items: flex-start; justify-content: flex-start; color: #fff; cursor: pointer; text-align: left;
+  transform-origin: 50% 100%; transform: translateY(var(--y)) rotate(var(--r)); transition: transform 0.15s;
+}
+.stack-cover svg { fill: currentColor; }
+/* 26.11, ніч (правка власниці): назва страви вгорі фото — 11/600 в один рядок з трикрапкою, відступи 5 / 8;
+   на фото — біла на затемненні зверху (180deg .55 → 0 до 75 %), без фото — ink; улюблена — зірочка 9 */
+.stack-cover.no-photo { color: var(--ink); }
+.stack-title { display: flex; align-items: center; gap: 3px; min-width: 0; max-width: 100%; padding: 5px 8px 0; font-size: 11px; font-weight: 600; line-height: 1.2; }
+.stack-title .ev-fav { flex: none; display: inline-flex; }
+.stack-title-t { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.stack-cover:hover { --y: -6px; }
+.period-stack.n1 .stack-cover { left: 0; --r: -2deg; }
+.period-stack.n2 .stack-cover { width: 62%; }
+.period-stack.n2 .stack-cover:nth-child(1) { left: 0; --r: -3deg; z-index: 1; }
+.period-stack.n2 .stack-cover:nth-child(2) { left: 38%; --r: 2.5deg; z-index: 2; }
+.period-stack.n3 .stack-cover { width: 46%; }
+.period-stack.n3 .stack-cover:nth-child(1) { left: 0; --r: -4deg; z-index: 1; }
+.period-stack.n3 .stack-cover:nth-child(2) { left: 27%; --r: -1deg; z-index: 2; }
+.period-stack.n3 .stack-cover:nth-child(3) { left: 54%; --r: 3deg; z-index: 3; }
+@media (prefers-reduced-motion: reduce) { .stack-cover { transition: none; } }
+/* Куди ляже будь-яка картка (26.11): прямокутник кольору її модуля; «інше» — сірий */
+.drop-zone { background: color-mix(in srgb, var(--zone, #a3c6a0) 28%, transparent); }
+.drop-zone.period { background: color-mix(in srgb, var(--zone, #a3c6a0) 40%, transparent); }
+.drop-zone.neutral, .drop-zone.neutral.period { background: rgba(118, 118, 128, 0.24); }

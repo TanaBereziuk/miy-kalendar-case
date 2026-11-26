@@ -158,9 +158,10 @@ export function seedTables(today = new Date(), empty = false): Record<string, Re
     end: plus60(t),
     source: `dish:${dishByName(name).id}`,
   }));
-  // Страва на весь вечір суботи (фото на всю висоту періоду) і страва в смузі «ранок» пʼятниці
+  // Дві страви на весь вечір суботи (стопка фото на смузі «вечір», 26.11) і страва в смузі «ранок» пʼятниці
   mealItems.push(
     { title: 'Запечена курка', module: 'food', date: day(5), allDay: false, start: '18:00', end: '22:00', source: `dish:${dishByName('Запечена курка').id}#period` },
+    { title: 'Табуле з булгуром', module: 'food', date: day(5), allDay: false, start: '18:00', end: '22:00', source: `dish:${dishByName('Табуле з булгуром').id}#period` },
     { title: 'Вівсянка з ягодами', module: 'food', date: day(4), allDay: false, start: '08:00', end: '09:00', source: `dish:${dishByName('Вівсянка з ягодами').id}#slot` },
   );
 

@@ -30,7 +30,7 @@ import { QuickPicker } from "./components/QuickPicker";
 import { QuickOnboarding } from "./components/QuickOnboarding";
 import { QUICK_TYPE_ORDER, type QuickType } from "./components/QuickAdd";
 import { EventView, type Anchor } from "./components/EventView";
-import { GROUPS, HOUR_PX } from "./lib/layout";
+import { GROUPS, HOUR_PX, periodOf } from "./lib/layout";
 import { ICONS, Icon } from "./components/Icon";
 import { useProfile } from "./lib/profile";
 import { expandForDays } from "./lib/repeat";
@@ -51,7 +51,8 @@ import {
   dishIdOf,
 } from "./food/dishes";
 import { FoodPanel, FoodHeadActions } from "./food/FoodPanel";
-import { DishDialog, DishPanelForm } from "./food/DishDialog";
+import { DishDialog, DishPanelForm, EditButton } from "./food/DishDialog";
+import { DeleteButton } from "./components/DeleteButton";
 import { AssistantPanel } from "./assistant/AssistantPanel";
 import { MonthPicker } from "./components/MonthPicker";
 import { SEARCH_ICON, SearchPanel } from "./components/SearchPanel";
@@ -142,6 +143,9 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
     dish?: Dish;
     then?: (id: string, d: NewDish) => void;
   } | null>(null);
+  // Картка страви (26.11): збережена відкривається переглядом, олівець — редагування; нова — одразу редагування
+  const [dishEdit, setDishEdit] = useState(false);
+  useEffect(() => setDishEdit(!dishDlg?.dish), [dishDlg]);
   // Асистент (16.11, 11:56): на ноутбуці завжди відкритий справа, згортається вправо (стан запамʼятовується);
   // на телефоні відкривається кнопкою біля «+» вікном знизу
   // Бічне меню (16.11, 12:19) — як у Google Календарі: праворуч вузька смуга з іконками «Асистент» і «Страви»;
@@ -559,17 +563,18 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
       next = { ...base, date, allDay: true, start: undefined, end: undefined };
     } else {
       const isDish = !!base.source?.startsWith("dish:");
-      // страва з періоду в годину чи смугу — знову звичайна тривалість
-      const dur = isPeriod(it.source) ? MEAL_MIN : !it.allDay && it.start && it.end ? toMinutes(it.end) - toMinutes(it.start) : it.module === "food" ? MEAL_MIN : 60;
+      // з періоду в годину чи смугу — знову звичайна тривалість (страва — MEAL_MIN, інша подія — 1 год)
+      const dur = isPeriod(it.source) ? MEAL_MIN : periodOf(it) ? 60 : !it.allDay && it.start && it.end ? toMinutes(it.end) - toMinutes(it.start) : it.module === "food" ? MEAL_MIN : 60;
       next = {
         ...base,
         date,
         allDay: false,
         start,
-        end: isDish && slot === "period" ? dishEnd(start, slot) : fromMinutes(Math.min(toMinutes(start) + dur, 24 * 60 - 1)),
+        // 26.11: на весь період можна покласти будь-яку подію — від початку до кінця групи
+        end: slot === "period" ? dishEnd(start, slot) : fromMinutes(Math.min(toMinutes(start) + dur, 24 * 60 - 1)),
         source: isDish ? dishSource(dishIdOf(base.source)!, slot) : base.source,
       };
-      if (!it.allDay && fromDate === date && it.start === start && (it.source === next.source)) return;
+      if (!it.allDay && fromDate === date && it.start === start && it.end === next.end && it.source === next.source) return;
     }
     // справу без дати (етап 1, 18.11) перетягнули з «цього тижня» — вона стає звичайною подією
     if (it.undated) return runTx("Справу поставлено в календар", (tx) => tx.update(it.id, { ...next, undated: false }));
@@ -624,10 +629,22 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
         tx.add({ ...rest, date });
       }
     });
+  // 26.11 (вечір): ШІ впорядкував інгредієнти в перегляді страви — тихо зберегти (без «Скасувати»)
+  const tidyDish = (id: string, ingredients: string) => {
+    const cur = dishes.find((x) => x.id === id);
+    if (cur) updateDish(id, { ...cur, ingredients });
+    setDishDlg((v) => (v?.dish?.id === id ? { ...v, dish: { ...v.dish, ingredients } } : v));
+  };
   const saveDish = (d: NewDish, id?: string) => {
     const then = dishDlg?.then;
-    if (id) updateDish(id, d);
-    else {
+    if (id) {
+      updateDish(id, d);
+      // 26.11: після «Зберегти» картка лишається відкритою — переглядом зі зміненими полями
+      if (dishDlg?.dish) {
+        setDishDlg({ ...dishDlg, dish: { ...dishDlg.dish, ...d } });
+        return;
+      }
+    } else {
       const newId = addDish(d);
       then?.(newId, d);
     }
@@ -653,8 +670,8 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
     { dishes, petNames },
   );
   const visibleDays = new Set(isPhone ? [toISO(day)] : days.map(toISO));
-  const sendToAssistant = (text: string) => {
-    const first = assistant.send(text, {});
+  const sendToAssistant = async (text: string) => {
+    const first = await assistant.send(text, {});
     // додане поза видимим тижнем (днем на телефоні) — показуємо його
     if (first && !visibleDays.has(first)) setDay(fromISO(first));
   };
@@ -1177,6 +1194,7 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
           dish={dishDlg.dish}
           onClose={() => setDishDlg(null)}
           onSave={saveDish}
+                    onTidy={tidyDish}
           onDelete={(id) => {
             removeDish(id);
             setDishDlg(null);
@@ -1232,7 +1250,23 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
               foodTitle={dishDlg?.dish ? "страва" : "нова страва"}
               onBack={dishInPanel ? () => setDishDlg(null) : undefined}
               foodHead={
-                <FoodHeadActions onAdd={() => setDishDlg({})} onDuplicate={copyToNextWeek} weekFoodCount={weekFood.length} />
+                dishInPanel ? (
+                  // 26.11: у картці страви праворуч у заголовку — кошик (лише для збереженої страви)
+                  dishDlg?.dish && (
+                    <div className="food-head-actions">
+                      {!dishEdit && <EditButton onClick={() => setDishEdit(true)} />}
+                      <DeleteButton
+                        key={dishDlg.dish.id}
+                        onDelete={() => {
+                          removeDish(dishDlg.dish!.id);
+                          setDishDlg(null);
+                        }}
+                      />
+                    </div>
+                  )
+                ) : (
+                  <FoodHeadActions onAdd={() => setDishDlg({})} onDuplicate={copyToNextWeek} weekFoodCount={weekFood.length} />
+                )
               }
               food={
                 dishInPanel ? (
@@ -1241,10 +1275,9 @@ function Calendar({ userId, email }: { userId: string; email: string }) {
                     dish={dishDlg?.dish}
                     onBack={() => setDishDlg(null)}
                     onSave={saveDish}
-                    onDelete={(id) => {
-                      removeDish(id);
-                      setDishDlg(null);
-                    }}
+                    onTidy={tidyDish}
+                    editing={dishEdit}
+                    setEditing={setDishEdit}
                   />
                 ) : foodOn ? (
                   <FoodPanel

@@ -73,3 +73,39 @@ export function extractIngredients(text: string): string[] {
   }
   return out;
 }
+
+// Кількість у рядку інгредієнта (26.11): число (1,5 · 1/2 · 2–3) з одиницею або без, «за смаком», «дрібка», «щіпка».
+const AMOUNT =
+  /(\d+(?:[.,/]\d+)?(?:\s*[-–]\s*\d+(?:[.,]\d+)?)?\s*(?:(?:кг|мг|гр|г|мл|л|шт|уп)\.?(?!\p{L})|ст\.?\s*л\.?|ч\.?\s*л\.?|(?:склянк|склян|пучк|пуч|зубчик|зубч|пачк|упаковк|банк|дрібк|щіпк|жмен|гілочк|скибк|лист)\p{L}*)?|(?:за|до)\s+смаку|за\s+смаком|(?:дрібк|щіпк|жмен)\p{L}*)/iu;
+
+/** Запасне правило без ШІ (26.11): одне слово з відомою основою → назва зі словника в називному відмінку
+ *  («сиру» → «сир», «борошна» → «борошно», «солі» → «сіль»); багатослівні назви й двозначні («масла») не чіпаємо */
+export function baseName(name: string): string {
+  const w = name.trim();
+  if (!/^\p{L}+$/u.test(w)) return name;
+  const low = w.toLowerCase();
+  for (const [stem, base] of STEMS) {
+    if (low.startsWith(stem) && low.length - stem.length <= 3 && !base.includes(' ')) return base;
+  }
+  return name;
+}
+
+/** Рядок інгредієнта → назва й кількість: «500 г сиру» → [«сиру», «500 г»], «сіль за смаком» → [«сіль», «за смаком»] */
+export function splitIngredient(line: string): { name: string; amount: string } {
+  // упорядкований формат «назва — кількість» (так зберігає ШІ, 26.11): усе після « — » — кількість чи уточнення
+  const dash = line.match(/^(.*\S)\s+—\s+(\S.*)$/);
+  if (dash) return { name: baseName(dash[1].trim()), amount: dash[2].trim() };
+  // відсотки («вершки 33%») — не кількість: пропускаємо такий збіг і шукаємо далі
+  const all = [...line.matchAll(new RegExp(AMOUNT.source, 'giu'))];
+  const m = all.find((x) => !/^\s*%/.test(line.slice((x.index ?? 0) + x[0].length)) && !/[\d.,]$/.test(line.slice(0, x.index)));
+  if (!m || m.index === undefined) return { name: line.trim(), amount: '' };
+  const amount = m[0].trim().replace(/\s+/g, ' ');
+  const name = (line.slice(0, m.index) + ' ' + line.slice(m.index + m[0].length))
+    .replace(/\s*[—–:-]\s*$/, '')
+    .replace(/^\s*[—–:-]\s*/, '')
+    .replace(/\(\s*\)/g, '')
+    .replace(/\s+/g, ' ')
+    .replace(/^[,;\s]+|[,;\s]+$/g, '')
+    .trim();
+  return name ? { name: baseName(name), amount } : { name: amount, amount: '' };
+}

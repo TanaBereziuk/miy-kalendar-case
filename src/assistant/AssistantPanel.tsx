@@ -61,7 +61,7 @@ export function AssistantPanel({ mode, focusKey = 0, messages, onSend, onUndo, o
   useLayoutEffect(() => {
     const el = panelRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages.length]);
+  }, [messages]);
 
   // поле росте разом з текстом (до 5 рядків)
   useLayoutEffect(() => {
@@ -94,7 +94,8 @@ export function AssistantPanel({ mode, focusKey = 0, messages, onSend, onUndo, o
           <h2 id="asst-title" className="head-font">
             {showFood ? (onBack && foodTitle ? foodTitle : 'страви') : 'що запланувати'}
           </h2>
-          {showFood && !onBack && foodHead}
+          {/* 26.11: у картці страви (onBack) foodHead — кошик «Видалити» */}
+          {showFood && foodHead}
           {/* 16:17: у бічній панелі «×» немає — панель ховає повторний клік по її іконці в меню */}
           {!dock && (
             <button type="button" className="round-btn" aria-label="Закрити" onClick={onClose}>
@@ -141,7 +142,7 @@ export function AssistantPanel({ mode, focusKey = 0, messages, onSend, onUndo, o
             </div>
           )}
 
-          {messages.map((m) =>
+          {messages.map((m, mi) =>
             m.role === 'user' ? (
               <div key={m.id} className="chat-user">
                 {m.text}
@@ -149,6 +150,16 @@ export function AssistantPanel({ mode, focusKey = 0, messages, onSend, onUndo, o
             ) : (
               <div key={m.id} className={'chat-bot' + (m.undone ? ' undone' : '')}>
                 {m.text && <p>{m.text}</p>}
+                {/* готові відповіді на уточнення — лише під останнім повідомленням */}
+                {!!m.options?.length && mi === messages.length - 1 && (
+                  <div className="chips chat-options">
+                    {m.options.map((o) => (
+                      <button type="button" key={o} className="chat-example" onClick={() => onSend(o)}>
+                        {o}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {!!m.shown?.length && (
                   <ul className="chat-items">
                     {m.shown.map((s, i) => {

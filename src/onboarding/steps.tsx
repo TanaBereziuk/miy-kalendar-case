@@ -26,16 +26,17 @@ import { IcalSteps } from "../components/GoogleLayerDialog";
 import { MODULES, type CalendarItem } from "../types";
 import { generateItems } from "./generate";
 import {
-  Field,
+  CheckRow,
   ModStepper,
   ModTile,
   OI,
+  OnbSection,
   ONB_MOD,
-  Segmented,
   StepHead,
   StepNav,
   Switch,
 } from "./ui";
+import { DateProp, DaysProp, PropInput, PropSelect, QfRow, TimeSelect } from "../components/QuickFields";
 
 export interface StepNavProps {
   steps: ModKey[];
@@ -74,25 +75,20 @@ export function ModulesStep({
     <div className="step modules-step">
       <StepHead
         title="що ви хочете планувати?"
-        sub="оберіть модулі, які календар має планувати. вимкнений модуль не показує подій і не надсилає нагадувань."
+        sub="увімкніть модулі, які календар має планувати. вимкнений модуль не показує подій і не надсилає нагадувань."
       />
-      <div className="grouped">
+      {/* 25.11: рядки як перелік у формі календаря — плитка 30, назва 14/600, опис 12 muted, перемикач праворуч */}
+      <div role="group" aria-label="Модулі" className="qf-list onb-list">
         {MOD_KEYS.map((k) => (
-          <div key={k} className="grouped-row tall">
-            <ModTile k={k} />
-            <span className="row-text">
-              <span className="row-name">
-                {ONB_MOD[k].name.charAt(0).toLowerCase() +
-                  ONB_MOD[k].name.slice(1)}
-              </span>
-              <span className="row-desc">{MOD_DESC[k]}</span>
-            </span>
-            <Switch
-              on={value[k]}
-              label={ONB_MOD[k].name}
-              onChange={(v) => onChange({ ...value, [k]: v })}
-            />
-          </div>
+          <CheckRow
+            key={k}
+            tile={k}
+            toggle
+            on={value[k]}
+            onChange={(v) => onChange({ ...value, [k]: v })}
+            name={ONB_MOD[k].name.charAt(0).toLowerCase() + ONB_MOD[k].name.slice(1)}
+            desc={MOD_DESC[k]}
+          />
         ))}
       </div>
       <p className="hint xs">
@@ -138,72 +134,58 @@ export function FoodStep({
         title="які прийоми їжі планувати?"
         sub="кожен прийом має свою групу в сітці тижня — туди ви перетягуватимете страви."
       />
-      <div className="grouped">
+      <div role="group" aria-label="Прийоми їжі" className="qf-list onb-list">
         {meals.map(([k, name, desc]) => (
-          <div key={k} className="grouped-row tall">
-            <span className="row-text">
-              <span className="row-name">{name}</span>
-              <span className="row-desc">{desc}</span>
-            </span>
-            <Switch
-              on={value.meals[k]}
-              label={name}
-              onChange={(v) =>
-                onChange({ ...value, meals: { ...value.meals, [k]: v } })
-              }
-            />
-          </div>
+          <CheckRow
+            key={k}
+            toggle
+            on={value.meals[k]}
+            onChange={(v) => onChange({ ...value, meals: { ...value.meals, [k]: v } })}
+            name={name}
+            desc={desc}
+          />
         ))}
       </div>
-      <section className="stack">
-        <form
-          className="inline-add"
-          onSubmit={(e) => {
-            e.preventDefault();
-            addDish();
-          }}
-        >
-          <input
-            type="text"
-            value={dish}
-            onChange={(e) => setDish(e.target.value)}
-            aria-label="Посилання на рецепт, текст або назва страви"
-            placeholder="додати страву"
-          />
-          <button
-            type="submit"
-            className="round-add"
-            aria-label="Додати страву"
-          >
-            <Icon d={OI.plus} size={18} />
-          </button>
-        </form>
-        <p className="hint xs">
-          можна додавати посилання на instagram, tiktok, youtube або текстову
-          статтю
+      {/* 25.11: страва — поле «підпис — значення», Enter додає; додані — капсули fill 24 з «×» 20 */}
+      <form
+        className="qf-grid onb-grid"
+        onSubmit={(e) => {
+          e.preventDefault();
+          addDish();
+        }}
+      >
+        {/* 26.11: поле — лінія на всю ширину, як назва у формі події (без рамки, лише лінія знизу) */}
+        <input
+          type="text"
+          className="qf-title onb-line"
+          value={dish}
+          onChange={(e) => setDish(e.target.value)}
+          aria-label="Посилання на рецепт, текст або назва страви"
+          placeholder="додати страву — посилання або назва"
+        />
+        <p className="qf-hint">
+          {dish.trim()
+            ? "Enter — додати в бібліотеку"
+            : "можна додавати посилання на instagram, tiktok, youtube або текстову статтю"}
         </p>
         {value.dishes.length > 0 && (
-          <div className="chips-wrap">
+          <div className="onb-chips">
             {value.dishes.map((d, i) => (
-              <span key={i} className="dish-chip">
+              <span key={i} className="task-new-chip">
                 {d}
                 <button
                   type="button"
+                  className="x20"
                   aria-label="Прибрати страву"
-                  onClick={() =>
-                    onChange({
-                      ...value,
-                      dishes: value.dishes.filter((_, j) => j !== i),
-                    })
-                  }
+                  onClick={() => onChange({ ...value, dishes: value.dishes.filter((_, j) => j !== i) })}
                 >
-                  <Icon d={OI.x} size={12} />
+                  <Icon d={OI.x} size={8} />
                 </button>
               </span>
             ))}
           </div>
         )}
-      </section>
+      </form>
       <StepNav
         onBack={nav.onBack}
         onSkip={nav.onSkip}
@@ -303,119 +285,74 @@ export function FopFields({
   const selGroup: 1 | 2 | 3 | "general" = value.how === "general" ? "general" : (grp ?? value.grp);
   const pickGroup = (k: 1 | 2 | 3 | "general") => (k === "general" ? set({ how: "general" }) : set({ how: "manual", grp: k }));
   const payTo = value.payTo;
-  const anyPay = payTo.staff || payTo.contract || payTo.fop;
-  const [payOn, setPayOn] = useState(anyPay);
   const savePay = (next: typeof payTo) =>
     set({ payTo: next, emp: next.staff || next.contract, pay: next.staff || next.contract ? "people" : next.fop ? "fop" : "no" });
   const togglePay = (k: "staff" | "contract" | "fop") => savePay({ ...payTo, [k]: !payTo[k] });
-  // Перемикач «здійснюю виплати іншим»: вимкнення знімає всі позначки
-  const togglePayOn = (v: boolean) => {
-    setPayOn(v);
-    if (!v) savePay({ staff: false, contract: false, fop: false });
-  };
   const remind = `Нагадаємо за ${value.lead}${value.d3 ? " і 3" : ""} дні${value.d0 ? " та в день дедлайну" : ""}.`;
 
   return (
     <>
-      <div className="grouped fop-form">
-        <section className="fop-sec">
-          <h2 className="fop-q">
-            <label htmlFor="fop-grp-select">група ФОП</label>
-          </h2>
-          <select
-            id="fop-grp-select"
-            className="fop-select"
+      {/* 25.11: поля «підпис — значення», як у формі календаря */}
+      <div className="qf-grid onb-grid fop-form">
+        <QfRow k="група ФОП">
+          <PropSelect
+            label="Група ФОП"
             value={String(selGroup)}
-            onChange={(e) => pickGroup(e.target.value === "general" ? "general" : (Number(e.target.value) as 1 | 2 | 3))}
-          >
-            {FOP_GROUPS.map((o) => (
-              <option key={o.k} value={String(o.k)}>
-                {o.l}
-              </option>
-            ))}
-          </select>
-          <p className="hint fop-help">
-            Не знаєте свою групу? Перегляньте в{" "}
-            <a className="text-link" href="https://cabinet.tax.gov.ua" target="_blank" rel="noopener noreferrer">
-              Е-кабінеті
-            </a>
-            .
-          </p>
-          {value.how === "general" && (
-            <p className="hint fop-help">Для загальної системи календар поки не ставить дедлайни сам. Їх можна додати як звичайні повторювані події.</p>
-          )}
-        </section>
+            onChange={(v) => pickGroup(v === "general" ? "general" : (Number(v) as 1 | 2 | 3))}
+            options={FOP_GROUPS.map((o) => [String(o.k), o.l] as [string, string])}
+          />
+        </QfRow>
+        <p className="qf-hint">
+          Не знаєте свою групу? Перегляньте в{" "}
+          <a className="text-link" href="https://cabinet.tax.gov.ua" target="_blank" rel="noopener noreferrer">
+            Е-кабінеті
+          </a>
+          .{value.how === "general" ? " Для загальної системи календар поки не ставить дедлайни сам. Їх можна додати як звичайні повторювані події." : ""}
+        </p>
 
         {grp === 3 && (
-          <section className="fop-sec">
-            <h2 className="fop-q" id="fop-rate">
-              ставка єдиного податку
-            </h2>
-            <Segmented
-              fill
-              label="Ставка єдиного податку"
-              value={value.vat ? 3 : 5}
-              onChange={(v) => set({ vat: v === 3 })}
-              options={[
-                { v: 5, l: "5% без ПДВ" },
-                { v: 3, l: "3% з ПДВ" },
-              ]}
-            />
-            {value.vat && <p className="hint fop-help">Додамо декларацію й сплату ПДВ щомісяця.</p>}
-          </section>
+          <>
+            <QfRow k="ставка">
+              <PropSelect
+                label="Ставка єдиного податку"
+                value={value.vat ? 3 : 5}
+                onChange={(v) => set({ vat: v === 3 })}
+                options={[
+                  [5, "5% без ПДВ"],
+                  [3, "3% з ПДВ"],
+                ]}
+              />
+            </QfRow>
+            {value.vat && <p className="qf-hint">Додамо декларацію й сплату ПДВ щомісяця.</p>}
+          </>
         )}
 
         {grp && (
-          <section className="fop-sec">
-            <h2 className="fop-q" id="fop-esv">
-              сплата ЄСВ за себе
-            </h2>
-            <div role="radiogroup" aria-labelledby="fop-esv" className="plain-radios">
-              {FOP_ESV.map((o) => {
-                const on = value.esv === o.v;
-                return (
-                  <label key={o.v} className="plain-radio">
-                    <input type="radio" name="fop-esv" className="radio-input" checked={on} onChange={() => set({ esv: o.v })} />
-                    <span className={"radio-dot" + (on ? " on" : "")} aria-hidden="true" />
-                    <span>{o.l}</span>
-                  </label>
-                );
-              })}
-            </div>
+          <>
+            <QfRow k="ЄСВ за себе">
+              <PropSelect label="Сплата ЄСВ за себе" value={value.esv} onChange={(esv) => set({ esv })} options={FOP_ESV.map((o) => [o.v, o.l] as [FopAnswers["esv"], string])} />
+            </QfRow>
             {value.esv === "exempt" && (
-              <p className="hint fop-help">Без нагадувань про ЄСВ за себе. Звільнення мають, зокрема, пенсіонери за віком, люди з інвалідністю та мобілізовані.</p>
+              <p className="qf-hint">Без нагадувань про ЄСВ за себе. Звільнення мають, зокрема, пенсіонери за віком, люди з інвалідністю та мобілізовані.</p>
             )}
-            {value.esv === "unknown" && <p className="hint fop-help">Нагадування про ЄСВ залишимо — прибрати їх можна будь-коли.</p>}
-          </section>
+            {value.esv === "unknown" && <p className="qf-hint">Нагадування про ЄСВ залишимо — прибрати їх можна будь-коли.</p>}
+          </>
         )}
 
         {grp && grp !== 1 && (
-          <section className="fop-sec">
-            <div className="fop-switch-row">
-              <span className="fop-q" id="fop-pay">
-                здійснюю виплати іншим
-              </span>
-              <Switch on={payOn} onChange={togglePayOn} label="Здійснюю виплати іншим" />
-            </div>
-            {payOn && (
-              <>
-                <div role="group" aria-labelledby="fop-pay" className="chips-wrap">
-                  {FOP_PAY_TO.map((o) => (
-                    <button
-                      key={o.k}
-                      type="button"
-                      aria-pressed={payTo[o.k]}
-                      className={"choice-chip" + (payTo[o.k] ? " on" : "")}
-                      onClick={() => togglePay(o.k)}
-                    >
-                      {o.l}
-                    </button>
-                  ))}
-                </div>
-                {(payTo.staff || payTo.contract) && <p className="hint fop-help">Додамо податки з кожної виплати й квартальний розрахунок.</p>}
-              </>
-            )}
-          </section>
+          <>
+            <span className="qf-k">виплати іншим</span>
+            {/* перемикач праворуч у кожному рядку; нічого не увімкнено — виплат немає */}
+            <span className="qf-v onb-switches" role="group" aria-label="Здійснюю виплати іншим">
+              {FOP_PAY_TO.map((o) => (
+                <label key={o.k} className="onb-switch-row">
+                  <span>{o.l}</span>
+                  <Switch on={payTo[o.k]} onChange={() => togglePay(o.k)} label={o.l} />
+                </label>
+              ))}
+            </span>
+            {(payTo.staff || payTo.contract) && <p className="qf-hint">Додамо податки з кожної виплати й квартальний розрахунок.</p>}
+          </>
         )}
       </div>
 
@@ -507,6 +444,8 @@ const PRESETS: [string, string][] = [
   ["Читання", "book"],
 ];
 const DOW = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
+const timesWord = (n: number) =>
+  n % 10 === 1 && n % 100 !== 11 ? "раз" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "рази" : "разів";
 
 // Вибір іконки заняття (14.11): плитка 44 + стрілка; по натисканню — набір іконок без підписів (сітка 4 × 2)
 function ActIconPicker({ value, onChange }: { value: string; onChange: (k: string) => void }) {
@@ -529,7 +468,7 @@ function ActIconPicker({ value, onChange }: { value: string; onChange: (k: strin
     <div className="icon-dd" ref={box}>
       <button type="button" className="icon-dd-btn" aria-label="Змінити іконку" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen(!open)}>
         <span className="icon-dd-tile">
-          <Icon d={actIcon(value)} size={24} />
+          <Icon d={actIcon(value)} size={16} />
         </span>
         <Icon d={OI.chevronDown} size={12} className={open ? "flip" : ""} />
       </button>
@@ -609,8 +548,10 @@ export function HobbyStep({
           </button>
         </div>
       )}
+      {/* 25.11: заняття — як форма «заняття» в календарі: плитка-іконка 30 зі стрілкою, назва 20/700 з лінією,
+          поля «підпис — значення»; між заняттями лінія */}
       {value.acts.map((a) => (
-        <section key={a.id} className="soft-card act-card">
+        <section key={a.id} className="onb-act" aria-label={a.name || "Заняття"}>
           <div className="act-head">
             <ActIconPicker value={a.icon} onChange={(icon) => setAct(a.id, { icon })} />
             <input
@@ -619,86 +560,66 @@ export function HobbyStep({
               onChange={(e) => setAct(a.id, { name: e.target.value })}
               aria-label="Назва заняття"
               placeholder="назва заняття"
-              className="act-name"
+              className="qf-title act-title"
               autoFocus={fresh === a.id}
             />
             <button
               type="button"
-              className="round-btn big"
+              className="round-btn"
               aria-label="Прибрати заняття"
               onClick={() => onChange({ acts: value.acts.filter((x) => x.id !== a.id) })}
             >
-              <Icon d={OI.x} size={14} />
+              <Icon d={OI.x} size={12} />
             </button>
           </div>
-          <Segmented
-            label="Розклад"
-            fill
-            value={a.mode}
-            onChange={(mode) => setAct(a.id, { mode })}
-            options={[
-              { v: "fixed", l: "Фіксовані дні й час" },
-              { v: "n", l: "N разів на тиждень" },
-            ]}
-          />
-          {a.mode === "fixed" ? (
-            <>
-              <div className="act-row">
-                <span className="act-label">дні</span>
-                <div className="act-days" role="group" aria-label="Дні тижня">
-                  {DOW.map((d, i) => (
-                    <button
-                      type="button"
-                      key={d}
-                      aria-pressed={!!a.days[i]}
-                      className={"day-pill" + (a.days[i] ? " on" : "")}
-                      onClick={() =>
-                        setAct(a.id, {
-                          days: a.days.map((x, j) => (j === i ? (x ? 0 : 1) : x)),
-                        })
-                      }
-                    >
-                      {d}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <label className="act-row">
-                <span className="act-label">час</span>
-                <input type="time" className="act-time" value={a.time} onChange={(e) => setAct(a.id, { time: e.target.value })} />
-              </label>
-            </>
-          ) : (
-            <div className="act-row">
-              <span className="act-label">разів на тиждень</span>
-              <div className="stepper-pill">
-                <button type="button" aria-label="Менше" onClick={() => setAct(a.id, { n: Math.max(1, a.n - 1) })}>
-                  <Icon d={OI.minus} size={14} />
-                </button>
-                <span className="num">{a.n}</span>
-                <button type="button" aria-label="Більше" onClick={() => setAct(a.id, { n: Math.min(14, a.n + 1) })}>
-                  <Icon d={OI.plus} size={14} />
-                </button>
-              </div>
-            </div>
-          )}
-          <div className="act-row">
-            <span className="act-label">тривалість</span>
-            <Segmented
-              label="Тривалість"
-              value={a.dur}
-              onChange={(dur) => setAct(a.id, { dur })}
-              options={[
-                { v: 30, l: "30 хв" },
-                { v: 45, l: "45 хв" },
-                { v: 60, l: "1 год" },
-                { v: 90, l: "1,5 год" },
-              ]}
-            />
+          <div className="qf-grid onb-grid">
+            <QfRow k="розклад">
+              <PropSelect
+                label="Розклад"
+                value={a.mode}
+                onChange={(mode) => setAct(a.id, { mode })}
+                options={[
+                  ["fixed", "щотижня"],
+                  ["n", "N разів на тиждень"],
+                ]}
+              />
+            </QfRow>
+            {a.mode === "fixed" ? (
+              <>
+                <QfRow k="дні">
+                  <DaysProp value={a.days} onChange={(days) => setAct(a.id, { days })} />
+                </QfRow>
+                <QfRow k="час">
+                  <TimeSelect value={a.time} onChange={(time) => setAct(a.id, { time })} label="Час заняття" />
+                </QfRow>
+              </>
+            ) : (
+              <QfRow k="разів на тиждень">
+                <PropSelect
+                  label="Разів на тиждень"
+                  value={a.n}
+                  onChange={(n) => setAct(a.id, { n })}
+                  options={Array.from({ length: 14 }, (_, i) => [i + 1, `${i + 1} ${timesWord(i + 1)}`] as [number, string])}
+                />
+              </QfRow>
+            )}
+            <QfRow k="тривалість">
+              <PropSelect
+                label="Тривалість"
+                value={a.dur}
+                onChange={(dur) => setAct(a.id, { dur })}
+                options={[
+                  [30, "30 хв"],
+                  [45, "45 хв"],
+                  [60, "1 год"],
+                  [90, "1,5 год"],
+                ]}
+              />
+            </QfRow>
+            {a.mode === "n" && (
+              <p className="qf-hint">У календарі ви зможете самі перетягнути картки на дні, коли плануєте займатися.</p>
+            )}
           </div>
-          {a.mode === "n" && (
-            <p className="hint act-note">У календарі ви зможете самі перетягнути картки на дні, коли плануєте займатися.</p>
-          )}
         </section>
       ))}
       {value.acts.length === 0 && (
@@ -743,32 +664,11 @@ const PROC_OPTS = [
   ["12", "щороку"],
 ];
 
-function Section({
-  title,
-  sub,
-  on,
-  onToggle,
-  children,
-}: {
-  title: string;
-  sub: string;
-  on: boolean;
-  onToggle: (v: boolean) => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="soft-card flush" aria-label={title}>
-      <div className="section-head">
-        <span className="row-text">
-          <span className="row-name">{title}</span>
-          <span className="row-desc">{sub}</span>
-        </span>
-        <Switch on={on} label={title} onChange={onToggle} />
-      </div>
-      {on && <div className="section-body">{children}</div>}
-    </section>
-  );
-}
+const VET_REPEAT: [string, string][] = [
+  ["no", "не повторюється"],
+  ["6", "кожні 6 міс"],
+  ["12", "щороку"],
+];
 
 export function PetStep({
   value,
@@ -795,39 +695,25 @@ export function PetStep({
   ) => upd({ vaccs: { ...pet.vaccs, [k]: { ...pet.vaccs[k], ...p } } });
   const known = pet.kind === "cat" || pet.kind === "dog";
 
-  // Рядок «підпис ліворуч — значення праворуч» (як у картці заняття)
-  const Row = ({ label, children, input }: { label: string; children: React.ReactNode; input?: boolean }) =>
-    input ? (
-      <label className="act-row">
-        <span className="act-label">{label}</span>
-        {children}
-      </label>
-    ) : (
-      <div className="act-row">
-        <span className="act-label">{label}</span>
-        {children}
-      </div>
-    );
-
-  // Щеплення (14.11, 21:26): без вкладеної картки й окремого заголовка — лише дата останнього й інтервал
+  // Щеплення: дата останнього й інтервал
   const vaccRows = (k: keyof Pet["vaccs"], label: string, name: string) => (
-    <div className="pet-group">
-      <Row label={label} input>
-        <input type="date" className="act-time" value={pet.vaccs[k].last} onChange={(e) => updVacc(k, { last: e.target.value })} />
-      </Row>
-      <Row label="інтервал">
-        <Segmented
+    <>
+      <QfRow k={label}>
+        <DateProp value={pet.vaccs[k].last} onChange={(last) => updVacc(k, { last })} placeholder="не вказано" label={`Дата: ${name}`} />
+      </QfRow>
+      <QfRow k="інтервал">
+        <PropSelect
           label={`Інтервал: ${name}`}
           value={pet.vaccs[k].iv}
           onChange={(iv) => updVacc(k, { iv })}
           options={[
-            { v: 6, l: "6 міс" },
-            { v: 12, l: "12 міс" },
-            { v: 36, l: "36 міс" },
+            [6, "6 міс"],
+            [12, "12 міс"],
+            [36, "36 міс"],
           ]}
         />
-      </Row>
-    </div>
+      </QfRow>
+    </>
   );
 
   return (
@@ -836,7 +722,7 @@ export function PetStep({
       <StepHead
         mod="pet"
         title="хто ваш улюбленець?"
-        sub="увімкніть те, про що варто нагадувати. досить дати останньої процедури — наступну календар порахує сам."
+        sub="позначте те, про що варто нагадувати. досить дати останньої процедури — наступну календар порахує сам."
       />
 
       <div className="acts-head">
@@ -866,284 +752,234 @@ export function PetStep({
         </div>
       )}
 
-      <Segmented
-        label="Вид"
-        fill
-        value={pet.kind}
-        onChange={(kind) => upd({ kind })}
-        options={[
-          {
-            v: "cat",
-            l: (
-              <>
-                <Icon d="M4 3l4 4h8l4-4v10l-2 7H6l-2-7z" size={18} />
-                Кіт
-              </>
-            ),
-          },
-          {
-            v: "dog",
-            l: (
-              <>
-                <Icon d="M3 6h5l1 2h6l1-2h5v6l-3 9H6l-3-9z" size={18} />
-                Собака
-              </>
-            ),
-          },
-          {
-            v: "other",
-            l: (
-              <>
-                <Icon d={ONB_MOD.pet.icon} size={18} />
-                Інше
-              </>
-            ),
-          },
-        ]}
-      />
-      <Field label="імʼя">
-        <input type="text" value={pet.name} onChange={(e) => upd({ name: e.target.value })} placeholder="напр. Бусинка" />
-      </Field>
+      {/* 25.11: як форма «улюбленець» у календарі — поля «підпис — значення»; розділи — позначка 18 замість перемикача */}
+      <div className="qf-grid onb-grid">
+        <QfRow k="імʼя">
+          <PropInput value={pet.name} onChange={(name) => upd({ name })} placeholder="наприклад, Бусинка" label="Імʼя" />
+        </QfRow>
+        <QfRow k="вид">
+          <PropSelect
+            label="Вид"
+            value={pet.kind}
+            onChange={(kind) => upd({ kind })}
+            options={[
+              ["cat", "кіт"],
+              ["dog", "собака"],
+              ["other", "інше"],
+            ]}
+          />
+        </QfRow>
+      </div>
 
-      <Section title="ліки" sub="кожен прийом зʼявиться в сітці з нагадуванням" on={pet.medOn} onToggle={(medOn) => upd({ medOn })}>
-        {pet.meds.map((m) => (
-          <div key={m.id} className="med">
-            <input
-              type="text"
-              className="pet-input"
-              aria-label="Назва препарату"
-              value={m.name}
-              onChange={(e) => updMed(m.id, { name: e.target.value })}
-              placeholder="назва препарату"
-            />
-            {!m.name.trim() && (
-              <div className="often">
-                часто додають:
-                <button type="button" className="chip-btn" onClick={() => updMed(m.id, { name: "Антигістамінне" })}>
-                  Антигістамінне
+      <div className="onb-secs">
+        <OnbSection title="ліки" sub="кожен прийом зʼявиться в сітці з нагадуванням" on={pet.medOn} onToggle={(medOn) => upd({ medOn })}>
+          {pet.meds.map((m) => {
+            const nTimes = m.freq === "daily" ? m.perDay : 1;
+            return (
+              <div key={m.id} className="qf-grid onb-grid onb-item">
+                <QfRow k="препарат">
+                  <PropInput value={m.name} onChange={(name) => updMed(m.id, { name })} placeholder="назва препарату" label="Назва препарату" />
+                </QfRow>
+                {!m.name.trim() && (
+                  <p className="qf-hint onb-often">
+                    часто додають:
+                    <button type="button" className="task-new-chip onb-often-chip" onClick={() => updMed(m.id, { name: "Антигістамінне" })}>
+                      Антигістамінне
+                    </button>
+                  </p>
+                )}
+                <QfRow k="доза">
+                  <PropSelect
+                    label="Доза"
+                    value={m.dose}
+                    onChange={(dose) => updMed(m.id, { dose })}
+                    options={[
+                      ["1/4 таблетки", "1/4 таблетки"],
+                      ["1/2 таблетки", "1/2 таблетки"],
+                      ["1 таблетка", "1 таблетка"],
+                    ]}
+                  />
+                </QfRow>
+                <QfRow k="як часто">
+                  <PropSelect
+                    label="Як часто"
+                    value={m.freq}
+                    onChange={(freq) => updMed(m.id, { freq })}
+                    options={[
+                      ["daily", "щодня"],
+                      ["alt", "через день"],
+                      ["week", "раз на тиждень"],
+                    ]}
+                  />
+                </QfRow>
+                {m.freq === "week" && (
+                  <QfRow k="день тижня">
+                    <PropSelect
+                      label="День тижня"
+                      value={m.wday ?? weekdayIndex(fromISO(m.start || toISO(new Date())))}
+                      onChange={(wday) => updMed(m.id, { wday })}
+                      options={DOW.map((d, i) => [i, d.toLowerCase()] as [number, string])}
+                    />
+                  </QfRow>
+                )}
+                {m.freq === "daily" && (
+                  <QfRow k="разів на день">
+                    <PropSelect
+                      label="Разів на день"
+                      value={m.perDay}
+                      onChange={(perDay) => updMed(m.id, { perDay, t: MED_TIMES[perDay].slice() })}
+                      options={[
+                        [1, "1 раз"],
+                        [2, "2 рази"],
+                        [3, "3 рази"],
+                      ]}
+                    />
+                  </QfRow>
+                )}
+                <QfRow k={nTimes === 1 ? "час" : "час прийомів"}>
+                  {Array.from({ length: nTimes }, (_, i) => (
+                    <TimeSelect
+                      key={i}
+                      label={`Прийом ${i + 1}`}
+                      value={m.t[i] ?? ""}
+                      onChange={(v) => {
+                        const t = m.t.slice();
+                        t[i] = v;
+                        updMed(m.id, { t });
+                      }}
+                    />
+                  ))}
+                </QfRow>
+                <QfRow k="з якого дня">
+                  <DateProp value={m.start} onChange={(start) => updMed(m.id, { start })} placeholder="з сьогодні" label="З якого дня" />
+                </QfRow>
+                <QfRow k="тривалість">
+                  <PropSelect
+                    label="Тривалість прийому"
+                    value={m.course}
+                    onChange={(course) => updMed(m.id, { course })}
+                    options={[
+                      ["always", "постійно"],
+                      ["course", "курсом"],
+                    ]}
+                  />
+                </QfRow>
+                {m.course === "course" && (
+                  <QfRow k="днів курсу">
+                    <PropInput value={String(m.days ?? "")} onChange={(v) => updMed(m.id, { days: v.replace(/\D/g, "") })} placeholder="наприклад, 10" label="Днів курсу" width={140} inputMode="numeric" />
+                  </QfRow>
+                )}
+                {pet.meds.length > 1 && (
+                  <button type="button" className="text-danger onb-remove" onClick={() => upd({ meds: pet.meds.filter((q) => q.id !== m.id) })}>
+                    Прибрати ці ліки
+                  </button>
+                )}
+              </div>
+            );
+          })}
+          <button type="button" className="text-add" onClick={() => upd({ meds: [...pet.meds, newMed()] })}>
+            <Icon d={OI.plus} size={12} />
+            Додати ще ліки
+          </button>
+        </OnbSection>
+
+        <OnbSection title="щеплення" sub="нагадаємо записатися за 7 днів до терміну" on={pet.vaccOn} onToggle={(vaccOn) => upd({ vaccOn })}>
+          <div className="qf-grid onb-grid">
+            {known ? (
+              <>
+                {vaccRows("complex", "комплексне", "комплексне щеплення")}
+                {vaccRows("rabies", "від сказу", "щеплення від сказу")}
+              </>
+            ) : (
+              vaccRows("generic", "останнє", "щеплення")
+            )}
+            <p className="qf-hint">Дата — останнього щеплення. Інтервали — стартові, уточніть їх у ветеринара. Щеплення без дати пропустимо.</p>
+          </div>
+        </OnbSection>
+
+        <OnbSection title="ветеринар" sub="нагадаємо за 1 день до візиту" on={pet.vetOn} onToggle={(vetOn) => upd({ vetOn })}>
+          <div className="qf-grid onb-grid">
+            <QfRow k="візит">
+              <PropSelect
+                label="Тип візиту"
+                value={pet.vetMode}
+                onChange={(vetMode) => upd({ vetMode })}
+                options={[
+                  ["planned", "запланований"],
+                  ["regular", "плановий огляд"],
+                ]}
+              />
+            </QfRow>
+            {pet.vetMode === "regular" ? (
+              <>
+                <QfRow k="останній візит">
+                  <DateProp value={pet.vetLast} onChange={(vetLast) => upd({ vetLast })} placeholder="не вказано" label="Останній візит" />
+                </QfRow>
+                <QfRow k="інтервал">
+                  <PropSelect
+                    label="Інтервал візитів"
+                    value={pet.vetIv}
+                    onChange={(vetIv) => upd({ vetIv })}
+                    options={[
+                      [6, "кожні 6 міс"],
+                      [12, "щороку"],
+                    ]}
+                  />
+                </QfRow>
+              </>
+            ) : (
+              <>
+                <QfRow k="день">
+                  <DateProp
+                    value={pet.vetDate}
+                    onChange={(d) => upd({ vetDate: d, vetTime: d ? pet.vetTime || "10:00" : "", vetBook: !!d })}
+                    label="День візиту"
+                  />
+                </QfRow>
+                {pet.vetDate && (
+                  <QfRow k="час">
+                    <TimeSelect value={pet.vetTime} onChange={(vetTime) => upd({ vetTime })} label="Час візиту" empty="без часу" />
+                  </QfRow>
+                )}
+                <QfRow k="повторення">
+                  <PropSelect
+                    label="Повторення"
+                    value={pet.vetReg ? String(pet.vetIv) : "no"}
+                    muted={!pet.vetReg}
+                    onChange={(v) => upd(v === "no" ? { vetReg: false } : { vetReg: true, vetIv: Number(v) as 6 | 12 })}
+                    options={VET_REPEAT}
+                  />
+                </QfRow>
+              </>
+            )}
+          </div>
+        </OnbSection>
+
+        <OnbSection title="інші процедури" sub="напр. обробка від бліх чи дегельмінтизація" on={pet.procOn} onToggle={(procOn) => upd({ procOn })}>
+          {pet.procs.map((p) => (
+            <div key={p.id} className="qf-grid onb-grid onb-item">
+              <QfRow k="процедура">
+                <PropInput value={p.name} onChange={(name) => updProc(p.id, { name })} placeholder="напр. обробка від бліх" label="Назва процедури" />
+              </QfRow>
+              <QfRow k="остання">
+                <DateProp value={p.last} onChange={(last) => updProc(p.id, { last })} placeholder="не вказано" label="Дата останньої процедури" />
+              </QfRow>
+              <QfRow k="інтервал">
+                <PropSelect label="Інтервал" value={p.iv} onChange={(iv) => updProc(p.id, { iv })} options={PROC_OPTS as [string, string][]} />
+              </QfRow>
+              {pet.procs.length > 1 && (
+                <button type="button" className="text-danger onb-remove" onClick={() => upd({ procs: pet.procs.filter((q) => q.id !== p.id) })}>
+                  Прибрати цю процедуру
                 </button>
-              </div>
-            )}
-            <Row label="доза">
-              <Segmented
-                label="Доза"
-                value={m.dose}
-                onChange={(dose) => updMed(m.id, { dose })}
-                options={[
-                  { v: "1/4 таблетки", l: "1/4" },
-                  { v: "1/2 таблетки", l: "1/2" },
-                  { v: "1 таблетка", l: "1 ціла" },
-                ]}
-              />
-            </Row>
-            <Row label="як часто">
-              <Segmented
-                label="Як часто"
-                value={m.freq}
-                onChange={(freq) => updMed(m.id, { freq })}
-                options={[
-                  { v: "daily", l: "щодня" },
-                  { v: "alt", l: "через день" },
-                  { v: "week", l: "раз на тиждень" },
-                ]}
-              />
-            </Row>
-            {m.freq === "week" && (
-              <div className="act-row">
-                <span className="act-label">бажаний день</span>
-                <div className="act-days" role="group" aria-label="Бажаний день">
-                  {DOW.map((d, i) => {
-                    const cur = m.wday ?? weekdayIndex(fromISO(m.start || toISO(new Date())));
-                    return (
-                      <button
-                        type="button"
-                        key={d}
-                        aria-pressed={cur === i}
-                        className={"day-pill" + (cur === i ? " on" : "")}
-                        onClick={() => updMed(m.id, { wday: i })}
-                      >
-                        {d}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-            {m.freq === "daily" && (
-              <Row label="разів на день">
-                <Segmented
-                  label="Разів на день"
-                  value={m.perDay}
-                  onChange={(perDay) => updMed(m.id, { perDay, t: MED_TIMES[perDay].slice() })}
-                  options={[
-                    { v: 1, l: "1" },
-                    { v: 2, l: "2" },
-                    { v: 3, l: "3" },
-                  ]}
-                />
-              </Row>
-            )}
-            {Array.from({ length: m.freq === "daily" ? m.perDay : 1 }, (_, i) => (
-              <Row key={i} label={(m.freq === "daily" ? m.perDay : 1) === 1 ? "час прийому" : `прийом ${i + 1}`} input>
-                <input
-                  type="time"
-                  className="act-time"
-                  value={m.t[i] ?? ""}
-                  onChange={(e) => {
-                    const t = m.t.slice();
-                    t[i] = e.target.value;
-                    updMed(m.id, { t });
-                  }}
-                />
-              </Row>
-            ))}
-            <Row label="з якої дати" input>
-              <input type="date" className="act-time" value={m.start} onChange={(e) => updMed(m.id, { start: e.target.value })} />
-            </Row>
-            <Row label="тривалість">
-              <Segmented
-                label="Тривалість прийому"
-                value={m.course}
-                onChange={(course) => updMed(m.id, { course })}
-                options={[
-                  { v: "always", l: "постійно" },
-                  { v: "course", l: "курсом" },
-                ]}
-              />
-            </Row>
-            {m.course === "course" && (
-              <Row label="днів курсу" input>
-                <input
-                  type="number"
-                  min={1}
-                  className="act-time num"
-                  value={m.days}
-                  onChange={(e) => updMed(m.id, { days: e.target.value })}
-                />
-              </Row>
-            )}
-            {pet.meds.length > 1 && (
-              <button type="button" className="text-danger" onClick={() => upd({ meds: pet.meds.filter((q) => q.id !== m.id) })}>
-                Прибрати ці ліки
-              </button>
-            )}
-          </div>
-        ))}
-        <button type="button" className="text-add" onClick={() => upd({ meds: [...pet.meds, newMed()] })}>
-          <Icon d={OI.plus} size={14} />
-          Додати ще ліки
-        </button>
-      </Section>
-
-      <Section title="щеплення" sub="нагадаємо записатися за 7 днів до терміну" on={pet.vaccOn} onToggle={(vaccOn) => upd({ vaccOn })}>
-        {known ? (
-          <>
-            {vaccRows("complex", "останнє комплексне", "комплексне щеплення")}
-            {vaccRows("rabies", "останнє від сказу", "щеплення від сказу")}
-          </>
-        ) : (
-          vaccRows("generic", "останнє щеплення", "щеплення")
-        )}
-        <p className="hint small">Інтервали — стартові, уточніть їх у ветеринара. Щеплення без дати пропустимо.</p>
-      </Section>
-
-      <Section title="ветеринар" sub="нагадаємо за 1 день до візиту" on={pet.vetOn} onToggle={(vetOn) => upd({ vetOn })}>
-        <Segmented
-          label="Тип візиту"
-          fill
-          value={pet.vetMode}
-          onChange={(vetMode) => upd({ vetMode })}
-          options={[
-            { v: "planned", l: "запланований" },
-            { v: "regular", l: "повторюваний" },
-          ]}
-        />
-        {pet.vetMode === "regular" ? (
-          <>
-            <Row label="останній візит" input>
-              <input type="date" className="act-time" value={pet.vetLast} onChange={(e) => upd({ vetLast: e.target.value })} />
-            </Row>
-            <Row label="інтервал">
-            <Segmented
-              label="Інтервал візитів"
-              value={pet.vetIv}
-              onChange={(vetIv) => upd({ vetIv })}
-              options={[
-                { v: 6, l: "6 міс" },
-                { v: 12, l: "12 міс" },
-              ]}
-            />
-            </Row>
-          </>
-        ) : (
-          <>
-            <Row label="дата і час" input>
-              <input
-                type="datetime-local"
-                className="act-time act-datetime"
-                value={pet.vetDate ? `${pet.vetDate}T${pet.vetTime || "10:00"}` : ""}
-                onChange={(e) => {
-                  const [d, t] = e.target.value.split("T");
-                  upd({ vetDate: d || "", vetTime: d ? t || "" : "", vetBook: !!d });
-                }}
-              />
-            </Row>
-            <div className="act-row">
-              <span className="act-label">повторювати</span>
-              <Switch on={pet.vetReg} label="повторювати" onChange={(vetReg) => upd({ vetReg })} />
+              )}
             </div>
-            {pet.vetReg && (
-              <Row label="інтервал">
-            <Segmented
-              label="Інтервал візитів"
-              value={pet.vetIv}
-              onChange={(vetIv) => upd({ vetIv })}
-              options={[
-                { v: 6, l: "6 міс" },
-                { v: 12, l: "12 міс" },
-              ]}
-            />
-              </Row>
-            )}
-          </>
-        )}
-      </Section>
-
-      <Section title="інші процедури" sub="напр. обробка від бліх чи дегельмінтизація" on={pet.procOn} onToggle={(procOn) => upd({ procOn })}>
-        {pet.procs.map((p) => (
-          <div key={p.id} className="med">
-            <input
-              type="text"
-              className="pet-input"
-              aria-label="Назва процедури"
-              value={p.name}
-              onChange={(e) => updProc(p.id, { name: e.target.value })}
-              placeholder="назва, напр. обробка від бліх"
-            />
-            <Row label="дата останньої" input>
-              <input type="date" className="act-time" value={p.last} onChange={(e) => updProc(p.id, { last: e.target.value })} />
-            </Row>
-            <Row label="інтервал" input>
-              <select className="row-select" value={p.iv} onChange={(e) => updProc(p.id, { iv: e.target.value })}>
-                {PROC_OPTS.map(([v, l]) => (
-                  <option key={v} value={v}>
-                    {l}
-                  </option>
-                ))}
-              </select>
-            </Row>
-            {pet.procs.length > 1 && (
-              <button type="button" className="text-danger" onClick={() => upd({ procs: pet.procs.filter((q) => q.id !== p.id) })}>
-                Прибрати цю процедуру
-              </button>
-            )}
-          </div>
-        ))}
-        <button type="button" className="text-add" onClick={() => upd({ procs: [...pet.procs, newProc()] })}>
-          <Icon d={OI.plus} size={14} />
-          Додати ще процедуру
-        </button>
-      </Section>
+          ))}
+          <button type="button" className="text-add" onClick={() => upd({ procs: [...pet.procs, newProc()] })}>
+            <Icon d={OI.plus} size={12} />
+            Додати ще процедуру
+          </button>
+        </OnbSection>
+      </div>
 
       {pets.length > 1 && (
         <button
@@ -1628,22 +1464,22 @@ export function GoogleStep({
         {asked ? (
           <div className="stack small-gap">
             <IcalSteps />
-            <label className="field">
-              <span className="label-muted">секретна адреса у форматі iCal</span>
-              <input
-                type="url"
-                className="onb-input"
-                value={value}
-                onChange={(e) => {
-                  setValue(e.target.value);
-                  const v = e.target.value.trim();
-                  onUrl(v && validIcalUrl(v) ? v.replace(/^webcal:/i, "https:") : undefined);
-                }}
-                placeholder="https://calendar.google.com/calendar/ical/…/basic.ics"
-                autoComplete="off"
-                spellCheck={false}
-              />
-            </label>
+            {/* 25.11: адреса — поле «підпис — значення», як у формі календаря */}
+            <div className="qf-grid onb-grid">
+              <QfRow k="адреса iCal">
+                <PropInput
+                  value={value}
+                  onChange={(v) => {
+                    setValue(v);
+                    const t = v.trim();
+                    onUrl(t && validIcalUrl(t) ? t.replace(/^webcal:/i, "https:") : undefined);
+                  }}
+                  placeholder="https://calendar.google.com/…/basic.ics"
+                  label="Секретна адреса у форматі iCal"
+                  inputMode="url"
+                />
+              </QfRow>
+            </div>
             <p className={"hint xs" + (bad ? " error-text" : "")}>
               {bad
                 ? "Це не схоже на секретну адресу iCal: вона починається з https://calendar.google.com/calendar/ical/ і закінчується на .ics"

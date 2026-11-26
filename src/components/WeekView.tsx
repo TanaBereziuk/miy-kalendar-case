@@ -2,15 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import { isBirthday } from '../lib/birthday';
 import { BdayNames } from './BdaySticker';
 import { Sticker, StickerPicker } from './Stickers';
-import { MODULES, type CalendarItem } from '../types';
+import { MODULES, type CalendarItem, type ModuleId } from '../types';
 import { MONTHS_GEN, DAYS_SHORT, fromMinutes, sameDay, toISO, toMinutes } from '../lib/dates';
-import { HOUR_PX, eventsWord, groupRange, isNight, isPast, pad2, placeDay, visibleGroups } from '../lib/layout';
+import { HOUR_PX, eventsWord, groupRange, isNight, isPast, pad2, periodOf, placeDay, visibleGroups } from '../lib/layout';
 import { useNow } from '../lib/useNow';
 import { ICONS, Icon } from './Icon';
 import type { PendingAct } from '../App';
 import type { CellSel } from './QuickAdd';
 import { DISH_MIME } from '../food/FoodPanel';
-import { MEAL_MIN, dishIdOf, isPeriod, isSlot, type Dish, type DishPlace } from '../food/dishes';
+import { MEAL_MIN, dishIdOf, isSlot, type Dish, type DishPlace } from '../food/dishes';
 import { isGoogle } from '../lib/google';
 import { ACT_MIME, PendingChips, pendingDrag } from './PendingChips';
 
@@ -21,6 +21,8 @@ let dragGrab = 0;
 /** Страва перетягується з сітки (етап 4, 23.11): тоді видно смугу «весь період» і підсвічено зону; тривалість — для підсвітки години */
 let dragDish = false;
 let dragDur = MEAL_MIN;
+/** Модуль картки, яку тягнуть (26.11): колір прямокутника, куди вона ляже */
+let dragModule: ModuleId = 'food';
 const GROUP_MEAL: Record<string, string> = { morning: '08:00', day: '13:00', evening: '19:00' };
 const dragKind = (e: React.DragEvent) =>
   e.dataTransfer.types.includes(DISH_MIME)
@@ -34,6 +36,12 @@ const dragKind = (e: React.DragEvent) =>
 const isDishDrag = (e: React.DragEvent) => {
   const k = dragKind(e);
   return k === 'dish' || (k === 'item' && dragDish && !pendingDrag.meta);
+};
+/** Тягнуть будь-яку картку з тижня чи страву з бібліотеки (26.11): видно смугу «весь період» і прямокутник, куди ляже.
+ *  Справи з «цього тижня» — ні (у них свій блок-підказка). */
+const isZoneDrag = (e: React.DragEvent) => {
+  const k = dragKind(e);
+  return k === 'dish' || (k === 'item' && !pendingDrag.meta);
 };
 /** Куди ляже страва: година, смуга групи чи весь період */
 type DropKind = 'hour' | 'slot' | 'period';
@@ -203,12 +211,13 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
   const [cellHover, setCellHover] = useState<{ iso: string; h: number } | null>(null);
   // Страва (етап 4, 23.11): поки тягнемо — у кожному періоді смуга «весь період» праворуч, а зона, куди ляже страва, підсвічена
   const [dishDrag, setDishDrag] = useState(false);
-  const [dropAt, setDropAt] = useState<{ iso: string; kind: DropKind; start: string } | null>(null);
+  const [dropAt, setDropAt] = useState<{ iso: string; kind: DropKind; start: string; mod: ModuleId } | null>(null);
   useEffect(() => {
     // після того, як смуга «весь період» встигла прийняти страву (інакше вона зникає раніше за drop)
     const end = () =>
       window.setTimeout(() => {
         dragDish = false;
+        dragModule = 'food';
         setDishDrag(false);
         setDropAt(null);
       }, 0);
@@ -226,10 +235,12 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
       e.preventDefault();
       e.stopPropagation();
       e.dataTransfer.dropEffect = k === 'dish' || k === 'act' ? 'copy' : 'move';
-      if (kind && isDishDrag(e)) {
+      // 26.11: година й весь період — для будь-якої картки; смуга групи — лише для страви
+      if (kind && (kind === 'slot' ? isDishDrag(e) : isZoneDrag(e))) {
         // година й період — точний прямокутник; смуга групи — уся клітинка смуги
         const start = startAt(e);
-        if (!dropAt || dropAt.iso !== iso || dropAt.kind !== kind || dropAt.start !== start) setDropAt({ iso, kind, start });
+        const mod: ModuleId = k === 'dish' ? 'food' : dragModule;
+        if (!dropAt || dropAt.iso !== iso || dropAt.kind !== kind || dropAt.start !== start || dropAt.mod !== mod) setDropAt({ iso, kind, start, mod });
         if (kind !== 'slot') return;
       }
       e.currentTarget.classList.add('drop-on');
@@ -269,7 +280,7 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
   const periodsByDay = new Map<string, CalendarItem[]>();
   const byDay = new Map<string, CalendarItem[]>();
   for (const it of items) {
-    if (!it.allDay && it.start && isPeriod(it.source)) {
+    if (periodOf(it)) {
       const l = periodsByDay.get(it.date) ?? [];
       l.push(it);
       periodsByDay.set(it.date, l);
@@ -285,6 +296,20 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
     list.push(it);
     byDay.set(it.date, list);
   }
+
+  // Страви на весь період (26.11, ніч): показуються стопкою фото на смузі групи, а не в сітці годин
+  const isMeal = (it: CalendarItem) => it.module === 'food' && !!dishIdOf(it.source);
+  const periodItems = (iso: string, gid: string) =>
+    (periodsByDay.get(iso) ?? []).filter((it) => periodOf(it)?.id === gid).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const coverDrag = (e: React.DragEvent, it: CalendarItem) => {
+    e.stopPropagation();
+    dragGrab = 0;
+    dragDish = true;
+    dragModule = it.module;
+    dragDur = MEAL_MIN;
+    e.dataTransfer.setData(ITEM_MIME, it.id);
+    e.dataTransfer.effectAllowed = 'move';
+  };
 
   // День з подією на весь день фарбується в колір її модуля (17.11): світлий відтінок — у CSS (.day-tint)
   const tint = (d: Date): { className: string; style?: React.CSSProperties } => {
@@ -315,7 +340,7 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
     <div
       className={'week' + (dishDrag ? ' dish-dragging' : '')}
       onDragOverCapture={(e) => {
-        if (!dishDrag && isDishDrag(e)) setDishDrag(true);
+        if (!dishDrag && isZoneDrag(e)) setDishDrag(true);
       }}
     >
       <div className="week-row week-head">
@@ -387,6 +412,7 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
                   onDragStart={(e) => {
                     dragGrab = 0;
                     dragDish = false;
+                    dragModule = it.module;
                     e.dataTransfer.setData(ITEM_MIME, it.id);
                     e.dataTransfer.effectAllowed = 'move';
                   }}
@@ -432,7 +458,8 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
                 </button>
               </div>
               {days.map((d, i) => {
-                const slots = [...(slotsByDay.get(toISO(d)) ?? []), ...(open ? [] : periodsByDay.get(toISO(d)) ?? [])]
+                const meals = periodItems(toISO(d), g.id).filter(isMeal);
+                const slots = [...(slotsByDay.get(toISO(d)) ?? []), ...(open ? [] : (periodsByDay.get(toISO(d)) ?? []).filter((it) => !isMeal(it)))]
                   .filter((it) => {
                     const h = Number(it.start!.slice(0, 2));
                     return h >= g.from && h < g.to;
@@ -445,7 +472,40 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
                     style={tint(d).style}
                     {...dropProps(toISO(d), () => GROUP_MEAL[g.id] ?? fromMinutes(g.from * 60), true, false, false, 'slot')}
                   >
-                    {i === 0 && <span className="range-chip">{groupRange(g)}</span>}
+                    {i === 0 && !meals.length && <span className="range-chip">{groupRange(g)}</span>}
+                    {meals.length > 0 && (
+                      // Страви на весь період (26.11, ніч; ескіз власниці): стопка фото віялом стирчить зі смуги групи,
+                      // низ обрізано лінією смуги; натискання на фото відкриває страву, фото можна тягнути
+                      <div className={'period-stack n' + Math.min(3, meals.length) + (meals.every((it) => isPast(it, now)) ? ' past' : '')}>
+                        {meals.slice(0, 3).map((it) => {
+                          const dish = dishById.get(dishIdOf(it.source)!);
+                          const photo = dish?.photoUrl;
+                          return (
+                            <button
+                              type="button"
+                              key={it.id}
+                              className={'stack-cover' + (photo ? '' : ' no-photo')}
+                              // 26.11, ніч: назва страви вгорі фото — біла на затемненні зверху (без фото — ink)
+                              style={photo ? { backgroundImage: `linear-gradient(180deg, rgba(0,0,0,.55) 0, rgba(0,0,0,0) 75%), url("${photo}")` } : undefined}
+                              title={`${it.title} · ${g.name}, ${groupRange(g)}`}
+                              aria-label={`${it.title}, ${g.name}`}
+                              onClick={() => openEv(it)}
+                              draggable
+                              onDragStart={(e) => coverDrag(e, it)}
+                            >
+                              <span className="stack-title">
+                                {dish?.fav && (
+                                  <span className="ev-fav" role="img" aria-label="улюблена">
+                                    <Icon d={MODULES.other.icon} size={9} />
+                                  </span>
+                                )}
+                                <span className="stack-title-t">{it.title}</span>
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                     {i === 1 && !open && count > 0 && (
                       <span className="range-chip muted">
                         {count} {eventsWord(count)}
@@ -464,7 +524,8 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
                           onDragStart={(e) => {
                             dragGrab = 0; // мала картка зі смуги групи: час — за годиною під курсором
                             dragDish = !!look;
-                            dragDur = MEAL_MIN;
+                            dragModule = it.module;
+                            dragDur = look ? MEAL_MIN : 60;
                             e.dataTransfer.setData(ITEM_MIME, it.id);
                             e.dataTransfer.effectAllowed = 'move';
                           }}
@@ -525,46 +586,46 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
                       }}
                     >
                       {(() => {
-                        // Страва на весь період (етап 4, 23.11): фото на всю висоту періоду під іншими подіями, назва вгорі.
-                        // Сама картка не ловить кліків — клітинки під нею працюють як звичайно; натискати й тягнути — за назву.
-                        const list = (periodsByDay.get(iso) ?? []).filter((it) => {
-                          const h = toMinutes(it.start!) / 60;
-                          return h >= g.from && h < g.to;
-                        }).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-                        return list.map((it, k) => {
-                          const look = dishLook(it, dishById, true);
-                          const s0 = toMinutes(it.start!);
-                          const e0 = Math.min(it.end ? toMinutes(it.end) : g.to * 60, g.to * 60);
-                          return (
+                        // Весь період «ранок / день / вечір» (26.11): будь-яка подія, крім страв, — картка кольору модуля
+                        // на всю висоту періоду під іншими подіями; кліки проходять крізь неї — натискати й тягнути за назву.
+                        // Страви на весь період — стопкою фото на смузі групи (див. вище).
+                        const others = periodItems(iso, g.id).filter((it) => !isMeal(it));
+                        if (!others.length) return null;
+                        const lanes = others.length;
+                        const pos = (k: number): React.CSSProperties => ({
+                          top: 1,
+                          height: (g.to - g.from) * HOUR_PX - 2,
+                          left: `calc(${(k / lanes) * 100}% + 3px)`,
+                          width: `calc(${100 / lanes}% - 6px)`,
+                        });
+                        const startDrag = (e: React.DragEvent, it: CalendarItem) => {
+                          e.stopPropagation();
+                          dragGrab = 0;
+                          dragDish = false;
+                          dragModule = it.module;
+                          dragDur = 60;
+                          e.dataTransfer.setData(ITEM_MIME, it.id);
+                          e.dataTransfer.effectAllowed = 'move';
+                        };
+                        const out: React.ReactNode[] = [];
+                        others.forEach((it, k) => {
+                          const m = MODULES[it.module];
+                          out.push(
                             <div
                               key={it.id}
-                              className={'period-dish' + (look?.photo ? ' with-photo' : '') + (isPast(it, now) ? ' past' : '')}
-                              style={{
-                                top: ((s0 - g.from * 60) / 60) * HOUR_PX + 1,
-                                height: ((e0 - s0) / 60) * HOUR_PX - 2,
-                                left: `calc(${(k / list.length) * 100}% + 3px)`,
-                                width: `calc(${100 / list.length}% - 6px)`,
-                                ...(look?.style ?? { background: MODULES.food.color, color: MODULES.food.text }),
-                              }}
+                              className={'period-card period-event' + (isPast(it, now) ? ' past' : '')}
+                              style={{ ...pos(k), ['--pc' as string]: m.color, ['--pc-pct' as string]: it.module === 'other' ? '10%' : '30%' }}
                             >
-                              <button
-                                type="button"
-                                className="period-dish-head"
-                                onClick={() => openEv(it)}
-                                draggable
-                                onDragStart={(e) => {
-                                  dragGrab = 0;
-                                  dragDish = true;
-                                  dragDur = MEAL_MIN;
-                                  e.dataTransfer.setData(ITEM_MIME, it.id);
-                                  e.dataTransfer.effectAllowed = 'move';
-                                }}
-                              >
-                                <DishTitle title={it.title} fav={!!look?.fav} />
+                              <button type="button" className="period-head" onClick={() => openEv(it)} draggable={!isGoogle(it)} onDragStart={(e) => startDrag(e, it)}>
+                                <span className="period-title">{it.title}</span>
+                                <span className="period-sub">
+                                  {it.start}–{it.end}
+                                </span>
                               </button>
-                            </div>
+                            </div>,
                           );
                         });
+                        return out;
                       })()}
                       {placed.map(({ item, top, height, lane, lanes, short }) => {
                         const m = MODULES[item.module];
@@ -588,6 +649,7 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
                               if (resizing.current) return e.preventDefault();
                               dragGrab = e.clientY - e.currentTarget.getBoundingClientRect().top;
                               dragDish = !!look;
+                              dragModule = item.module;
                               dragDur = item.end ? Math.max(15, toMinutes(item.end) - toMinutes(item.start!)) : MEAL_MIN;
                               e.dataTransfer.setData(ITEM_MIME, item.id);
                               e.dataTransfer.effectAllowed = 'move';
@@ -695,8 +757,8 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
                         const e0 = dropAt.kind === 'period' ? g.to * 60 : Math.min(s0 + dragDur, g.to * 60);
                         return (
                           <div
-                            className={'cell-rect drop-zone' + (dropAt.kind === 'period' ? ' period' : '')}
-                            style={{ top: ((s0 - g.from * 60) / 60) * HOUR_PX, height: ((e0 - s0) / 60) * HOUR_PX + 1 }}
+                            className={'cell-rect drop-zone' + (dropAt.kind === 'period' ? ' period' : '') + (dropAt.mod === 'other' ? ' neutral' : '')}
+                            style={{ top: ((s0 - g.from * 60) / 60) * HOUR_PX, height: ((e0 - s0) / 60) * HOUR_PX + 1, ['--zone' as string]: MODULES[dropAt.mod].color }}
                             aria-hidden="true"
                           >
                             <span>{dropAt.kind === 'period' ? `${g.name} · ${groupRange(g)}` : `${dropAt.start}–${fromMinutes(Math.min(s0 + dragDur, 24 * 60 - 1))}`}</span>

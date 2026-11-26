@@ -35,6 +35,25 @@ export function isNight(item: CalendarItem): boolean {
 }
 
 export const pad2 = (n: number) => String(n).padStart(2, '0');
+
+/** Подія на весь період «ранок / день / вечір» (26.11): страва з позначкою `#period` або будь-яка інша подія
+ *  рівно від початку до кінця групи (06:00–12:00, 12:00–18:00, 18:00–22:00). Події Google — ні.
+ *  У тижні лежить карткою на всю висоту періоду під іншими подіями й не займає місця в розкладці. */
+export function periodOf(item: CalendarItem): Group | null {
+  if (item.allDay || !item.start || !item.end || item.source === 'google') return null;
+  const src = item.source ?? '';
+  if (src.startsWith('dish:') && !src.endsWith('#period')) return null;
+  return GROUPS.find((g) => !g.night && item.start === `${pad2(g.from)}:00` && item.end === `${pad2(g.to)}:00`) ?? null;
+}
+
+/** «страва / страви / страв» */
+export function dishesWord(n: number): string {
+  const a = n % 10;
+  const b = n % 100;
+  if (a === 1 && b !== 11) return 'страва';
+  if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return 'страви';
+  return 'страв';
+}
 export const groupRange = (g: Group) => `${pad2(g.from)}:00–${pad2(g.to % 24)}:00`;
 
 export interface Placed {
