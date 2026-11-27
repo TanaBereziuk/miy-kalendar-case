@@ -3058,3 +3058,16 @@ textarea.qf-title { display: block; height: auto; min-height: 40px; padding: 6px
 .drop-zone { background: color-mix(in srgb, var(--zone, #a3c6a0) 28%, transparent); }
 .drop-zone.period { background: color-mix(in srgb, var(--zone, #a3c6a0) 40%, transparent); }
 .drop-zone.neutral, .drop-zone.neutral.period { background: rgba(118, 118, 128, 0.24); }
+
+/* 26.11, ніч (правка власниці): на смузі групи є і стопка фото страв на весь період, і картки страв без точного
+   часу — смуга росте: картки стоять над стопкою, знизу під стопку 40 (видимі 36 фото + 4), тож нічого не перекривається
+   і фото не стирчать у рядок над смугою */
+.group-cell.has-slots.has-stack { padding-bottom: 32px; }
+
+/* 27.11 (правки власниці): заштрихована смуга групи 36 (спершу зменшена до 18, потім удвічі більша); назва групи
+   й підпис часу — 16, по центру; фото страв у стопці виглядають знизу — видно 28 з 44 (низ обрізано лінією смуги),
+   верх фото за 8 нижче верху смуги, тож у рядок над смугою вони більше не заходять */
+.group-head > div { min-height: 36px; }
+.group-toggle { height: 16px; }
+.range-chip { padding: 0 6px; line-height: 16px; }
+.stack-cover { bottom: -16px; }

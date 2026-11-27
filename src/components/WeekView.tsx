@@ -458,17 +458,21 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
                 </button>
               </div>
               {days.map((d, i) => {
-                const meals = periodItems(toISO(d), g.id).filter(isMeal);
-                const slots = [...(slotsByDay.get(toISO(d)) ?? []), ...(open ? [] : (periodsByDay.get(toISO(d)) ?? []).filter((it) => !isMeal(it)))]
-                  .filter((it) => {
-                    const h = Number(it.start!.slice(0, 2));
-                    return h >= g.from && h < g.to;
-                  })
+                const inGroup = (it: CalendarItem) => {
+                  const h = Number(it.start!.slice(0, 2));
+                  return h >= g.from && h < g.to;
+                };
+                // 27.11 (правка власниці): на смузі групи лише страви — і без точного часу (#slot), і на весь період —
+                // однією стопкою фото, що виглядає знизу; окремих карток 22 для страв на смузі більше немає
+                const slotMeals = (slotsByDay.get(toISO(d)) ?? []).filter((it) => isMeal(it) && inGroup(it));
+                const meals = [...periodItems(toISO(d), g.id).filter(isMeal), ...slotMeals].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+                const slots = [...(slotsByDay.get(toISO(d)) ?? []).filter((it) => !isMeal(it)), ...(open ? [] : (periodsByDay.get(toISO(d)) ?? []).filter((it) => !isMeal(it)))]
+                  .filter(inGroup)
                   .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
                 return (
                   <div
                     key={toISO(d)}
-                    className={'group-cell hatch' + (sameDay(d, now) ? ' today' : '') + (slots.length ? ' has-slots' : '') + tint(d).className + (dropAt?.kind === 'slot' && dropAt.iso === toISO(d) && dropAt.start === (GROUP_MEAL[g.id] ?? fromMinutes(g.from * 60)) ? ' drop-zone-head' : '')}
+                    className={'group-cell hatch' + (sameDay(d, now) ? ' today' : '') + (slots.length ? ' has-slots' : '') + (meals.length ? ' has-stack' : '') + tint(d).className + (dropAt?.kind === 'slot' && dropAt.iso === toISO(d) && dropAt.start === (GROUP_MEAL[g.id] ?? fromMinutes(g.from * 60)) ? ' drop-zone-head' : '')}
                     style={tint(d).style}
                     {...dropProps(toISO(d), () => GROUP_MEAL[g.id] ?? fromMinutes(g.from * 60), true, false, false, 'slot')}
                   >
@@ -487,7 +491,7 @@ export function WeekView({ days, items: rawItems, pending, onPlan, undated, onOp
                               className={'stack-cover' + (photo ? '' : ' no-photo')}
                               // 26.11, ніч: назва страви вгорі фото — біла на затемненні зверху (без фото — ink)
                               style={photo ? { backgroundImage: `linear-gradient(180deg, rgba(0,0,0,.55) 0, rgba(0,0,0,0) 75%), url("${photo}")` } : undefined}
-                              title={`${it.title} · ${g.name}, ${groupRange(g)}`}
+                              title={`${it.title} · ${g.name}, ${isSlot(it.source) ? 'без точного часу' : groupRange(g)}`}
                               aria-label={`${it.title}, ${g.name}`}
                               onClick={() => openEv(it)}
                               draggable
