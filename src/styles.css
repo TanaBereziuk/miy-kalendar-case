@@ -3071,3 +3071,8 @@ textarea.qf-title { display: block; height: auto; min-height: 40px; padding: 6px
 .group-toggle { height: 16px; }
 .range-chip { padding: 0 6px; line-height: 16px; }
 .stack-cover { bottom: -16px; }
+
+/* 27.11 (правка власниці): фото страв у стопці висунуто за межі заштрихованої смуги — висота 56, низ обрізано лінією
+   смуги (видно 48), над смугою 36 фото виступають на 12, поверх рядка над нею (z-index 6) */
+.stack-cover { height: 56px; bottom: -8px; }
+.period-stack { height: 72px; }
